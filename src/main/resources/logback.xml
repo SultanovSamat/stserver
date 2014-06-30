@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="6 seconds" debug="false">
+    <property name="appName" value="kkutil"/>
+    <contextName>${appName}</contextName>
+    
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">   
+        <encoder>  
+        <pattern>%d{yyyy-mm-dd HH:mm:ss} [%thread] %level %logger{38} - %msg%n</pattern>   
+        </encoder>   
+    </appender>
+    <appender name="simple_stdout" class="ch.qos.logback.core.ConsoleAppender">   
+        <encoder>  
+        <pattern>%d{yyyy-mm-dd HH:mm:ss.SSS} %msg%n</pattern>   
+        </encoder>   
+    </appender>    
+    <appender name="recvData" class="ch.qos.logback.core.FileAppender">
+        <file>log/recv/data</file>
+        <append>true</append>
+        <prudent>false</prudent>
+        <encoder>
+            <pattern>%d{yy-mm-dd HH:mm:ss.SSS} %msg%n</pattern>   
+        </encoder>
+    </appender>
+    <appender name="sendData" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>log/send/data.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>log/send/data%d{yyyyMMddHHmmss}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <append>true</append>
+        <prudent>false</prudent>
+        <encoder>
+            <pattern>%d{yy-mm-dd HH:mm:ss.SSS} %msg%n</pattern>   
+        </encoder>
+    </appender>
+    <root level="warn">
+        <appender-ref ref="stdout" />
+    </root>
+    <logger name="recv" level="error" additivity="false">
+        <appender-ref ref="recvData" />
+        <appender-ref ref="stdout" />
+    </logger>
+    <logger name="send" level="info" additivity="false">
+        <appender-ref ref="sendData" />
+        <appender-ref ref="stdout" />
+    </logger>
+</configuration>
