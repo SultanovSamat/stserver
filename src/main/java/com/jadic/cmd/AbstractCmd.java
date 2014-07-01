@@ -3,18 +3,32 @@ package com.jadic.cmd;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 
+import com.jadic.utils.Const;
+
 /**
  * @author Jadic
  * @created 2014-5-26
  */
 public abstract class AbstractCmd implements ICmd {
-
-    private int cmdSNo;
-
-    private int cmdHeadSize;
-    private int cmdEndSize;
-
+	
+	private byte headFlag;		//头标识
+	
+	private short cmdFlagId;	//命令ID
+	private byte clientType;	//终端类型
+	private int terminalId;		//终端ID
+	private short cmdBodyLen;	//消息体长度
+    private short cmdSNo;		//消息流水号
+    
+    //....						  消息体
+    
+    //....						  校验位
+    
+    private byte endFlag;		//尾标识
+    
     private static int currCmdMaxSNo = 0;
+    
+    public AbstractCmd() {
+    }
 
     @Override
     public int getCmdSize() {
@@ -24,7 +38,12 @@ public abstract class AbstractCmd implements ICmd {
     @Override
     public boolean disposeData(ChannelBuffer channelBuffer) {
         if (channelBuffer != null && channelBuffer.readableBytes() >= this.getCmdSize()) {
-            // dispose cmd head
+            this.headFlag = channelBuffer.readByte();
+            this.cmdFlagId = channelBuffer.readShort();
+            this.clientType = channelBuffer.readByte();
+            this.terminalId = channelBuffer.readInt();
+            this.cmdBodyLen = channelBuffer.readShort();
+            this.cmdSNo = channelBuffer.readShort();
             disposeCmdBody(channelBuffer);
 
             return true;
@@ -41,34 +60,35 @@ public abstract class AbstractCmd implements ICmd {
     }
 
     private void setCmdCommonField() {
+    	this.headFlag = Const.CMD_HEAD_FLAG;
         this.cmdSNo = getNextCmdSNo();
+        this.cmdBodyLen = (short)this.getCmdBodySize();
+        this.endFlag = Const.CMD_END_FLAG;
     }
 
     private boolean fillChannelBuffer(ChannelBuffer channelBuffer) {
         if (channelBuffer.writableBytes() >= this.getCmdSize()) {
             // write common fields
+        	channelBuffer.writeByte(this.headFlag);
+        	channelBuffer.writeShort(this.cmdFlagId);
+        	channelBuffer.writeByte(this.clientType);
+        	channelBuffer.writeInt(this.terminalId);
             channelBuffer.writeInt(this.cmdSNo);
 
             fillCmdBody(channelBuffer);
 
-            // write cmd end
+            //CRC check sum
+            channelBuffer.writeByte(this.endFlag);
             return true;
         }
         return false;
     }
 
     protected int getCmdHeadEndSize() {
-        return this.cmdHeadSize + this.cmdEndSize;
+        return 14;//1 + 2 + 1 + 4 + 2 + 2 + 1 + 1
     }
 
-    private static int getNextCmdSNo() {
-        if (currCmdMaxSNo <= Integer.MAX_VALUE) {
-            return currCmdMaxSNo++;
-        } else {
-            currCmdMaxSNo = 0;
-            return 0;
-        }
-    }
+    protected abstract short getNextCmdSNo() ;
 
     protected abstract int getCmdBodySize();
 
