@@ -15,7 +15,7 @@ public abstract class AbstractCmd implements ICmd {
 	
 	private short cmdFlagId;	//命令ID
 	private byte clientType;	//终端类型
-	private int terminalId;		//终端ID
+	private int terminalId;    //终端ID
 	private short cmdBodyLen;	//消息体长度
     private short cmdSNo;		//消息流水号
     
@@ -24,8 +24,6 @@ public abstract class AbstractCmd implements ICmd {
     //....						  校验位
     
     private byte endFlag;		//尾标识
-    
-    private static int currCmdMaxSNo = 0;
     
     public AbstractCmd() {
     }
@@ -73,6 +71,7 @@ public abstract class AbstractCmd implements ICmd {
         	channelBuffer.writeShort(this.cmdFlagId);
         	channelBuffer.writeByte(this.clientType);
         	channelBuffer.writeInt(this.terminalId);
+        	channelBuffer.writeShort(this.cmdBodyLen);
             channelBuffer.writeInt(this.cmdSNo);
 
             fillCmdBody(channelBuffer);
@@ -95,5 +94,41 @@ public abstract class AbstractCmd implements ICmd {
     protected abstract void disposeCmdBody(ChannelBuffer channelBuffer);
 
     protected abstract void fillCmdBody(ChannelBuffer channelBuffer);
+
+    public short getCmdFlagId() {
+        return cmdFlagId;
+    }
+
+    public void setCmdFlagId(short cmdFlagId) {
+        this.cmdFlagId = cmdFlagId;
+    }
+
+    public byte getClientType() {
+        return clientType;
+    }
+
+    public void setClientType(byte clientType) {
+        this.clientType = clientType;
+    }
+
+    public int getTerminalId() {
+        return terminalId;
+    }
+
+    public void setTerminalId(int terminalId) {
+        this.terminalId = terminalId;
+    }
+
+    public short getCmdSNo() {
+        return cmdSNo;
+    }
+
+    public void setCmdSNo(short cmdSNo) {
+        this.cmdSNo = cmdSNo;
+    }
+
+    public short getCmdBodyLen() {
+        return cmdBodyLen;
+    }
 
 }

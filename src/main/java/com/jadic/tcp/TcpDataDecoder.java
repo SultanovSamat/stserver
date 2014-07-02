@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.jadic.utils.KKTool;
 
+
 public class TcpDataDecoder extends FrameDecoder {
 	
     private final static Logger log = LoggerFactory.getLogger("recvData");
@@ -23,7 +24,7 @@ public class TcpDataDecoder extends FrameDecoder {
 		Object message = e.getMessage();
 		if (message instanceof ChannelBuffer) {
 			ChannelBuffer buffer = (ChannelBuffer)message;
-			log.info("[{}] {}",buffer.readableBytes(), KKTool.channelBufferToHexStr(buffer));
+			log.info("[{}] {}",buffer.readableBytes(), KKTool.channelBufferReadableBytesToHexStr(buffer));
 		}
 		
 		super.messageReceived(ctx, e);
