@@ -44,6 +44,12 @@ public class KKTool {
     final static short SHORT_5A02 = 0x5A02;
     final static short SHORT_5E01 = 0x5E01;
     final static short SHORT_5E02 = 0x5E02;
+    
+    final static byte BYTE_7E = 0x7E;
+    final static byte BYTE_7D = 0x7D;
+    final static short SHORT_7D02 = 0x7D02;
+    final static short SHORT_7D01 = 0x7D01;
+    
 
     /* 数据的大小端标识 */
     public static final byte BIT_BIGENDIAN = 0;
@@ -1815,29 +1821,23 @@ public class KKTool {
     public static ChannelBuffer getEscapedBuffer(ChannelBuffer channelBuffer) {
         if (channelBuffer != null) {
             ChannelBuffer retBuffer = ChannelBuffers.buffer(channelBuffer.readableBytes() * 2);
-            retBuffer.writeByte(BYTE_5B);
+            retBuffer.writeByte(BYTE_7E);
             byte b = 0;
             for (int i = channelBuffer.readerIndex() + 1; i < channelBuffer.writerIndex() - 1; i++) {
                 b = channelBuffer.getByte(i);
                 switch (b) {
-                case BYTE_5B:
-                    retBuffer.writeShort(SHORT_5A01);
+                case BYTE_7E:
+                    retBuffer.writeShort(SHORT_7D02);
                     break;
-                case BYTE_5A:
-                    retBuffer.writeShort(SHORT_5A02);
-                    break;
-                case BYTE_5D:
-                    retBuffer.writeShort(SHORT_5E01);
-                    break;
-                case BYTE_5E:
-                    retBuffer.writeShort(SHORT_5E02);
+                case BYTE_7D:
+                    retBuffer.writeShort(SHORT_7D01);
                     break;
                 default:
                     retBuffer.writeByte(b);
                     break;
                 }
             }
-            retBuffer.writeByte(BYTE_5D);
+            retBuffer.writeByte(BYTE_7E);
 
             return retBuffer;
         }
@@ -1859,28 +1859,17 @@ public class KKTool {
             byte b1 = 0;
             byte b2 = 0;
 
-            retBuffer.writeByte(BYTE_5B);
+            retBuffer.writeByte(BYTE_7E);
             // 去掉头尾标识
             for (int i = channelBuffer.readerIndex() + 1; i < channelBuffer.writerIndex() - 1; i++) {
                 b1 = channelBuffer.getByte(i);
-                if (b1 == BYTE_5A) {
+                if (b1 == BYTE_7D) {
                     b2 = channelBuffer.getByte(i + 1);
-                    if (b2 == BYTE_01) {
-                        retBuffer.writeByte(BYTE_5B);
+                    if (b2 == BYTE_02) {
+                        retBuffer.writeByte(BYTE_7E);
                         i++;
-                    } else if (b2 == BYTE_02) {
-                        retBuffer.writeByte(BYTE_5A);
-                        i++;
-                    } else {
-                        retBuffer.writeByte(b1);
-                    }
-                } else if (b1 == BYTE_5E) {
-                    b2 = channelBuffer.getByte(i + 1);
-                    if (b2 == BYTE_01) {
-                        retBuffer.writeByte(BYTE_5D);
-                        i++;
-                    } else if (b2 == BYTE_02) {
-                        retBuffer.writeByte(BYTE_5E);
+                    } else if (b2 == BYTE_01) {
+                        retBuffer.writeByte(BYTE_7D);
                         i++;
                     } else {
                         retBuffer.writeByte(b1);
@@ -1889,7 +1878,7 @@ public class KKTool {
                     retBuffer.writeByte(b1);
                 }
             }
-            retBuffer.writeByte(BYTE_5D);
+            retBuffer.writeByte(BYTE_7E);
 
             return retBuffer;
         }
