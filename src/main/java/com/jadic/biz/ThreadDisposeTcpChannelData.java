@@ -1,9 +1,17 @@
 package com.jadic.biz;
 
+import java.nio.Buffer;
+
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jadic.cmd.req.CmdHeartbeatReq;
+import com.jadic.cmd.req.CmdLoginReq;
+import com.jadic.cmd.req.CmdModuleStatusReq;
+import com.jadic.cmd.req.CmdTYRetReq;
+import com.jadic.cmd.rsp.CmdLoginRsp;
+import com.jadic.cmd.rsp.CmdTYRetRsp;
 import com.jadic.tcp.server.TcpChannel;
 import com.jadic.utils.Const;
 import com.jadic.utils.KKTool;
@@ -57,32 +65,64 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 			return;
 		}
 
-		short cmdFlag = buffer.getShort(buffer.readerIndex() + 9);
+		short cmdFlag = buffer.getShort(buffer.readerIndex() + 1);
 		switch (cmdFlag) {
-//		case Const.UP_CONNECT_REQ: // 主链路登录请求消息 主链路
-//			dealCmdUpConnectReq(buffer);
-//			break;
-//		case Const.UP_DISCONNECE_REQ: // 主链路注销请求消息 主链路
-//			dealCmdUpDisconnectReq(buffer);
-//			break;
-//		case Const.UP_LINKETEST_REQ: // 主链路连接保持请求消息 主链路
-//			dealCmdUpLinkTestReq(buffer);
-//			break;
-//		case Const.UP_EXG_MSG: // 主链路动态信息交换消息 主链路
-//		case Const.UP_PLAFORM_MSG: // 主链路平台间信息交互消息 主链路
-//		case Const.UP_WARN_MSG: // 主链路报警信息交互消息 主链路
-//		case Const.UP_CTRL_MSG: // 主链路车辆监管消息 主链路
-//		case Const.UP_BASE_MSG: // 主链路静态信息交换消息 主链路
-//			short subBizCmdFlag = buffer.getShort(buffer.readerIndex() + 9 + 2 + 4 + 3 + 1 + 4 + 22);
-//			if (cmdFlag == Const.DOWN_PLATFORM_MSG) {
-//				subBizCmdFlag = buffer.getShort(buffer.readerIndex() + 9 + 2 + 4 + 3 + 1 + 4);
-//			}
-//			dispose809SubBizData(subBizCmdFlag, buffer);
-//			break;
+		case Const.TER_TY_RET:
+		    dealCmdTYRet(buffer);
+		    break;
+		case Const.TER_HEARTBEAT:
+		    dealCmdHeartbeat(buffer);
+		    break;
+		case Const.TER_LOGIN:
+		    dealCmdLogin(buffer);
+		    break;
+		case Const.TER_MODULE_STATUS:
+		    dealCmdModuleStatus(buffer);
+		    break;
 		default:
 			log.warn("Unknown command flag:{}", KKTool.byteArrayToHexStr(KKTool.short2BytesBigEndian(cmdFlag)));
 			break;
 		}
 	}
+	
+	private void dealCmdTYRet(ChannelBuffer buffer) {
+	    CmdTYRetReq cmdReq = new CmdTYRetReq();
+	    if (cmdReq.disposeData(buffer)) {
+	        
+	    }
+	}
 
+	private void dealCmdHeartbeat(ChannelBuffer buffer) {
+	    CmdHeartbeatReq cmdReq = new CmdHeartbeatReq();
+	    if (cmdReq.disposeData(buffer)) {
+	        CmdTYRetRsp cmdRsp = new CmdTYRetRsp();
+	        cmdRsp.setCmdCommonField(cmdReq);
+	        cmdRsp.setCmdFlagIdRsp(cmdReq.getCmdFlagId());
+	        cmdRsp.setCmdSNoRsp(cmdReq.getCmdSNo());
+	        this.sendData(cmdRsp.getSendBuffer());
+	    }
+	}
+	
+	private void dealCmdLogin(ChannelBuffer buffer) {
+	    CmdLoginReq cmdReq = new CmdLoginReq();
+	    if (cmdReq.disposeData(buffer)) {
+	        CmdLoginRsp cmdRsp = new CmdLoginRsp();
+	        cmdRsp.setCmdCommonField(cmdReq);
+	        cmdRsp.setCmdSNoRsp(cmdReq.getCmdSNo());
+	    }
+	}
+	
+	private void dealCmdModuleStatus(ChannelBuffer buffer) {
+	    CmdModuleStatusReq cmdReq = new CmdModuleStatusReq();
+	    if (cmdReq.disposeData(buffer)) {
+	        CmdTYRetRsp cmdRsp = new CmdTYRetRsp();
+	        cmdRsp.setCmdCommonField(cmdReq);
+	        
+	        this.sendData(cmdRsp.getSendBuffer());
+	    }
+	}
+	
+	private void sendData(ChannelBuffer buffer) {
+	    this.tcpChannel.sendData(buffer);
+	}
 }

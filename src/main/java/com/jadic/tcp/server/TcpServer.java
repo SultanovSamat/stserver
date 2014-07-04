@@ -52,7 +52,10 @@ public class TcpServer implements ITcpChannelDisposer {
         bootstrap.setPipelineFactory(new ChannelPipelineFactory(){
             @Override
             public ChannelPipeline getPipeline() throws Exception {
-                return Channels.pipeline(new TcpDataDecoder());
+                ChannelPipeline pipeline = Channels.pipeline();
+                pipeline.addLast("tcpDecoder", new TcpDataDecoder());
+                pipeline.addLast("tcpServerHandler", new TcpServerHandler(TcpServer.this));
+                return pipeline;
             }
         });
         bootstrap.setOption("child.tcpNoDelay", true);
@@ -61,9 +64,9 @@ public class TcpServer implements ITcpChannelDisposer {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (future.isSuccess()) {
-                    log.info("sub link server started, listening on Port:{}", localPort);      
+                    log.info("tcp server started, listening on Port:{}", localPort);      
                 } else {
-                    log.info("sub link server bind port[{}] failed", localPort);
+                    log.info("tcp server bind port[{}] failed", localPort);
                 }
             }
         });

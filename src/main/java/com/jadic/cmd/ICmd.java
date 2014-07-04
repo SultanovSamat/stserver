@@ -9,7 +9,7 @@ public interface ICmd {
 
     public int getCmdSize();
 
-    public boolean disposeData(ChannelBuffer channelBuffer);
+    public boolean disposeData(ChannelBuffer buffer);
 
     public ChannelBuffer getSendBuffer();
 

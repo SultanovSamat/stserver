@@ -2,16 +2,23 @@ package com.jadic.cmd.rsp;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.jadic.utils.Const;
+
 /**
  * @author 	Jadic
  * @created 2014-7-2
  */
-public class CmdRetRsp extends AbstractCmdRsp {
+public class CmdTYRetRsp extends AbstractCmdRsp {
     
-    private short cmdSNORsp;
+    private short cmdSNoRsp;
     private short cmdFlagIdRsp;
     private byte ret;
 
+    public CmdTYRetRsp() {
+        this.setCmdFlagId(Const.SER_TY_RET);
+        this.setRet(Const.TY_RET_OK);
+    }
+    
     @Override
     protected int getCmdBodySize() {
         return 5;
@@ -19,17 +26,17 @@ public class CmdRetRsp extends AbstractCmdRsp {
     
     @Override
     protected void fillCmdBody(ChannelBuffer channelBuffer) {
-        channelBuffer.writeShort(cmdSNORsp);
+        channelBuffer.writeShort(cmdSNoRsp);
         channelBuffer.writeShort(cmdFlagIdRsp);
         channelBuffer.writeByte(ret);
     }
 
-    public short getCmdSNORsp() {
-        return cmdSNORsp;
+    public short getCmdSNoRsp() {
+        return cmdSNoRsp;
     }
 
-    public void setCmdSNORsp(short cmdSNORsp) {
-        this.cmdSNORsp = cmdSNORsp;
+    public void setCmdSNoRsp(short cmdSNoRsp) {
+        this.cmdSNoRsp = cmdSNoRsp;
     }
 
     public short getCmdFlagIdRsp() {

@@ -34,15 +34,15 @@ public abstract class AbstractCmd implements ICmd {
     }
 
     @Override
-    public boolean disposeData(ChannelBuffer channelBuffer) {
-        if (channelBuffer != null && channelBuffer.readableBytes() >= this.getCmdSize()) {
-            this.headFlag = channelBuffer.readByte();
-            this.cmdFlagId = channelBuffer.readShort();
-            this.clientType = channelBuffer.readByte();
-            this.terminalId = channelBuffer.readInt();
-            this.cmdBodyLen = channelBuffer.readShort();
-            this.cmdSNo = channelBuffer.readShort();
-            disposeCmdBody(channelBuffer);
+    public boolean disposeData(ChannelBuffer buffer) {
+        if (buffer != null && buffer.readableBytes() >= this.getCmdSize()) {
+            this.headFlag = buffer.readByte();
+            this.cmdFlagId = buffer.readShort();
+            this.clientType = buffer.readByte();
+            this.terminalId = buffer.readInt();
+            this.cmdBodyLen = buffer.readShort();
+            this.cmdSNo = buffer.readShort();
+            disposeCmdBody(buffer);
 
             return true;
         }
@@ -99,7 +99,7 @@ public abstract class AbstractCmd implements ICmd {
         return cmdFlagId;
     }
 
-    public void setCmdFlagId(short cmdFlagId) {
+    protected void setCmdFlagId(short cmdFlagId) {
         this.cmdFlagId = cmdFlagId;
     }
 
@@ -107,7 +107,7 @@ public abstract class AbstractCmd implements ICmd {
         return clientType;
     }
 
-    public void setClientType(byte clientType) {
+    protected void setClientType(byte clientType) {
         this.clientType = clientType;
     }
 
@@ -115,16 +115,12 @@ public abstract class AbstractCmd implements ICmd {
         return terminalId;
     }
 
-    public void setTerminalId(int terminalId) {
+    protected void setTerminalId(int terminalId) {
         this.terminalId = terminalId;
     }
 
     public short getCmdSNo() {
         return cmdSNo;
-    }
-
-    public void setCmdSNo(short cmdSNo) {
-        this.cmdSNo = cmdSNo;
     }
 
     public short getCmdBodyLen() {

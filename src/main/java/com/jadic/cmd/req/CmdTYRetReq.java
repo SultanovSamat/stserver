@@ -7,7 +7,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
  * @author 	Jadic
  * @created 2014-7-2
  */
-public class CmdRetReq extends AbstractCmdReq {
+public class CmdTYRetReq extends AbstractCmdReq {
     
     private short cmdSNORsp;
     private short cmdFlagIdRsp;

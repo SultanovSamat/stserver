@@ -3,6 +3,7 @@ package com.jadic.cmd.rsp;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 import com.jadic.cmd.AbstractCmd;
+import com.jadic.cmd.req.AbstractCmdReq;
 
 /**
  * @author 	Jadic
@@ -23,5 +24,11 @@ public abstract class AbstractCmdRsp extends AbstractCmd {
     @Override
     protected void disposeCmdBody(ChannelBuffer channelBuffer) {
     }
+    
+    public void setCmdCommonField(AbstractCmdReq cmdReq) {
+        this.setClientType(cmdReq.getClientType());
+        this.setTerminalId(cmdReq.getTerminalId());
+    }
 
+    
 }

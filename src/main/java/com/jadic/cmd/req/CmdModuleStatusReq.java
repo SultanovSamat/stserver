@@ -4,10 +4,10 @@ import org.jboss.netty.buffer.ChannelBuffer;
 
 /**
  * @author 	Jadic
- * @created 2014-7-2
+ * @created 2014-7-4
  */
-public class CmdHeartbeatReq extends AbstractCmdReq {
-    
+public class CmdModuleStatusReq extends AbstractCmdReq {
+
     @Override
     protected void disposeCmdBody(ChannelBuffer channelBuffer) {
     }

@@ -1,30 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="6 seconds" debug="false">
-    <property name="appName" value="kkutil"/>
-    <contextName>${appName}</contextName>
-    
-    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">   
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender"> 
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>info</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
         <encoder>  
-        <pattern>%d{yyyy-mm-dd HH:mm:ss} [%thread] %level %logger{38} - %msg%n</pattern>   
+            <pattern>%d{yy-MM-dd HH:mm:ss} %msg [%thread-%logger{38}]%n</pattern>   
         </encoder>   
     </appender>
-    <appender name="simple_stdout" class="ch.qos.logback.core.ConsoleAppender">   
+    <appender name="debug" class="ch.qos.logback.core.rolling.RollingFileAppender"> 
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>DEBUG</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>log/debug/data.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>log/debug/data%d{yyyyMMdd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <append>true</append>
+        <prudent>false</prudent>
         <encoder>  
-        <pattern>%d{yyyy-mm-dd HH:mm:ss.SSS} %msg%n</pattern>   
+            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} %msg [%thread-%logger{38}]%n</pattern>   
         </encoder>   
-    </appender>    
-    <appender name="recvData" class="ch.qos.logback.core.FileAppender">
-        <file>log/recv/data</file>
+    </appender>
+    <appender name="info" class="ch.qos.logback.core.rolling.RollingFileAppender"> 
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>log/info/data.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>log/info/data%d{yyyyMMdd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <append>true</append>
+        <prudent>false</prudent>
+        <encoder>  
+            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} %msg [%thread-%logger{38}]%n</pattern>   
+        </encoder>   
+    </appender>
+    <appender name="warn" class="ch.qos.logback.core.rolling.RollingFileAppender"> 
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>    
+        <file>log/warn/data.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>log/warn/data%d{yyyyMMdd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <append>true</append>
+        <prudent>false</prudent>
+        <encoder>  
+            <pattern>%d{yy-MM-dd HH:mm:ss} %msg [%thread-%logger{38}]%n</pattern>   
+        </encoder>   
+    </appender>
+    <appender name="error" class="ch.qos.logback.core.rolling.RollingFileAppender"> 
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>log/error/data.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>log/error/data%d{yyyyMMdd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <append>true</append>
+        <prudent>false</prudent>        
+        <encoder>  
+            <pattern>%d{yy-MM-dd HH:mm:ss} %msg [%thread-%logger{38}]%n</pattern>   
+        </encoder>   
+    </appender>
+    <appender name="recvData" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>log/recv/data.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>log/recv/data%d{yyyyMMddHH}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
         <append>true</append>
         <prudent>false</prudent>
         <encoder>
-            <pattern>%d{yy-mm-dd HH:mm:ss.SSS} %msg%n</pattern>   
+            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} %msg%n</pattern>   
         </encoder>
     </appender>
+    <appender name="recvDataAsync" class="ch.qos.logback.classic.AsyncAppender">
+	    <appender-ref ref="recvData" />
+	    <discardingThreshold>0</discardingThreshold>
+	</appender>
     <appender name="sendData" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>log/send/data.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>log/send/data%d{yyyyMMddHHmmss}.log</fileNamePattern>
+            <fileNamePattern>log/send/data%d{yyyyMMddHH}.log</fileNamePattern>
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <append>true</append>
@@ -33,15 +106,22 @@
             <pattern>%d{yy-mm-dd HH:mm:ss.SSS} %msg%n</pattern>   
         </encoder>
     </appender>
-    <root level="warn">
+    <appender name="sendDataAsync" class="ch.qos.logback.classic.AsyncAppender">
+	    <appender-ref ref="sendData" />
+	    <discardingThreshold>0</discardingThreshold>
+	</appender>
+	    
+    <root level="debug">
         <appender-ref ref="stdout" />
+        <appender-ref ref="debug" />
+        <appender-ref ref="info" />
+        <appender-ref ref="warn" />
+        <appender-ref ref="error" />
     </root>
-    <logger name="recv" level="error" additivity="false">
-        <appender-ref ref="recvData" />
-        <appender-ref ref="stdout" />
+    <logger name="recvData" level="info" additivity="false">
+        <appender-ref ref="recvDataAsync" />
     </logger>
-    <logger name="send" level="info" additivity="false">
-        <appender-ref ref="sendData" />
-        <appender-ref ref="stdout" />
+    <logger name="sendData" level="info" additivity="false">
+        <appender-ref ref="sendDataAsync" />
     </logger>
 </configuration>
