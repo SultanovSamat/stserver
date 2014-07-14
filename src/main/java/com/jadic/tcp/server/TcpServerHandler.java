@@ -44,11 +44,13 @@ public class TcpServerHandler extends SimpleChannelHandler {
 	@Override
 	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
 		TcpChannel tcpChannel = this.tcpServer.addTcpChannel(ctx.getChannel());
-		log.info("a tcp client [{}] connected to SuperiorTcpServer, total:{}", tcpChannel, tcpServer.getClientsCount());
+		log.info("a tcp client [{}] connected to tcp server, total:{}", tcpChannel, tcpServer.getClientsCount());
 	}
 
 	@Override
 	public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
+		TcpChannel tcpChannel = this.tcpServer.getTcpChannel(ctx.getChannel().getId());
+		log.info("a tcp client [{}] disconnected from tcp server, total:{}", tcpChannel != null ? tcpChannel : ctx.getChannel().getRemoteAddress(), tcpServer.getClientsCount());
 		this.tcpServer.removeTcpChannel(ctx.getChannel().getId());
 	}
 

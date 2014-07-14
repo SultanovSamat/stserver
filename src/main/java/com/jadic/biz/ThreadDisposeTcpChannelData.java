@@ -1,7 +1,5 @@
 package com.jadic.biz;
 
-import java.nio.Buffer;
-
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
