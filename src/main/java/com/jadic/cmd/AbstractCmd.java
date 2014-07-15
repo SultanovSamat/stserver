@@ -72,11 +72,12 @@ public abstract class AbstractCmd implements ICmd {
         	channelBuffer.writeByte(this.clientType);
         	channelBuffer.writeInt(this.terminalId);
         	channelBuffer.writeShort(this.cmdBodyLen);
-            channelBuffer.writeInt(this.cmdSNo);
+            channelBuffer.writeShort(this.cmdSNo);
 
             fillCmdBody(channelBuffer);
 
             //CRC check sum
+            channelBuffer.writeByte(getCRCCheckSum(channelBuffer));
             channelBuffer.writeByte(this.endFlag);
             return true;
         }
@@ -85,6 +86,10 @@ public abstract class AbstractCmd implements ICmd {
 
     protected int getCmdHeadEndSize() {
         return 14;//1 + 2 + 1 + 4 + 2 + 2 + 1 + 1
+    }
+    
+    private byte getCRCCheckSum(ChannelBuffer buffer) {
+        return 0;
     }
 
     protected abstract short getNextCmdSNo() ;
