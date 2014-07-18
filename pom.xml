@@ -11,8 +11,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <cxf.version>2.2.3</cxf.version>
   </properties>
-
   <dependencies>
     <dependency>
 	  <groupId>io.netty</groupId>
@@ -61,6 +61,24 @@
       <version>1.9.5</version>
       <scope>test</scope>
 	</dependency>
+	
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-frontend-jaxws</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-rt-transports-http</artifactId>
+        <version>${cxf.version}</version>
+    </dependency>	
+    
+	<dependency>
+	    <groupId>mysql</groupId>
+	    <artifactId>mysql-connector-java</artifactId>
+	    <version>5.1.31</version>
+	</dependency>
+    
   </dependencies>
   
   <build>

@@ -10,9 +10,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.jadic.utils.JDBCConfig;
 import com.jolbox.bonecp.BoneCP;
 import com.jolbox.bonecp.BoneCPConfig;
-import com.jadic.utils.JDBCConfig;
 
 public class DBConnPools {
 

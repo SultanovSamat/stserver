@@ -86,13 +86,14 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	private void dealCmdTYRet(ChannelBuffer buffer) {
 	    CmdTYRetReq cmdReq = new CmdTYRetReq();
 	    if (cmdReq.disposeData(buffer)) {
-	        
+	        log.info("recv tcp channel[{}] ty ret", tcpChannel);
 	    }
 	}
 
 	private void dealCmdHeartbeat(ChannelBuffer buffer) {
 	    CmdHeartbeatReq cmdReq = new CmdHeartbeatReq();
 	    if (cmdReq.disposeData(buffer)) {
+	        log.info("recv tcp channel[{}] heartbeat", tcpChannel);
 	        CmdTYRetRsp cmdRsp = new CmdTYRetRsp();
 	        cmdRsp.setCmdCommonField(cmdReq);
 	        cmdRsp.setCmdFlagIdRsp(cmdReq.getCmdFlagId());
@@ -104,6 +105,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	private void dealCmdLogin(ChannelBuffer buffer) {
 	    CmdLoginReq cmdReq = new CmdLoginReq();
 	    if (cmdReq.disposeData(buffer)) {
+	        log.info("tcp channel[{}] login", tcpChannel);
 	        CmdLoginRsp cmdRsp = new CmdLoginRsp();
 	        cmdRsp.setCmdCommonField(cmdReq);
 	        cmdRsp.setCmdSNoRsp(cmdReq.getCmdSNo());
@@ -113,6 +115,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	private void dealCmdModuleStatus(ChannelBuffer buffer) {
 	    CmdModuleStatusReq cmdReq = new CmdModuleStatusReq();
 	    if (cmdReq.disposeData(buffer)) {
+	        log.info("recv tcp channel[{}] module status", tcpChannel);
 	        CmdTYRetRsp cmdRsp = new CmdTYRetRsp();
 	        cmdRsp.setCmdCommonField(cmdReq);
 	        

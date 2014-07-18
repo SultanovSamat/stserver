@@ -1,12 +1,17 @@
 package com.jadic.kkutil;
 
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.List;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.mockito.Mockito.*;
+import com.jadic.db.DBOper;
 /**
  * Unit test for simple App.
  */
@@ -27,7 +32,12 @@ public class AppTest {
         logger.error("{}",mock.size());
     }
     
+    @Test
     public void testA() {
-        LoggerFactory.getLogger(this.getClass().getName()).error("testA");        
+        DBOper.getDBOper().test();    
     }
+    
+    public void testWS() {
+    }
+    
 }
