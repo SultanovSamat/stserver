@@ -19,4 +19,9 @@ public class CmdLoginReq extends AbstractCmdReq {
         return identity;
     }
 
+	@Override
+	protected int getCmdBodySize() {
+		return 4;
+	}
+
 }

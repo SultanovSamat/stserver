@@ -19,9 +19,9 @@ public abstract class AbstractCmdReq extends AbstractCmd {
         return 0;
     }
 
-    @Override
-    protected int getCmdBodySize() {
-        return 0;
-    }
+//    @Override
+//    protected int getCmdBodySize() {
+//        return 0;
+//    }
 
 }

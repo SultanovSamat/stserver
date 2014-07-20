@@ -12,4 +12,9 @@ public class CmdHeartbeatReq extends AbstractCmdReq {
     protected void disposeCmdBody(ChannelBuffer channelBuffer) {
     }
 
+	@Override
+	protected int getCmdBodySize() {
+		return 0;
+	}
+
 }
