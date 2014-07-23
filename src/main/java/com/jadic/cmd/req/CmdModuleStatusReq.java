@@ -38,4 +38,9 @@ public class CmdModuleStatusReq extends AbstractCmdReq {
         return msList;
     }
 
+	@Override
+	protected int getCmdBodySize() {
+		return 1;
+	}
+
 }

@@ -50,5 +50,9 @@ public final class DBOper extends DefaultDBImpl {
             KKTool.closeRS_Statement_ConnInSilence(resultSet, statement, connection);
         }
     }
+    
+    public static void main(String[] strings) {
+    	DBOper.getDBOper().test();
+    }
 
 }

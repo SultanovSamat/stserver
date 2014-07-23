@@ -32,4 +32,9 @@ public class CmdTYRetReq extends AbstractCmdReq {
         return ret;
     }
 
+	@Override
+	protected int getCmdBodySize() {
+		return 5;
+	}
+
 }
