@@ -91,6 +91,16 @@ public abstract class AbstractCmd implements ICmd {
     private byte getCRCCheckSum(ChannelBuffer buffer) {
         return 0;
     }
+    
+    /**
+     * 判断字节数组长度是否一致
+     * @param buf1
+     * @param buf2
+     * @return true if both buf1 and buf2 are not null, and length of buf1 equals length of buf2
+     */
+    public boolean isByteArraySameSize(byte[] buf1, byte[] buf2) {
+        return buf1 != null && buf2 != null && buf1.length == buf2.length;
+    }
 
     protected abstract short getNextCmdSNo() ;
 

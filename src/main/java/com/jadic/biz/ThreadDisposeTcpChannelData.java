@@ -4,15 +4,18 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jadic.cmd.req.CmdGetMac2Req;
 import com.jadic.cmd.req.CmdHeartbeatReq;
 import com.jadic.cmd.req.CmdLoginReq;
 import com.jadic.cmd.req.CmdModuleStatusReq;
 import com.jadic.cmd.req.CmdTYRetReq;
+import com.jadic.cmd.rsp.CmdGetMac2Rsp;
 import com.jadic.cmd.rsp.CmdLoginRsp;
 import com.jadic.cmd.rsp.CmdTYRetRsp;
 import com.jadic.tcp.server.TcpChannel;
 import com.jadic.utils.Const;
 import com.jadic.utils.KKTool;
+import com.jadic.ws.WSUtil;
 
 /**
  * @author Jadic
@@ -23,7 +26,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     private final static Logger log = LoggerFactory.getLogger(ThreadDisposeTcpChannelData.class);
 	private TcpChannel tcpChannel;
 
-	final static int MAX_DISPOSE_COUNT = 200000;// 线程处理每个通道一次最多连续处理次数
+	final static int MAX_DISPOSE_COUNT = 20;// 线程处理每个通道一次最多连续处理次数
 
 	public ThreadDisposeTcpChannelData(TcpChannel tcpChannel) {
 		this.tcpChannel = tcpChannel;
@@ -77,6 +80,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 		case Const.TER_MODULE_STATUS:
 		    dealCmdModuleStatus(buffer);
 		    break;
+		case Const.TER_GET_MAC2:
+		    dealCmdGetMac2(buffer);
+		    break;
 		default:
 			log.warn("Unknown command flag:{}", KKTool.byteArrayToHexStr(KKTool.short2BytesBigEndian(cmdFlag)));
 			break;
@@ -123,7 +129,22 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	    }
 	}
 	
+	private void dealCmdGetMac2(ChannelBuffer buffer) {
+	    CmdGetMac2Req cmdReq = new CmdGetMac2Req();
+	    if (cmdReq.disposeData(buffer)) {
+	        log.info("recv get mac2[{}]", tcpChannel);
+	        CmdGetMac2Rsp cmdRsp = new CmdGetMac2Rsp();
+	        cmdRsp.setCmdCommonField(cmdReq);
+	        String sMac2 = WSUtil.getWsUtil().getMac2(cmdReq);
+	        byte[] mac2 = KKTool.strToHexBytes(sMac2, 4, 'F');
+	        cmdRsp.setMac2(mac2);
+	        sendData(cmdRsp.getSendBuffer());
+	    }
+	}
+	
 	private void sendData(ChannelBuffer buffer) {
-	    this.tcpChannel.sendData(KKTool.getEscapedBuffer(buffer));
+	    if (this.tcpChannel != null && !this.tcpChannel.isClosed()) {
+	        this.tcpChannel.sendData(KKTool.getEscapedBuffer(buffer));
+	    }
 	}
 }

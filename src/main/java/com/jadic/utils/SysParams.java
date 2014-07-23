@@ -27,6 +27,9 @@ public class SysParams {
     private String jdbcUrl;
     private String dbUserName;
     private String dbUserPass;
+    
+    private String cityCardWSIp;
+    private int cityCardWSPort;
 
     private List<JDBCConfig> jdbcList;
 
@@ -56,6 +59,9 @@ public class SysParams {
                 this.jdbcList.add(jdbcConfig);
             }
         }
+        
+        this.cityCardWSIp = kkConfig.getStrValue("cityCardWSIp");
+        this.cityCardWSPort = kkConfig.getIntValue("cityCardWSPort");
     }
 
     /**
@@ -128,6 +134,14 @@ public class SysParams {
 
     public int getLocalTcpPort() {
         return localTcpPort;
+    }
+
+    public String getCityCardWSIp() {
+        return cityCardWSIp;
+    }
+
+    public int getCityCardWSPort() {
+        return cityCardWSPort;
     }
 
 }

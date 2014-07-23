@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.jadic</groupId>
-  <artifactId>kkutil</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <artifactId>stserver</artifactId>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
 
-  <name>kkutil</name>
+  <name>stserver</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -77,6 +77,16 @@
 	    <groupId>mysql</groupId>
 	    <artifactId>mysql-connector-java</artifactId>
 	    <version>5.1.31</version>
+	</dependency>
+	<dependency>
+	    <groupId>dom4j</groupId>
+	    <artifactId>dom4j</artifactId>
+	    <version>1.6.1</version>
+	</dependency>
+	<dependency>
+	    <groupId>jaxen</groupId>
+	    <artifactId>jaxen</artifactId>
+	    <version>1.1.6</version>
 	</dependency>
     
   </dependencies>

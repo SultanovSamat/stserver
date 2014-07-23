@@ -16,9 +16,9 @@ for /f "delims=" %%c   in ('dir  /b/a-d/s  %LIBS%\*.jar')  do (
 set PUB_LIB=%cp%
 ::echo %PUB_LIB%
 
-set MAIN_CLASS=com.jadic.kkutil.KKTool
+set MAIN_CLASS=com.jadic.ws.WSUtil
 
 ::project class path
-set "CLASSPATH=%CLASSPATH%;%rootdir%\conf;%PUB_LIB%"
+set "CLASSPATH=%CLASSPATH%;%rootdir%\resources;%PUB_LIB%"
 ::echo %CLASSPATH%
 java -server -Dlog.dir=%logdir% %MAIN_CLASS% 

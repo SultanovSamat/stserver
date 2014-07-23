@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="CenterProcess"
+ targetNamespace="http://10.0.4.116:9900/CenterProcess.wsdl"
+ xmlns:tns="http://10.0.4.116:9900/CenterProcess.wsdl"
+ xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+ xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ xmlns:ns="urn:CenterProcess"
+ xmlns:SOAP="http://schemas.xmlsoap.org/wsdl/soap/"
+ xmlns:MIME="http://schemas.xmlsoap.org/wsdl/mime/"
+ xmlns:DIME="http://schemas.xmlsoap.org/ws/2002/04/dime/wsdl/"
+ xmlns:WSDL="http://schemas.xmlsoap.org/wsdl/"
+ xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+<types>
+
+ <schema targetNamespace="urn:CenterProcess"
+  xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="urn:CenterProcess"
+  xmlns="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="unqualified"
+  attributeFormDefault="unqualified">
+  <import namespace="http://schemas.xmlsoap.org/soap/encoding/" schemaLocation="http://schemas.xmlsoap.org/soap/encoding/"/>
+  <complexType name="Response">
+   <sequence>
+     <element name="HOMEDOMAIN" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <element name="TRANSIDH" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <element name="RESPCODE" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+     <element name="RESPDESC" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+   </sequence>
+  </complexType>
+ </schema>
+
+</types>
+
+<message name="callbackRequest">
+ <part name="input" type="xsd:string"/>
+</message>
+
+<message name="callbackResponse">
+ <part name="output" type="xsd:string"/>
+</message>
+
+<portType name="CenterProcessPortType">
+ <operation name="callback">
+  <documentation>Service definition of function ns__callback</documentation>
+  <input message="tns:callbackRequest"/>
+  <output message="tns:callbackResponse"/>
+ </operation>
+</portType>
+
+<binding name="CenterProcess" type="tns:CenterProcessPortType">
+ <SOAP:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+ <operation name="callback">
+  <SOAP:operation style="rpc" soapAction="" />
+  <input>
+     <SOAP:body use="literal" namespace="urn:CenterProcess" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/ "/>
+  </input>
+  <output>
+     <SOAP:body use="literal" namespace="urn:CenterProcess" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/ "/>
+  </output>
+ </operation>
+</binding>
+
+<service name="CenterProcess">
+ <documentation>gSOAP 2.8.0 generated service definition</documentation>
+ <port name="CenterProcess" binding="tns:CenterProcess">
+  <SOAP:address location="http://10.0.4.116:9900/CenterProcess"/>
+ </port>
+</service>
+
+</definitions>
