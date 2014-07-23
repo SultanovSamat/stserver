@@ -15,7 +15,7 @@ public abstract class AbstractCmd implements ICmd {
 	
 	private short cmdFlagId;	//命令ID
 	private byte clientType;	//终端类型
-	private int terminalId;    //终端ID
+	private byte[] terminalId;    //终端ID
 	private short cmdBodyLen;	//消息体长度
     private short cmdSNo;		//消息流水号
     
@@ -26,6 +26,7 @@ public abstract class AbstractCmd implements ICmd {
     private byte endFlag;		//尾标识
     
     public AbstractCmd() {
+        terminalId = new byte[6];
     }
 
     @Override
@@ -39,7 +40,7 @@ public abstract class AbstractCmd implements ICmd {
             this.headFlag = buffer.readByte();
             this.cmdFlagId = buffer.readShort();
             this.clientType = buffer.readByte();
-            this.terminalId = buffer.readInt();
+            buffer.readBytes(this.terminalId);
             this.cmdBodyLen = buffer.readShort();
             this.cmdSNo = buffer.readShort();
             disposeCmdBody(buffer);
@@ -70,7 +71,7 @@ public abstract class AbstractCmd implements ICmd {
         	channelBuffer.writeByte(this.headFlag);
         	channelBuffer.writeShort(this.cmdFlagId);
         	channelBuffer.writeByte(this.clientType);
-        	channelBuffer.writeInt(this.terminalId);
+        	channelBuffer.writeBytes(this.terminalId);
         	channelBuffer.writeShort(this.cmdBodyLen);
             channelBuffer.writeShort(this.cmdSNo);
 
@@ -126,12 +127,14 @@ public abstract class AbstractCmd implements ICmd {
         this.clientType = clientType;
     }
 
-    public int getTerminalId() {
+    public byte[] getTerminalId() {
         return terminalId;
     }
 
-    protected void setTerminalId(int terminalId) {
-        this.terminalId = terminalId;
+    protected void setTerminalId(byte[] terminalId) {
+        if (isByteArraySameSize(this.terminalId, terminalId)) {
+            this.terminalId = terminalId;
+        }
     }
 
     public short getCmdSNo() {

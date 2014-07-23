@@ -9,5 +9,7 @@ public final class SQL {
     private SQL() {
     }
     
-    public final static String QUERY_TERMINAL_INFO = "select a.id, a.enabled from tab_terminal";
+    public final static String QUERY_TERMINAL_INFO = "select a.id, a.enabled " +
+    		                                           "from tab_terminal a" +
+    		                                           "where a.typeid=1";
 }

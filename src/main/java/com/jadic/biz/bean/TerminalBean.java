@@ -4,7 +4,7 @@ package com.jadic.biz.bean;
  * @author 	Jadic
  * @created 2014-7-18
  */
-public class TerminalBean extends IDBean {
+public class TerminalBean extends IDLongBean {
 
     private byte enabled;
 

@@ -92,23 +92,23 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	private void dealCmdTYRet(ChannelBuffer buffer) {
 	    CmdTYRetReq cmdReq = new CmdTYRetReq();
 	    if (cmdReq.disposeData(buffer)) {
-	        log.info("recv ty ret from[{}] ", tcpChannel);
+	        log.info("recv ty ret[{}] ", tcpChannel);
 	    } else {
-			log.warn("recv cmd ty ret, but fail to dispose");
+			log.warn("recv cmd ty ret, but fail to dispose[{}]", tcpChannel);
 		}
 	}
 
 	private void dealCmdHeartbeat(ChannelBuffer buffer) {
 	    CmdHeartbeatReq cmdReq = new CmdHeartbeatReq();
 	    if (cmdReq.disposeData(buffer)) {
-	        log.info("recv heartbeat from[{}] ", tcpChannel);
+	        log.info("recv heartbeat[{}] ", tcpChannel);
 	        CmdTYRetRsp cmdRsp = new CmdTYRetRsp();
 	        cmdRsp.setCmdCommonField(cmdReq);
 	        cmdRsp.setCmdFlagIdRsp(cmdReq.getCmdFlagId());
 	        cmdRsp.setCmdSNoRsp(cmdReq.getCmdSNo());
 	        this.sendData(cmdRsp.getSendBuffer());
 	    } else {
-	    	log.warn("recv cmd heartbeat, but fail to dispose");
+	    	log.warn("recv cmd heartbeat, but fail to dispose[{}]", tcpChannel);
 	    }
 	}
 	
@@ -120,20 +120,20 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	        cmdRsp.setCmdCommonField(cmdReq);
 	        cmdRsp.setCmdSNoRsp(cmdReq.getCmdSNo());
 	    } else {
-			log.warn("recv cmd login, but fail to dispose");
+			log.warn("recv cmd login, but fail to dispose[{}]", tcpChannel);
 		}
 	}
 	
 	private void dealCmdModuleStatus(ChannelBuffer buffer) {
 	    CmdModuleStatusReq cmdReq = new CmdModuleStatusReq();
 	    if (cmdReq.disposeData(buffer)) {
-	        log.info("recv tcp channel[{}] module status", tcpChannel);
+	        log.info("recv module status[{}]", tcpChannel);
 	        CmdTYRetRsp cmdRsp = new CmdTYRetRsp();
 	        cmdRsp.setCmdCommonField(cmdReq);
 	        
 	        this.sendData(cmdRsp.getSendBuffer());
 	    } else {
-	    	log.warn("recv cmd module status, but fail to dispose");
+	    	log.warn("recv cmd module status, but fail to dispose[{}]", tcpChannel);
 	    }
 	}
 	
@@ -147,6 +147,8 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	        byte[] mac2 = KKTool.strToHexBytes(sMac2, 4, 'F');
 	        cmdRsp.setMac2(mac2);
 	        sendData(cmdRsp.getSendBuffer());
+	    } else {
+	        log.warn("recv cmd get mac2, but fail to dispose[{}]", tcpChannel);
 	    }
 	}
 	

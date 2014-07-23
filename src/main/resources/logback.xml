@@ -7,7 +7,7 @@
             <onMismatch>DENY</onMismatch>
         </filter>
         <encoder>  
-            <pattern>%d{yy-MM-dd HH:mm:ss} %msg [%thread-%logger{38}]%n</pattern>   
+            <pattern>%d{yy-MM-dd HH:mm:ss} %msg%n</pattern>   
         </encoder>   
     </appender>
     <appender name="debug" class="ch.qos.logback.core.rolling.RollingFileAppender"> 
@@ -41,7 +41,7 @@
         <append>true</append>
         <prudent>false</prudent>
         <encoder>  
-            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} %msg [%thread-%logger{38}]%n</pattern>   
+            <pattern>%d{yy-MM-dd HH:mm:ss.SSS} %msg%n</pattern>   
         </encoder>   
     </appender>
     <appender name="warn" class="ch.qos.logback.core.rolling.RollingFileAppender"> 

@@ -3,11 +3,11 @@ package com.jadic.cmd.req;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 /**
- * @author 	Jadic
+ * @author Jadic
  * @created 2014-7-23
  */
 public class CmdGetMac2Req extends AbstractCmdReq {
-    
+
     private byte operType;
     private byte[] cardNo;
     private byte[] termNo;
@@ -19,7 +19,7 @@ public class CmdGetMac2Req extends AbstractCmdReq {
     private byte[] mac1;
     private byte[] chargeDate;
     private byte[] chargeTime;
-    
+
     public CmdGetMac2Req() {
         this.cardNo = new byte[8];
         this.termNo = new byte[6];
@@ -29,6 +29,13 @@ public class CmdGetMac2Req extends AbstractCmdReq {
         this.mac1 = new byte[4];
         this.chargeDate = new byte[4];
         this.chargeTime = new byte[3];
+    }
+
+    @Override
+    protected int getCmdBodySize() {
+        return 1 + cardNo.length + termNo.length + asn.length + randNumber.length 
+                + cardTradNo.length + 4 + 4 + mac1.length
+                + chargeDate.length + chargeTime.length;
     }
 
     @Override
