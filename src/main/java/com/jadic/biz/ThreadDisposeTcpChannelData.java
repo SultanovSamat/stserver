@@ -4,6 +4,8 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jadic.biz.bean.TerminalBean;
+import com.jadic.cmd.req.AbstractCmdReq;
 import com.jadic.cmd.req.CmdGetMac2Req;
 import com.jadic.cmd.req.CmdHeartbeatReq;
 import com.jadic.cmd.req.CmdLoginReq;
@@ -92,6 +94,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	private void dealCmdTYRet(ChannelBuffer buffer) {
 	    CmdTYRetReq cmdReq = new CmdTYRetReq();
 	    if (cmdReq.disposeData(buffer)) {
+	        this.setTcpchannelTerminalId(cmdReq);
 	        log.info("recv ty ret[{}] ", tcpChannel);
 	    } else {
 			log.warn("recv cmd ty ret, but fail to dispose[{}]", tcpChannel);
@@ -101,6 +104,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	private void dealCmdHeartbeat(ChannelBuffer buffer) {
 	    CmdHeartbeatReq cmdReq = new CmdHeartbeatReq();
 	    if (cmdReq.disposeData(buffer)) {
+	        this.setTcpchannelTerminalId(cmdReq);
 	        log.info("recv heartbeat[{}] ", tcpChannel);
 	        CmdTYRetRsp cmdRsp = new CmdTYRetRsp();
 	        cmdRsp.setCmdCommonField(cmdReq);
@@ -115,10 +119,26 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	private void dealCmdLogin(ChannelBuffer buffer) {
 	    CmdLoginReq cmdReq = new CmdLoginReq();
 	    if (cmdReq.disposeData(buffer)) {
+	        this.setTcpchannelTerminalId(cmdReq);
 	        log.info("a client login[{}]", tcpChannel);
 	        CmdLoginRsp cmdRsp = new CmdLoginRsp();
 	        cmdRsp.setCmdCommonField(cmdReq);
 	        cmdRsp.setCmdSNoRsp(cmdReq.getCmdSNo());
+	        
+	        byte ret = 0;
+	        TerminalBean terminal = getTerminal(cmdReq);
+	        if (terminal != null) {
+	            if (terminal.getEnabled() == 1) {//停用
+	                ret = 3;
+	            } else if (terminal.getChannelId() == -1 || terminal.getChannelId() == tcpChannel.getId()) {
+	                ret = 0;
+	            } else {//被占用
+	                ret = 1;
+	            }
+	        } else {
+	            ret = 2;
+	        }
+	        cmdRsp.setRet(ret);
 	    } else {
 			log.warn("recv cmd login, but fail to dispose[{}]", tcpChannel);
 		}
@@ -127,6 +147,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	private void dealCmdModuleStatus(ChannelBuffer buffer) {
 	    CmdModuleStatusReq cmdReq = new CmdModuleStatusReq();
 	    if (cmdReq.disposeData(buffer)) {
+	        this.setTcpchannelTerminalId(cmdReq);
 	        log.info("recv module status[{}]", tcpChannel);
 	        CmdTYRetRsp cmdRsp = new CmdTYRetRsp();
 	        cmdRsp.setCmdCommonField(cmdReq);
@@ -140,6 +161,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	private void dealCmdGetMac2(ChannelBuffer buffer) {
 	    CmdGetMac2Req cmdReq = new CmdGetMac2Req();
 	    if (cmdReq.disposeData(buffer)) {
+	        this.setTcpchannelTerminalId(cmdReq);
 	        log.info("recv get mac2[{}]", tcpChannel);
 	        CmdGetMac2Rsp cmdRsp = new CmdGetMac2Rsp();
 	        cmdRsp.setCmdCommonField(cmdReq);
@@ -156,5 +178,27 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	    if (this.tcpChannel != null && !this.tcpChannel.isClosed()) {
 	        this.tcpChannel.sendData(KKTool.getEscapedBuffer(buffer));
 	    }
+	}
+	
+	private void setTcpchannelTerminalId(AbstractCmdReq cmdReq) {
+	    if (this.tcpChannel != null) {
+	        this.tcpChannel.setTerminalId(Long.parseLong(KKTool.byteArrayToHexStr(cmdReq.getTerminalId())));
+	        TerminalBean terminal = getTerminal(cmdReq);
+	        if (terminal != null) {
+	            int oldChannelId = terminal.getChannelId();
+	            if (oldChannelId == -1) {
+	                terminal.setChannelId(tcpChannel.getId());
+	            } else if (oldChannelId != tcpChannel.getId()) {
+	                log.warn("channelid diff,new channelid[{}], old channelid[{}], terminalId[{}]", tcpChannel.getId(), oldChannelId, terminal.getId());
+	            }
+	        } else {
+	            log.warn("can't find terminal bean by terminalId:{}", KKTool.byteArrayToHexStr(cmdReq.getTerminalId()));
+	        }
+	        
+	    }
+	}
+	
+	private TerminalBean getTerminal(AbstractCmdReq cmdReq) {
+	    return BaseInfo.getBaseInfo().getTerminal(Long.valueOf(KKTool.byteArrayToHexStr(cmdReq.getTerminalId())));
 	}
 }

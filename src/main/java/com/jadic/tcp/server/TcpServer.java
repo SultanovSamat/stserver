@@ -20,6 +20,7 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jadic.biz.BaseInfo;
 import com.jadic.biz.ThreadDisposeTcpChannelData;
 import com.jadic.tcp.TcpDataDecoder;
 import com.jadic.utils.KKSimpleTimer;
@@ -38,7 +39,6 @@ public class TcpServer implements ITcpChannelDisposer {
     private KKSimpleTimer checkTimeoutTimer;
     private ServerBootstrap bootstrap;
     private int localPort;
-
     
     public TcpServer(int localPort) {
         this.localPort = localPort;
@@ -154,6 +154,7 @@ public class TcpServer implements ITcpChannelDisposer {
         TcpChannel tcpChannel = tcpChannels.remove(channelId);
         if (tcpChannel != null) {
             tcpChannel.close();
+            BaseInfo.getBaseInfo().initTerminalChannelId(tcpChannel.getTerminalId());
         }
     }
     

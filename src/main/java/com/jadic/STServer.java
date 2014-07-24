@@ -1,5 +1,7 @@
 package com.jadic;
 
+import com.jadic.biz.BaseInfo;
+import com.jadic.db.DBOper;
 import com.jadic.tcp.server.TcpServer;
 import com.jadic.utils.SysParams;
 
@@ -10,12 +12,19 @@ import com.jadic.utils.SysParams;
 public class STServer {
 
     private TcpServer tcpServer;
-    private SysParams sysParams;
+    private SysParams sysParams = SysParams.getInstance();
 
     public STServer() {
-        sysParams = SysParams.getInstance();
+        loadBaseInfo();
         tcpServer = new TcpServer(sysParams.getLocalTcpPort());
+    }
+    
+    public void start() {
         tcpServer.start();
+    }
+    
+    private void loadBaseInfo() {
+        BaseInfo.getBaseInfo().updateBaseInfo(DBOper.getDBOper().queryTerminals());
     }
 
     public static void main(String[] args) {

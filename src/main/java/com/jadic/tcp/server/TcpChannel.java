@@ -30,6 +30,9 @@ public class TcpChannel {
 	private volatile boolean isDisposing;
 	private Lock lock;
 	private long lastRecvDataTime;
+	
+	private String tcpChannelDesc;
+	private long terminalId = -1;
 
 	public TcpChannel(Channel channel, ITcpChannelDisposer tcpDataDisposer) {
 	    this.tcpDataDisposer = tcpDataDisposer;
@@ -39,6 +42,7 @@ public class TcpChannel {
 		this.lastRecvDataTime = System.currentTimeMillis();
 		this.isClosed = false;
 		this.isDisposing = false;
+		this.generateTcpChannelDesc();
 	}
 	
 	/**
@@ -151,11 +155,9 @@ public class TcpChannel {
 					return true;
 				}
 				return false;
-			} catch (Exception e) {
 			} finally {
 				lock.unlock();
 			}
-			return false;
 		}
 	}
 
@@ -167,20 +169,39 @@ public class TcpChannel {
 	}
 	
 	public int getId() {
-		return this.channel.getId();
+		return this.channel != null ? this.channel.getId() : -1;
 	}
 	
 	public SocketAddress getSocektAddress() {
-		return this.channel.getRemoteAddress();
+		return this.channel != null ? this.channel.getRemoteAddress() : null;
 	}
 	
 	@Override
 	public String toString() {
-		return "id:" + getId() + ",address:" + getSocektAddress();
+		return tcpChannelDesc;
+	}
+	
+	private void generateTcpChannelDesc() {
+	    StringBuilder sBuilder = new StringBuilder();
+	    sBuilder.append("id:").append(getId());
+	    sBuilder.append(",address:").append(getSocektAddress());
+	    sBuilder.append(",terminalId:").append(this.terminalId);
+	    this.tcpChannelDesc = sBuilder.toString();
 	}
 
 	public long getLastRecvDataTime() {
 		return lastRecvDataTime;
 	}
+
+    public long getTerminalId() {
+        return terminalId;
+    }
+
+    public void setTerminalId(long terminalId) {
+        if (this.terminalId != terminalId) {
+            this.terminalId = terminalId;
+            generateTcpChannelDesc();
+        }
+    }
 
 }

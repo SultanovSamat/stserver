@@ -19,6 +19,7 @@ public class ThreadLoadBaseinfo implements Runnable {
     @Override
     public void run() {
         List<TerminalBean> terminalList = DBOper.getDBOper().queryTerminals();
+        log.info("load {} terminals", terminalList.size());
     }
 
 }
