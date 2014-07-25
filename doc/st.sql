@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50525
 File Encoding         : 65001
 
-Date: 2014-07-18 16:30:33
+Date: 2014-07-25 18:03:09
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -36,7 +36,7 @@ INSERT INTO `tab_module` VALUES ('2', 'b');
 -- ----------------------------
 DROP TABLE IF EXISTS `tab_terminal`;
 CREATE TABLE `tab_terminal` (
-  `id` int(10) NOT NULL,
+  `id` bigint(19) NOT NULL COMMENT '终端ID  12位',
   `typeId` smallint(6) DEFAULT NULL COMMENT '终端类型，默认0',
   `position` varchar(255) DEFAULT NULL COMMENT '终端投放地址',
   `enabled` tinyint(2) DEFAULT '0' COMMENT '启用状态 0：启用 1：停用',
@@ -47,14 +47,15 @@ CREATE TABLE `tab_terminal` (
 -- ----------------------------
 -- Records of tab_terminal
 -- ----------------------------
-INSERT INTO `tab_terminal` VALUES ('12345678', '1', 'abcd', '0', 'aaa');
+INSERT INTO `tab_terminal` VALUES ('123456', '2', 'a', '0', 'sfd');
+INSERT INTO `tab_terminal` VALUES ('112233445566', '1', 'abcd', '0', 'aaa');
 
 -- ----------------------------
 -- Table structure for tab_terminal_module_status
 -- ----------------------------
 DROP TABLE IF EXISTS `tab_terminal_module_status`;
 CREATE TABLE `tab_terminal_module_status` (
-  `TERMINALID` int(10) DEFAULT NULL,
+  `TERMINALID` bigint(19) DEFAULT NULL,
   `MODULEID` smallint(5) DEFAULT NULL,
   `STATUS` tinyint(2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -70,15 +71,15 @@ INSERT INTO `tab_terminal_module_status` VALUES ('12345678', '2', '1');
 -- ----------------------------
 DROP TABLE IF EXISTS `tab_terminal_status`;
 CREATE TABLE `tab_terminal_status` (
-  `TERMINALID` int(255) NOT NULL COMMENT '终端ID  主键',
+  `TERMINALID` bigint(19) NOT NULL COMMENT '终端ID  主键',
   `OnlineStatus` tinyint(2) DEFAULT NULL COMMENT '设备在线状态  0：未知  1：在线  2：离线',
   `LastOnlineTime` datetime DEFAULT NULL COMMENT '最近一次的在线时间',
-  `M1STATUS` tinyint(2) DEFAULT NULL,
-  `M2STATUS` tinyint(2) DEFAULT NULL,
-  `M3STATUS` tinyint(2) DEFAULT NULL,
-  `M4STATUS` tinyint(2) DEFAULT NULL,
-  `M5STATUS` tinyint(2) DEFAULT NULL,
-  `M6STATUS` tinyint(2) DEFAULT NULL,
+  `M1STATUS` tinyint(2) DEFAULT NULL COMMENT '市民卡读写模块 (0:未知 1:正常 2:故障   下同)',
+  `M2STATUS` tinyint(2) DEFAULT NULL COMMENT '现金模块',
+  `M3STATUS` tinyint(2) DEFAULT NULL COMMENT '银联模块',
+  `M4STATUS` tinyint(2) DEFAULT NULL COMMENT '打印模块',
+  `M5STATUS` tinyint(2) DEFAULT NULL COMMENT '身份证读取模块',
+  `M6STATUS` tinyint(2) DEFAULT NULL COMMENT '密码键盘模块',
   `M7STATUS` tinyint(2) DEFAULT NULL,
   `M8STATUS` tinyint(2) DEFAULT NULL,
   PRIMARY KEY (`TERMINALID`)
@@ -87,7 +88,7 @@ CREATE TABLE `tab_terminal_status` (
 -- ----------------------------
 -- Records of tab_terminal_status
 -- ----------------------------
-INSERT INTO `tab_terminal_status` VALUES ('12345678', '1', '2014-07-18 15:27:32', '1', '2', '3', '3', '1', '2', '1', '0');
+INSERT INTO `tab_terminal_status` VALUES ('1122334456', '1', '2014-07-18 15:27:32', '1', '2', '3', '3', '1', '2', '1', '0');
 
 -- ----------------------------
 -- Table structure for tab_terminal_type
