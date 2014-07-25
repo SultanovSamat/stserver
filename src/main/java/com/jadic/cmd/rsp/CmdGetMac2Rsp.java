@@ -2,6 +2,8 @@ package com.jadic.cmd.rsp;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.jadic.utils.Const;
+
 /**
  * @author 	Jadic
  * @created 2014-7-23
@@ -11,6 +13,7 @@ public class CmdGetMac2Rsp extends AbstractCmdRsp {
     private byte[] mac2;
     
     public CmdGetMac2Rsp() {
+        this.setCmdFlagId(Const.SER_GET_MAC2_RET);
         mac2 = new byte[4];
     }
 
@@ -20,8 +23,9 @@ public class CmdGetMac2Rsp extends AbstractCmdRsp {
     }
 
     @Override
-    protected void fillCmdBody(ChannelBuffer channelBuffer) {
+    protected boolean fillCmdBody(ChannelBuffer channelBuffer) {
         channelBuffer.writeBytes(this.mac2);
+        return true;
     }
 
     public void setMac2(byte[] mac2) {

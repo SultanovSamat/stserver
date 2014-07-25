@@ -43,9 +43,7 @@ public abstract class AbstractCmd implements ICmd {
             buffer.readBytes(this.terminalId);
             this.cmdBodyLen = buffer.readShort();
             this.cmdSNo = buffer.readShort();
-            disposeCmdBody(buffer);
-
-            return true;
+            return disposeCmdBody(buffer);
         }
         return false;
     }
@@ -75,18 +73,18 @@ public abstract class AbstractCmd implements ICmd {
         	channelBuffer.writeShort(this.cmdBodyLen);
             channelBuffer.writeShort(this.cmdSNo);
 
-            fillCmdBody(channelBuffer);
-
-            //CRC check sum
-            channelBuffer.writeByte(getCRCCheckSum(channelBuffer));
-            channelBuffer.writeByte(this.endFlag);
-            return true;
+            if (fillCmdBody(channelBuffer)) {
+                //CRC check sum
+                channelBuffer.writeByte(getCRCCheckSum(channelBuffer));
+                channelBuffer.writeByte(this.endFlag);
+                return true;
+            }
         }
         return false;
     }
 
     protected int getCmdHeadEndSize() {
-        return 14;//1 + 2 + 1 + 4 + 2 + 2 + 1 + 1
+        return 16;//1 + 2 + 1 + 6 + 2 + 2 + 1 + 1
     }
     
     private byte getCRCCheckSum(ChannelBuffer buffer) {
@@ -107,9 +105,9 @@ public abstract class AbstractCmd implements ICmd {
 
     protected abstract int getCmdBodySize();
 
-    protected abstract void disposeCmdBody(ChannelBuffer channelBuffer);
+    protected abstract boolean disposeCmdBody(ChannelBuffer channelBuffer);
 
-    protected abstract void fillCmdBody(ChannelBuffer channelBuffer);
+    protected abstract boolean fillCmdBody(ChannelBuffer channelBuffer);
 
     public short getCmdFlagId() {
         return cmdFlagId;

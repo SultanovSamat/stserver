@@ -11,7 +11,8 @@ import com.jadic.cmd.AbstractCmd;
 public abstract class AbstractCmdReq extends AbstractCmd {
 
     @Override
-    protected void fillCmdBody(ChannelBuffer channelBuffer) {
+    protected boolean fillCmdBody(ChannelBuffer channelBuffer) {
+        return true;
     }
     
     @Override

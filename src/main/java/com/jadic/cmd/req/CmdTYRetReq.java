@@ -9,19 +9,20 @@ import org.jboss.netty.buffer.ChannelBuffer;
  */
 public class CmdTYRetReq extends AbstractCmdReq {
     
-    private short cmdSNORsp;
+    private short cmdSNoRsp;
     private short cmdFlagIdRsp;
     private byte ret;
     
     @Override
-    protected void disposeCmdBody(ChannelBuffer channelBuffer) {
-        this.cmdSNORsp = channelBuffer.readShort();
+    protected boolean disposeCmdBody(ChannelBuffer channelBuffer) {
+        this.cmdSNoRsp = channelBuffer.readShort();
         this.cmdFlagIdRsp = channelBuffer.readShort();
         this.ret = channelBuffer.readByte();
+        return true;
     }
 
-    public short getCmdSNORsp() {
-        return cmdSNORsp;
+    public short getCmdSNoRsp() {
+        return cmdSNoRsp;
     }
 
     public short getCmdFlagIdRsp() {

@@ -84,8 +84,8 @@ public class TcpServer implements ITcpChannelDisposer {
      * start timer to check all connected channels timeout 
      */
     private void startCheckTimeoutTimer() {
-        this.checkTimeoutTimer = new KKSimpleTimer("superior tcp server timeout checker", new Runnable() {
-            final static long TIME_OUT = 1000 * 60 * 3;
+        this.checkTimeoutTimer = new KKSimpleTimer("tcp server timeout checker", new Runnable() {
+            final static long TIME_OUT = 1000 * 60 * 1;
             
             @Override
             public void run() {
@@ -104,7 +104,7 @@ public class TcpServer implements ITcpChannelDisposer {
                     }
                 }
             }
-        }, 60, 60);
+        }, 15, 15);
         this.checkTimeoutTimer.start();
     }
     

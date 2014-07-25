@@ -55,6 +55,7 @@ class DBConnPool {
         config.setAcquireIncrement(3);
         config.setIdleMaxAgeInMinutes(20);
         config.setIdleConnectionTestPeriodInMinutes(2);
+        config.setConnectionTimeoutInMs(10000);
         boneCP = new BoneCP(config);
         this.jdbcFlag = jdbcConfig.getKey();
     }

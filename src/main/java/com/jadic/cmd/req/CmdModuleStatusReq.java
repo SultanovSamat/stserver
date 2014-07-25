@@ -21,13 +21,14 @@ public class CmdModuleStatusReq extends AbstractCmdReq {
     }
 
     @Override
-    protected void disposeCmdBody(ChannelBuffer channelBuffer) {
+    protected boolean disposeCmdBody(ChannelBuffer channelBuffer) {
         this.moduleCount = channelBuffer.readByte();
         for (int i = 0; i < this.moduleCount; i++) {
             ModuleStatus moduleStatus = new ModuleStatus();
             moduleStatus.setModuleId(channelBuffer.readByte());
             moduleStatus.setModuleStatus(channelBuffer.readByte());
         }
+        return true;
     }
 
     public byte getModuleCount() {

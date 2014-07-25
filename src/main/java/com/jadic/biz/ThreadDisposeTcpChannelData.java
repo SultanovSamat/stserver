@@ -11,6 +11,7 @@ import com.jadic.cmd.req.CmdHeartbeatReq;
 import com.jadic.cmd.req.CmdLoginReq;
 import com.jadic.cmd.req.CmdModuleStatusReq;
 import com.jadic.cmd.req.CmdTYRetReq;
+import com.jadic.cmd.req.CmdDefaultReq;
 import com.jadic.cmd.rsp.CmdGetMac2Rsp;
 import com.jadic.cmd.rsp.CmdLoginRsp;
 import com.jadic.cmd.rsp.CmdTYRetRsp;
@@ -69,6 +70,12 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 		}
 
 		short cmdFlag = buffer.getShort(buffer.readerIndex() + 1);
+		
+		if (!tcpChannel.isLogined() && cmdFlag != Const.TER_LOGIN) {//can't deal other cmd, unless terminal is logined 
+		    dealInvalidCmd(buffer, Const.TY_RET_NO_LOGIN);
+		    return;
+		}
+		
 		switch (cmdFlag) {
 		case Const.TER_TY_RET:
 		    dealCmdTYRet(buffer);
@@ -86,7 +93,8 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 		    dealCmdGetMac2(buffer);
 		    break;
 		default:
-			log.warn("Unknown command flag:{}", KKTool.byteArrayToHexStr(KKTool.short2BytesBigEndian(cmdFlag)));
+		    dealInvalidCmd(buffer, Const.TY_RET_NOT_SUPPORTED);
+			log.warn("Unsupported command flag:{}", KKTool.byteArrayToHexStr(KKTool.short2BytesBigEndian(cmdFlag)));
 			break;
 		}
 	}
@@ -94,7 +102,6 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	private void dealCmdTYRet(ChannelBuffer buffer) {
 	    CmdTYRetReq cmdReq = new CmdTYRetReq();
 	    if (cmdReq.disposeData(buffer)) {
-	        this.setTcpchannelTerminalId(cmdReq);
 	        log.info("recv ty ret[{}] ", tcpChannel);
 	    } else {
 			log.warn("recv cmd ty ret, but fail to dispose[{}]", tcpChannel);
@@ -104,13 +111,8 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	private void dealCmdHeartbeat(ChannelBuffer buffer) {
 	    CmdHeartbeatReq cmdReq = new CmdHeartbeatReq();
 	    if (cmdReq.disposeData(buffer)) {
-	        this.setTcpchannelTerminalId(cmdReq);
 	        log.info("recv heartbeat[{}] ", tcpChannel);
-	        CmdTYRetRsp cmdRsp = new CmdTYRetRsp();
-	        cmdRsp.setCmdCommonField(cmdReq);
-	        cmdRsp.setCmdFlagIdRsp(cmdReq.getCmdFlagId());
-	        cmdRsp.setCmdSNoRsp(cmdReq.getCmdSNo());
-	        this.sendData(cmdRsp.getSendBuffer());
+	        sendCmdTYRsp(cmdReq, Const.TY_RET_OK);
 	    } else {
 	    	log.warn("recv cmd heartbeat, but fail to dispose[{}]", tcpChannel);
 	    }
@@ -119,6 +121,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	private void dealCmdLogin(ChannelBuffer buffer) {
 	    CmdLoginReq cmdReq = new CmdLoginReq();
 	    if (cmdReq.disposeData(buffer)) {
+	        this.tcpChannel.setTerminalVer(cmdReq.getVer());//this means tcpchannel is logined
 	        this.setTcpchannelTerminalId(cmdReq);
 	        log.info("a client login[{}]", tcpChannel);
 	        CmdLoginRsp cmdRsp = new CmdLoginRsp();
@@ -139,6 +142,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	            ret = 2;
 	        }
 	        cmdRsp.setRet(ret);
+	        sendData(cmdRsp.getSendBuffer());
 	    } else {
 			log.warn("recv cmd login, but fail to dispose[{}]", tcpChannel);
 		}
@@ -147,12 +151,8 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	private void dealCmdModuleStatus(ChannelBuffer buffer) {
 	    CmdModuleStatusReq cmdReq = new CmdModuleStatusReq();
 	    if (cmdReq.disposeData(buffer)) {
-	        this.setTcpchannelTerminalId(cmdReq);
 	        log.info("recv module status[{}]", tcpChannel);
-	        CmdTYRetRsp cmdRsp = new CmdTYRetRsp();
-	        cmdRsp.setCmdCommonField(cmdReq);
-	        
-	        this.sendData(cmdRsp.getSendBuffer());
+	        sendCmdTYRsp(cmdReq, Const.TY_RET_OK);
 	    } else {
 	    	log.warn("recv cmd module status, but fail to dispose[{}]", tcpChannel);
 	    }
@@ -161,7 +161,6 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	private void dealCmdGetMac2(ChannelBuffer buffer) {
 	    CmdGetMac2Req cmdReq = new CmdGetMac2Req();
 	    if (cmdReq.disposeData(buffer)) {
-	        this.setTcpchannelTerminalId(cmdReq);
 	        log.info("recv get mac2[{}]", tcpChannel);
 	        CmdGetMac2Rsp cmdRsp = new CmdGetMac2Rsp();
 	        cmdRsp.setCmdCommonField(cmdReq);
@@ -174,12 +173,42 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	    }
 	}
 	
+	/**
+	 * 非法命令统一以通用应答处理
+	 * @param buffer
+	 * @param ret 应答结果
+	 */
+	private void dealInvalidCmd(ChannelBuffer buffer, byte ret) {
+	    CmdDefaultReq cmdReq = new CmdDefaultReq();
+	    if (cmdReq.disposeData(buffer)) {
+	        sendCmdTYRsp(cmdReq, ret);
+	    }
+	}
+	
+	/**
+	 * 回复通用应答
+	 * @param cmdReq
+	 * @param ret
+	 */
+	private void sendCmdTYRsp(AbstractCmdReq cmdReq, byte ret) {
+	    CmdTYRetRsp cmdRsp = new CmdTYRetRsp();
+        cmdRsp.setCmdCommonField(cmdReq);
+        cmdRsp.setCmdFlagIdRsp(cmdReq.getCmdFlagId());
+        cmdRsp.setCmdSNoRsp(cmdReq.getCmdSNo());
+        cmdRsp.setRet(ret);
+        sendData(cmdRsp.getSendBuffer());
+	}
+	
 	private void sendData(ChannelBuffer buffer) {
 	    if (this.tcpChannel != null && !this.tcpChannel.isClosed()) {
 	        this.tcpChannel.sendData(KKTool.getEscapedBuffer(buffer));
 	    }
 	}
 	
+	/**
+	 * 设置tcpchannel、terminal之间相互关联的值即tcpchannel.terminalId与terminal.channelId
+	 * @param cmdReq
+	 */
 	private void setTcpchannelTerminalId(AbstractCmdReq cmdReq) {
 	    if (this.tcpChannel != null) {
 	        this.tcpChannel.setTerminalId(Long.parseLong(KKTool.byteArrayToHexStr(cmdReq.getTerminalId())));

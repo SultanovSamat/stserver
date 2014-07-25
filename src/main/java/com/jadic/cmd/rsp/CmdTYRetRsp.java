@@ -25,10 +25,11 @@ public class CmdTYRetRsp extends AbstractCmdRsp {
     }
     
     @Override
-    protected void fillCmdBody(ChannelBuffer channelBuffer) {
+    protected boolean fillCmdBody(ChannelBuffer channelBuffer) {
         channelBuffer.writeShort(cmdSNoRsp);
         channelBuffer.writeShort(cmdFlagIdRsp);
         channelBuffer.writeByte(ret);
+        return true;
     }
 
     public short getCmdSNoRsp() {

@@ -22,7 +22,8 @@ public abstract class AbstractCmdRsp extends AbstractCmd {
     }
 
     @Override
-    protected void disposeCmdBody(ChannelBuffer channelBuffer) {
+    protected boolean disposeCmdBody(ChannelBuffer channelBuffer) {
+        return true;
     }
     
     public void setCmdCommonField(AbstractCmdReq cmdReq) {

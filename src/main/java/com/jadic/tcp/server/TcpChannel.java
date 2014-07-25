@@ -33,6 +33,7 @@ public class TcpChannel {
 	
 	private String tcpChannelDesc;
 	private long terminalId = -1;
+	private short terminalVer = -1;
 
 	public TcpChannel(Channel channel, ITcpChannelDisposer tcpDataDisposer) {
 	    this.tcpDataDisposer = tcpDataDisposer;
@@ -117,7 +118,10 @@ public class TcpChannel {
 		}
 		
 		this.isClosed = true;
-		disposeBufferData();//the buffer data in the queue may not be all disposed
+		if (getBufferQueueSize() > 0) {
+		    disposeBufferData();//the buffer data in the queue may not be all disposed
+		}
+		this.channel.close();
 	}
 	
 	/**
@@ -202,6 +206,21 @@ public class TcpChannel {
             this.terminalId = terminalId;
             generateTcpChannelDesc();
         }
+    }
+
+    public short getTerminalVer() {
+        return terminalVer;
+    }
+
+    public void setTerminalVer(short terminalVer) {
+        this.terminalVer = terminalVer;
+        if (this.terminalVer == -1) {
+            this.terminalVer = 0;
+        }
+    }
+    
+    public boolean isLogined() {
+        return this.terminalVer != -1;
     }
 
 }

@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.jadic.biz.bean.TerminalBean;
 
 /**
@@ -12,6 +15,7 @@ import com.jadic.biz.bean.TerminalBean;
  */
 public final class BaseInfo {
     
+    private final static Logger log = LoggerFactory.getLogger(BaseInfo.class);
     //只增不减
     private Map<Long, TerminalBean> terminals;
     
@@ -33,9 +37,11 @@ public final class BaseInfo {
                 if (oldTerminal.getEnabled() != terminal.getEnabled()) {
                     oldTerminal.setEnabled(terminal.getEnabled());
                     noticeTerminalEnabled(terminal);//if enabled status changed, notice terminal
+                    log.info("terminal[{}] enabled status changed, new status[{}]", terminal.getId(), terminal.getEnabled());
                 }
             } else {
                 terminals.put(terminal.getId(), terminal);
+                log.info("a terminal[{}] is added", terminal);
             }
         }
     }

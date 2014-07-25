@@ -8,20 +8,21 @@ import org.jboss.netty.buffer.ChannelBuffer;
  */
 public class CmdLoginReq extends AbstractCmdReq {
     
-    private int identity;
+    private short ver;
 
     @Override
-    protected void disposeCmdBody(ChannelBuffer channelBuffer) {
-        this.identity = channelBuffer.readInt();
+    protected boolean disposeCmdBody(ChannelBuffer channelBuffer) {
+        this.ver = channelBuffer.readShort();
+        return true;
     }
 
-    public int getIdentity() {
-        return identity;
+	public short getVer() {
+        return ver;
     }
 
-	@Override
+    @Override
 	protected int getCmdBodySize() {
-		return 4;
+		return 2;
 	}
 
 }

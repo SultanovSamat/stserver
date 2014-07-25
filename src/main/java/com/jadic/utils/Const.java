@@ -18,10 +18,11 @@ public final class Const {
     public final static short SER_LOGIN_RET     = 0x7003;//终端注册应答
     public final static short TER_MODULE_STATUS = 0x0004;//终端模块状态汇报
     public final static short TER_GET_MAC2      = 0x0005;//获取mac2
+    public final static short SER_GET_MAC2_RET  = 0x7005;//获取mac2应答
     
     public final static byte TY_RET_OK            = 0x00;//0：成功/确认  
     public final static byte TY_RET_FAIL          = 0x00;//1：失败  
-    public final static byte TY_RET_INVALID       = 0x00;//2：消息有误 
+    public final static byte TY_RET_NO_LOGIN      = 0x00;//2：未注册 
     public final static byte TY_RET_NOT_SUPPORTED = 0x00;//3：不支持
     
     public final static byte LOGIN_RET_OK              = 0x00;//0:成功 

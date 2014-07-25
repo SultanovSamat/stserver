@@ -28,6 +28,7 @@ public class STServer {
     }
 
     public static void main(String[] args) {
-        new STServer();
+        STServer stServer = new STServer();
+        stServer.start();
     }
 }

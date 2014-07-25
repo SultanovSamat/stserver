@@ -14,6 +14,7 @@ public class CmdLoginRsp extends AbstractCmdRsp {
     private byte ret;
     
     public CmdLoginRsp() {
+        this.setCmdFlagId(Const.SER_LOGIN_RET);
         this.ret = Const.LOGIN_RET_OK;
     }
 
@@ -23,9 +24,10 @@ public class CmdLoginRsp extends AbstractCmdRsp {
     }
 
     @Override
-    protected void fillCmdBody(ChannelBuffer channelBuffer) {
+    protected boolean fillCmdBody(ChannelBuffer channelBuffer) {
         channelBuffer.writeShort(cmdSNoRsp);
         channelBuffer.writeByte(ret);
+        return true;
     }
 
     public short getCmdSNoRsp() {

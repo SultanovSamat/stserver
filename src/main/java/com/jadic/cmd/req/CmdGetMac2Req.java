@@ -39,7 +39,7 @@ public class CmdGetMac2Req extends AbstractCmdReq {
     }
 
     @Override
-    protected void disposeCmdBody(ChannelBuffer channelBuffer) {
+    protected boolean disposeCmdBody(ChannelBuffer channelBuffer) {
         this.operType = channelBuffer.readByte();
         channelBuffer.readBytes(this.cardNo);
         channelBuffer.readBytes(this.termNo);
@@ -51,6 +51,7 @@ public class CmdGetMac2Req extends AbstractCmdReq {
         channelBuffer.readBytes(this.mac1);
         channelBuffer.readBytes(this.chargeDate);
         channelBuffer.readBytes(this.chargeTime);
+        return true;
     }
 
     public byte getOperType() {
