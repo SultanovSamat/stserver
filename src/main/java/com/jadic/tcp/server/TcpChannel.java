@@ -187,9 +187,9 @@ public class TcpChannel {
 	
 	private void generateTcpChannelDesc() {
 	    StringBuilder sBuilder = new StringBuilder();
-	    sBuilder.append("id:").append(getId());
+	    sBuilder.append("terminalId:").append(this.terminalId);
+	    sBuilder.append(",id:").append(getId());
 	    sBuilder.append(",address:").append(getSocektAddress());
-	    sBuilder.append(",terminalId:").append(this.terminalId);
 	    this.tcpChannelDesc = sBuilder.toString();
 	}
 

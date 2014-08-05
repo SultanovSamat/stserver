@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -30,6 +32,16 @@ public final class DBOper extends DefaultDBImpl {
     
     public List<TerminalBean> queryTerminals() {
         return queryForList(SQL.QUERY_TERMINAL_INFO, null, TerminalBean.class);
+    }
+    
+    public boolean updateTerminalStatus(String sql, List<Object> params) {
+        return executeUpdateSingle(sql, params) != -1;
+    }
+    
+    public boolean updateTerminalOffline(long terminalId) {
+        List<Object> params = new ArrayList<Object>();
+        params.add(terminalId);
+        return executeUpdateSingle(SQL.UPDATE_TERMINAL_OFFLINE, params) != -1;
     }
 
     public void test() {

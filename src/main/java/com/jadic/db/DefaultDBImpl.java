@@ -202,6 +202,76 @@ public class DefaultDBImpl {
         }
         return obj;
     }
+    
+    protected int executeUpdateSingle(String sql, List<Object> paramsObj) {
+        Connection connection = null;
+        PreparedStatement pstmt = null;
+        try {
+            connection = getMasterConnection();
+            pstmt = connection.prepareStatement(sql);
+
+            if (paramsObj != null) {
+                for (int i = 0; i < paramsObj.size(); i++) {
+                    pstmt.setObject(i + 1, paramsObj.get(i));
+                }
+            }
+
+            return pstmt.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("executeUpdateSingle err, sql:{},tip:{}", sql, KKTool.getExceptionTip(e));
+        } finally {
+            KKTool.closeStatementAndConnectionInSilence(pstmt, connection);
+        }
+
+        return -1;
+    }
+
+    protected int executeUpdateMulti(String sql, List<Object[]> paramsObjList) {
+        if (paramsObjList == null) {
+            return 0;
+        }
+
+        Connection connection = null;
+        PreparedStatement pstmt = null;
+        boolean autoCommit = true;
+        try {
+            connection = getMasterConnection();
+            pstmt = connection.prepareStatement(sql);
+            autoCommit = connection.getAutoCommit();
+            connection.setAutoCommit(false);
+
+            for (Object[] paramsObj : paramsObjList) {
+                if (paramsObj != null) {
+                    for (int i = 0; i < paramsObj.length; i++) {
+                        pstmt.setObject(i + 1, paramsObj[i]);
+                    }
+                    pstmt.addBatch();
+                }
+            }
+            pstmt.executeBatch();
+            connection.commit();
+            return 1;
+        } catch (SQLException e) {
+            logger.error("executeUpdateMulti err, sql:{}", sql, e);
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException e1) {
+                    logger.error("executeUpdate rollback err",e);
+                }
+            }
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(autoCommit);
+                } catch (SQLException e) {
+                    logger.error("restore autocommit err:" + KKTool.getExceptionTip(e));
+                }
+            }
+            KKTool.closeStatementAndConnectionInSilence(pstmt, connection);
+        }
+        return -1;
+    }
 
     /**
      * 保存操作

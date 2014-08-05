@@ -106,7 +106,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     private void dealCmdTYRet(ChannelBuffer buffer) {
         CmdTYRetReq cmdReq = new CmdTYRetReq();
         if (cmdReq.disposeData(buffer)) {
-            log.info("recv ty ret[{}] ", tcpChannel);
+            log.debug("recv ty ret[{}] ", tcpChannel);
         } else {
             log.warn("recv cmd ty ret, but fail to dispose[{}]", tcpChannel);
         }
@@ -115,7 +115,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     private void dealCmdHeartbeat(ChannelBuffer buffer) {
         CmdHeartbeatReq cmdReq = new CmdHeartbeatReq();
         if (cmdReq.disposeData(buffer)) {
-            log.info("recv heartbeat[{}] ", tcpChannel);
+            log.debug("recv heartbeat[{}] ", tcpChannel);
             sendCmdTYRsp(cmdReq, Const.TY_RET_OK);
         } else {
             log.warn("recv cmd heartbeat, but fail to dispose[{}]", tcpChannel);
