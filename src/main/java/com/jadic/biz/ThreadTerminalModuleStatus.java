@@ -1,11 +1,9 @@
 package com.jadic.biz;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 
 import com.jadic.biz.bean.ModuleStatus;
 import com.jadic.cmd.req.CmdModuleStatusReq;
@@ -13,6 +11,7 @@ import com.jadic.db.DBOper;
 import com.jadic.utils.KKTool;
 
 /**
+ * 实时更新终端模块状态
  * @author 	Jadic
  * @created 2014-8-5
  */
@@ -20,13 +19,11 @@ public class ThreadTerminalModuleStatus extends AbstractThreadDisposeDataFromQue
     
     private DBOper dbOper;
     
-    private Map<Long, String> terminalStatus;//用来更新设备在线状态
-    
-    private final long OFFLINE_TIME = 5 * 60 * 1000;
+    private Set<Long> terminalIdSet;//有终端模块状态数据的终端ID集合
     
     public ThreadTerminalModuleStatus() {
         dbOper = DBOper.getDBOper();
-        terminalStatus = new HashMap<Long, String>();
+        terminalIdSet = new HashSet<Long>();
     }
 
     @Override
@@ -36,19 +33,16 @@ public class ThreadTerminalModuleStatus extends AbstractThreadDisposeDataFromQue
             while ((cmdReq = getQueuePollData()) != null) {
                 disposeCmd(cmdReq);
             }
-            
-            checkTerminalOnlineStatus();
             waitNewData();
         }
     }
     
     private void disposeCmd(CmdModuleStatusReq cmdReq) {
         long terminalId = Long.parseLong(KKTool.byteArrayToHexStr(cmdReq.getTerminalId()));
-        String oldValue = terminalStatus.put(terminalId, "1_" + System.currentTimeMillis());
         StringBuilder sqlBuilder = new StringBuilder();
         List<ModuleStatus>msList = cmdReq.getMsList();
         List<Object> params = new ArrayList<Object>();
-        if (oldValue == null) {//新增   
+        if (terminalIdSet.add(terminalId)) {//新增   
             sqlBuilder.append("insert into tab_terminal_status ");
             sqlBuilder.append("(terminalId, onlinestatus, lastonlinetime");
             for (ModuleStatus ms : msList) {
@@ -78,21 +72,6 @@ public class ThreadTerminalModuleStatus extends AbstractThreadDisposeDataFromQue
             }
             params.add(terminalId);
             dbOper.updateTerminalStatus(sqlBuilder.toString(), params);
-        }
-    }
-    
-    private void checkTerminalOnlineStatus() {
-        Iterator<Entry<Long, String>>iterator = terminalStatus.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Entry<Long, String> entry = iterator.next();
-            long terminalId = entry.getKey();
-            String value = entry.getValue();
-            if (value.startsWith("1")) {//只针对在线的
-                long time = Long.parseLong(value.substring(2));
-                if (System.currentTimeMillis() - time >= OFFLINE_TIME) {
-                    
-                }
-            }
         }
     }
 

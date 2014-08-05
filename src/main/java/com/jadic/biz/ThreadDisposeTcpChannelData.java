@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import com.jadic.biz.bean.TerminalBean;
 import com.jadic.cmd.req.AbstractCmdReq;
+import com.jadic.cmd.req.CmdChargeDetailReq;
 import com.jadic.cmd.req.CmdGetMac2Req;
 import com.jadic.cmd.req.CmdHeartbeatReq;
 import com.jadic.cmd.req.CmdLoginReq;
@@ -28,10 +29,11 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 
     private final static Logger log = LoggerFactory.getLogger(ThreadDisposeTcpChannelData.class);
     private TcpChannel tcpChannel;
+    private ICmdBizDisposer cmdBizDisposer;
 
     final static int MAX_DISPOSE_COUNT = 20;// 线程处理每个通道一次最多连续处理次数
 
-    public ThreadDisposeTcpChannelData(TcpChannel tcpChannel) {
+    public ThreadDisposeTcpChannelData(TcpChannel tcpChannel, ICmdBizDisposer cmdBizDisposer) {
         this.tcpChannel = tcpChannel;
     }
 
@@ -96,6 +98,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         case Const.TER_GET_MAC2:
             dealCmdGetMac2(buffer);
             break;
+        case Const.TER_CHARGE_DETAIL:
+        	dealCmdChargeDetail(buffer);
+        	break;
         default:
             dealInvalidCmd(buffer, Const.TY_RET_NOT_SUPPORTED);
             log.warn("Unsupported command flag:{}", KKTool.byteArrayToHexStr(KKTool.short2BytesBigEndian(cmdFlag)));
@@ -156,8 +161,11 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     private void dealCmdModuleStatus(ChannelBuffer buffer) {
         CmdModuleStatusReq cmdReq = new CmdModuleStatusReq();
         if (cmdReq.disposeData(buffer)) {
+        	sendCmdTYRsp(cmdReq, Const.TY_RET_OK);
             log.info("recv module status[{}]", tcpChannel);
-            sendCmdTYRsp(cmdReq, Const.TY_RET_OK);
+            if (this.cmdBizDisposer != null) {
+            	this.cmdBizDisposer.disposeCmdModuleStatus(cmdReq);
+            }
         } else {
             log.warn("recv cmd module status, but fail to dispose[{}]", tcpChannel);
         }
@@ -178,6 +186,17 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         }
     }
 
+    private void dealCmdChargeDetail(ChannelBuffer buffer) {
+    	CmdChargeDetailReq cmdReq = new CmdChargeDetailReq();
+    	if (cmdReq.disposeData(buffer)) {
+    		sendCmdTYRetOK(cmdReq);
+    		log.info("recv charege detail[{}]", tcpChannel);
+    		if (this.cmdBizDisposer != null) {
+    			this.cmdBizDisposer.disposeCmdChargeDetail(cmdReq);
+    		}
+    	}
+    }
+    
     /**
      * 非法命令统一以通用应答处理
      * 
@@ -190,6 +209,10 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         if (cmdReq.disposeData(buffer)) {
             sendCmdTYRsp(cmdReq, ret);
         }
+    }
+    
+    private void sendCmdTYRetOK(AbstractCmdReq cmdReq) {
+    	sendCmdTYRsp(cmdReq, Const.TY_RET_OK);
     }
 
     /**

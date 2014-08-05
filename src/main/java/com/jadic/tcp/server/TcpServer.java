@@ -21,7 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jadic.biz.BaseInfo;
+import com.jadic.biz.ICmdBizDisposer;
 import com.jadic.biz.ThreadDisposeTcpChannelData;
+import com.jadic.db.DBOper;
 import com.jadic.tcp.TcpDataDecoder;
 import com.jadic.utils.KKSimpleTimer;
 
@@ -40,7 +42,9 @@ public class TcpServer implements ITcpChannelDisposer {
     private ServerBootstrap bootstrap;
     private int localPort;
     
-    public TcpServer(int localPort) {
+    private ICmdBizDisposer cmdBizDisposer;
+    
+    public TcpServer(int localPort, ICmdBizDisposer cmdBizDisposer) {
         this.localPort = localPort;
         this.tcpChannels = new ConcurrentHashMap<Integer, TcpChannel>();
         this.threadPoolDisposeTcpData = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -98,6 +102,7 @@ public class TcpServer implements ITcpChannelDisposer {
                         entry = iterator.next();
                         tcpChannel = entry.getValue();
                         if (System.currentTimeMillis() - tcpChannel.getLastRecvDataTime() >= TIME_OUT) {
+                        	DBOper.getDBOper().updateTerminalOffline(tcpChannel.getTerminalId());
                             tcpChannel.close();
                             tcpChannels.remove(entry.getKey());
                         }
@@ -168,6 +173,6 @@ public class TcpServer implements ITcpChannelDisposer {
     
     @Override
     public void executeDisposeTask(TcpChannel tcpChannel) {
-        this.threadPoolDisposeTcpData.execute(new ThreadDisposeTcpChannelData(tcpChannel));
+        this.threadPoolDisposeTcpData.execute(new ThreadDisposeTcpChannelData(tcpChannel, this.cmdBizDisposer));
     }
 }

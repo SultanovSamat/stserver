@@ -15,7 +15,7 @@ import com.jadic.utils.MyExceptionHandler;
  */
 public abstract class AbstractThreadDisposeDataFromQueue<T> extends MyAbstractThread implements IAddDataToQueue<T> {
 	
-	final static long DEFAULT_WAIT_NEW_DATA_TIME = 5 * 60 * 1000;
+	final static long DEFAULT_WAIT_NEW_DATA_TIME = 2 * 60 * 1000;
 	
 	private Object objNewData;
 	private final Queue<T> queue;
