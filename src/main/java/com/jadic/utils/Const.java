@@ -20,7 +20,7 @@ public final class Const {
     public final static short TER_MODULE_STATUS = 0x0004;//终端模块状态汇报
     public final static short TER_GET_MAC2      = 0x0005;//获取mac2
     public final static short SER_GET_MAC2_RET  = 0x7005;//获取mac2应答
-    public final static short TER_CHARGE_DETAIL	= 0x0006;//上传充值交易数据
+    public final static short TER_UPLOAD_TRANS	= 0x0006;//上传充值交易数据
     //-----------------------------通讯命令字定义-------------------------
     
     public final static byte TY_RET_OK            = 0x00;//0：成功/确认  
