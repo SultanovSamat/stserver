@@ -1577,6 +1577,14 @@ public class KKTool {
         return sBuilder.toString();
     }
     
+    public static String getLeftFillFixedLenStr(String srcStr, int fixedLen, char filledChar) {
+        return getFixedLenString(srcStr, fixedLen, filledChar, true);
+    }
+    
+    public static String getRightFillFixedLenStr(String srcStr, int fixedLen, char filledChar) {
+        return getFixedLenString(srcStr, fixedLen, filledChar, false);
+    }
+    
     /**
      * 根据提供的字符串及填充字符串生成固定长度的字符串
      * 
