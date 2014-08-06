@@ -1,0 +1,12 @@
+NV11 SDK - Version Information
+
+1.0
+
+- Initial release
+
+1.1
+
+- Isolated poll response to avoid overwriting the SSP_COMMAND structure
+- Removed some unnecessary locking/unlocking of threads
+- Program now reconnects when the poll command receives a 'Key not set' response
+- Stopped some poll responses incrementing the index counter incorrectly

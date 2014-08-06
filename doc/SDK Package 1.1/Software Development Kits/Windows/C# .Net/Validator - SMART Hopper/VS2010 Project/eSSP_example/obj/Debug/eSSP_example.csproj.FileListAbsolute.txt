@@ -1,0 +1,16 @@
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\bin\Debug\eSSP_example.exe.config
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\obj\Debug\ResolveAssemblyReference.cache
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\obj\Debug\eSSP_example.CCommsWindow.resources
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\obj\Debug\eSSP_example.Form1.resources
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\obj\Debug\eSSP_example.frmOpenMenu.resources
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\obj\Debug\eSSP_example.frmPayoutByDenom.resources
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\obj\Debug\eSSP_example.frmSetLevel.resources
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\obj\Debug\eSSP_example.frmSettings.resources
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\obj\Debug\eSSP_example.Properties.Resources.resources
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\obj\Debug\ResGen.read.1.tlog
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\obj\Debug\ResGen.write.1.tlog
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\bin\Debug\eSSP_example.exe
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\bin\Debug\eSSP_example.pdb
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\bin\Debug\ITLlib.dll
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\obj\Debug\eSSP_example.exe
+S:\SDK\SDK Package 1.1\Software Development Kits\Windows\C# .Net\Validator - SMART Hopper\VS2010 Project\eSSP_example\obj\Debug\eSSP_example.pdb

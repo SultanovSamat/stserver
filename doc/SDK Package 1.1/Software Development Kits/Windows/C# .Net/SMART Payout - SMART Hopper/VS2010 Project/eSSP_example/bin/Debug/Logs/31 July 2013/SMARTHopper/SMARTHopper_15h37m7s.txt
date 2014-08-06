@@ -1,0 +1,97 @@
+
+No Encryption
+Sent Packet #1
+Length: 1
+Sync: 1
+Data: 11 
+
+Received Packet #1
+Length: 1
+Sync: 1
+Data: 11 
+
+No Encryption
+Sent Packet #2
+Length: 1
+Sync: 1
+Data: 11 
+
+Received Packet #2
+Length: 1
+Sync: 1
+Data: 11 
+
+No Encryption
+Sent Packet #3
+Length: 1
+Sync: 1
+Data: 11 
+
+Received Packet #3
+Length: 1
+Sync: 1
+Data: 11 
+
+No Encryption
+Sent Packet #4
+Length: 1
+Sync: 1
+Data: 11 
+
+Received Packet #4
+Length: 1
+Sync: 1
+Data: 11 
+
+No Encryption
+Sent Packet #5
+Length: 1
+Sync: 1
+Data: 11 
+
+Received Packet #5
+Length: 1
+Sync: 1
+Data: 11 
+
+No Encryption
+Sent Packet #6
+Length: 1
+Sync: 1
+Data: 11 
+
+Received Packet #6
+Length: 1
+Sync: 1
+Data: 11 
+
+No Encryption
+Sent Packet #7
+Length: 1
+Sync: 1
+Data: 11 
+
+Received Packet #7
+Length: 1
+Sync: 1
+Data: 11 
+
+No Encryption
+Sent Packet #8
+Length: 1
+Sync: 1
+Data: 11 
+
+Received Packet #8
+Length: 1
+Sync: 1
+Data: 11 
+
+No Encryption
+Sent Packet #9
+Length: 1
+Sync: 1
+Data: 11 
+
+Received Packet #9
+Le

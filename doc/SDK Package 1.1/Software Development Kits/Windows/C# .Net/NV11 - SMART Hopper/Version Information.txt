@@ -1,0 +1,31 @@
+SMART Hopper & NV11 SDK - Version Information
+
+1.0
+
+- Initial release.
+
+1.1
+
+- Added a more useful message when a dispensed response is received from a poll to the NV11.
+
+1.2
+
+- Fixed interface bug with Payout by Denomination
+
+1.3
+
+- Updated ITLLib.dll to version 1.0.0.3
+- Isolated poll response to avoid corruption of data in the command structure.
+
+1.4
+
+- This SDK now supports a single COM port only.
+- Added a LibraryHandler to synchronise access to the COM port.
+- Improvements to the payout algorithm.
+- Improvements to device reconnection.
+- Improvements to program exit routine.
+- Added additional method to the Helper class.
+
+1.5
+
+- This SDK now uses the .Net 3.5 framework, it previously used .Net 4.0.

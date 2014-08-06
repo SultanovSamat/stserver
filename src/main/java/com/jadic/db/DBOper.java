@@ -4,13 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jadic.biz.bean.LongIDBean;
 import com.jadic.biz.bean.TerminalBean;
 import com.jadic.utils.KKTool;
 
@@ -32,6 +32,10 @@ public final class DBOper extends DefaultDBImpl {
     
     public List<TerminalBean> queryTerminals() {
         return queryForList(SQL.QUERY_TERMINAL_INFO, null, TerminalBean.class);
+    }
+    
+    public List<LongIDBean> queryTerminalIdsWithOnlineTime() {
+        return queryForList(SQL.QUERY_TERMINALIDS_ONLINE, null, LongIDBean.class);
     }
     
     public boolean updateTerminalStatus(String sql, List<Object> params) {

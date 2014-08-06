@@ -12,6 +12,11 @@ public final class SQL {
     public final static String QUERY_TERMINAL_INFO = "select a.id, a.enabled, -1 as channelId " +
     		                                           "from tab_terminal a " +
     		                                           "where a.typeid=1";
+    
+    //上过线的终端设备ID
+    public final static String QUERY_TERMINALIDS_ONLINE = "select terminalId as id " +
+    		                                                "from tab_terminal_status";
+    
     public final static String UPDATE_TERMINAL_OFFLINE = "update tab_terminal_status " +
     		                                               "set OnlineStatus = 2 " +
     		                                               "where terminalId = ? ";

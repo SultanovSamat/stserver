@@ -1,0 +1,12 @@
+SMART Payout SDK - Version Information
+
+1.0
+
+- Initial release
+
+1.1
+
+- Isolated poll response to prevent the command structure being overwritten
+- Some small efficiency improvements
+- Program will now reconnect on receiving an 0xFA response to a poll
+- Removed some unnecessary code

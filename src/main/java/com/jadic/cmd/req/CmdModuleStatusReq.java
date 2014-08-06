@@ -27,6 +27,7 @@ public class CmdModuleStatusReq extends AbstractCmdReq {
             ModuleStatus moduleStatus = new ModuleStatus();
             moduleStatus.setModuleId(channelBuffer.readByte());
             moduleStatus.setModuleStatus(channelBuffer.readByte());
+            msList.add(moduleStatus);
         }
         return true;
     }

@@ -1,0 +1,181 @@
+
+No Encryption
+Sent Packet #1
+Length: 1
+Sync: 1
+Data: 11 
+
+Received Packet #1
+Length: 1
+Sync: 1
+Data: F0 
+
+No Encryption
+Sent Packet #2
+Length: 9
+Sync: 0
+Data: 4A E5 2B 36 44 00 00 00 00 
+
+Received Packet #2
+Length: 1
+Sync: 0
+Data: F2 
+
+No Encryption
+Sent Packet #3
+Length: 9
+Sync: 1
+Data: 4B 25 38 FE 3B 00 00 00 00 
+
+Received Packet #3
+Length: 1
+Sync: 1
+Data: F2 
+
+No Encryption
+Sent Packet #4
+Length: 9
+Sync: 0
+Data: 4C EC 02 9C 26 00 00 00 00 
+
+Received Packet #4
+Length: 1
+Sync: 0
+Data: F2 
+
+No Encryption
+Sent Packet #5
+Length: 2
+Sync: 1
+Data: 06 06 
+
+Received Packet #5
+Length: 1
+Sync: 1
+Data: F2 
+
+No Encryption
+Sent Packet #6
+Length: 2
+Sync: 0
+Data: 06 07 
+
+Received Packet #6
+Length: 1
+Sync: 0
+Data: F2 
+
+No Encryption
+Sent Packet #7
+Length: 2
+Sync: 1
+Data: 06 08 
+
+Received Packet #7
+Length: 1
+Sync: 1
+Data: F2 
+
+No Encryption
+Sent Packet #8
+Length: 2
+Sync: 0
+Data: 06 09 
+
+Received Packet #8
+Length: 1
+Sync: 0
+Data: F2 
+
+No Encryption
+Sent Packet #9
+Length: 2
+Sync: 1
+Data: 06 0A 
+
+Received Packet #9
+Length: 1
+Sync: 1
+Data: F2 
+
+No Encryption
+Sent Packet #10
+Length: 2
+Sync: 0
+Data: 06 0B 
+
+Received Packet #10
+Length: 1
+Sync: 0
+Data: F2 
+
+No Encryption
+Sent Packet #11
+Length: 2
+Sync: 1
+Data: 06 0C 
+
+Received Packet #11
+Length: 1
+Sync: 1
+Data: F2 
+
+No Encryption
+Sent Packet #12
+Length: 2
+Sync: 0
+Data: 06 0D 
+
+Received Packet #12
+Length: 1
+Sync: 0
+Data: F2 
+
+No Encryption
+Sent Packet #13
+Length: 2
+Sync: 1
+Data: 06 0E 
+
+Received Packet #13
+Length: 1
+Sync: 1
+Data: F2 
+
+No Encryption
+Sent Packet #14
+Length: 2
+Sync: 0
+Data: 06 0F 
+
+Received Packet #14
+Length: 1
+Sync: 0
+Data: F2 
+
+No Encryption
+Sent Packet #15
+Length: 2
+Sync: 1
+Data: 06 10 
+
+Received Packet #15
+Length: 1
+Sync: 1
+Data: F2 
+
+No Encryption
+Sent Packet #16
+Length: 2
+Sync: 0
+Data: 06 11 
+
+Received Packet #16
+Length: 1
+Sync: 0
+Data: F2 
+
+No Encryption
+Sent Packet #17
+Length: 2
+Sync: 1

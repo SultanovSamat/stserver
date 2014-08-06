@@ -1,0 +1,87 @@
+
+No Encryption
+Sent Packet #1
+Length: 1
+Sync: 0
+Data: 01 
+
+No response...
+No Encryption
+Sent Packet #2
+Length: 1
+Sync: 1
+Data: 11 
+
+Received Packet #2
+Length: 1
+Sync: 1
+Data: F0 
+
+No Encryption
+Sent Packet #3
+Length: 9
+Sync: 0
+Data: 4A DB 55 98 23 00 00 00 00 
+
+Received Packet #3
+Length: 1
+Sync: 0
+Data: F0 
+
+No Encryption
+Sent Packet #4
+Length: 9
+Sync: 1
+Data: 4B 87 79 78 01 00 00 00 00 
+
+Received Packet #4
+Length: 1
+Sync: 1
+Data: F0 
+
+No Encryption
+Sent Packet #5
+Length: 9
+Sync: 0
+Data: 4C 88 D6 32 01 00 00 00 00 
+
+Received Packet #5
+Length: 9
+Sync: 0
+Data: F0 90 26 FA 00 00 00 00 00 
+
+No Encryption
+Sent Packet #6
+Length: 2
+Sync: 1
+Data: 06 06 
+
+Received Packet #6
+Length: 1
+Sync: 1
+Data: F0 
+
+No Encryption
+Sent Packet #7
+Length: 2
+Sync: 0
+Data: 06 07 
+
+Received Packet #7
+Length: 1
+Sync: 0
+Data: F0 
+
+No Encryption
+Sent Packet #8
+Length: 2
+Sync: 1
+Data: 06 08 
+
+Received Packet #8
+Length: 1
+Sync: 1
+Data: F8 
+
+No Encryption
+Sen

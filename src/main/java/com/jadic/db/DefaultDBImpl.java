@@ -218,7 +218,7 @@ public class DefaultDBImpl {
 
             return pstmt.executeUpdate();
         } catch (SQLException e) {
-            logger.error("executeUpdateSingle err, sql:{},tip:{}", sql, KKTool.getExceptionTip(e));
+            logger.error("executeUpdateSingle err, sql:{}", sql, e);
         } finally {
             KKTool.closeStatementAndConnectionInSilence(pstmt, connection);
         }

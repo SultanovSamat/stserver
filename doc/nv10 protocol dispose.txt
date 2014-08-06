@@ -1,0 +1,91 @@
+通讯格式：
+STX + SEQ + LENGTH + DATA + CRCL + CRCH
+
+STX: 				起始字节，为十六进制：0x7F.
+SEQ: 				标志位. 如果是NV9、NV10、NV200使用0x80和0x00交替使用. Hopper 使用0x90和0x10交替使用.
+LENGTH: 		包长度，长度不包含 STX、SEQ、CRCL，CRCH
+DATA: 			命令或数据
+CRCL,CRCH: 	CRC-16 校验 (详细见附件算法)， 需要校验的数据从 SEQ 开始直到 Data 为止.
+
+NV10USB implementation list
+
+1.Reset (0x01) 重新初始化
+	req:7F 80 01 01 06 02
+	rsp:7F 80 01 F0 23 80 (OK)
+	
+2.Set Channel Inhibits(0x02)设置通道禁止，进制了某个通道就意味着禁止了某种面额
+	在 Set inhibits 命令中，02 后面的两个字节就是控制相应的通道，其中第一个字节的最高位Bit7 必须为 1，
+	其他每个位对应于一个通道，因此，最大可以控制15 个通道。 
+	命令字后面的两字节应该是小端模式排序
+	req:7F 80 03 02 FF 00 27 A6	所有通道都启用 
+	rsp:7F 80 01 F0 23 80	(OK)
+	
+3.Display On (0x03) 指示灯亮
+	req:7F 80 01 03 09 82
+	rsp:7F 80 01 F0 23 80
+
+4.Display Off (0x04) 指示灯灭
+	req:7F 80 01 04 18 02
+	rsp:7F 80 01 F0 23 80
+	
+5.Setup Request (0x05) 获取设备的相关信息，如国家代码、版本、通道。。。
+	req:7F 80 01 05 1D 82
+	rsp:见附1
+
+6.Host Protocol Version (0x06) 设置设备协议版本，如果对主机设置的协议版本支持将返回ok，否则返回0xF8
+	req:7F 80 02 06 06 24 14	该命令表示启用版本6
+	rsp:7F 80 01 F0 23 80			设备应答ok
+
+7.Poll (0x07) 
+
+8.Reject Banknote (0x08)
+
+9.Disable (0x09) 
+
+10.Enable (0x0A)
+
+11.Get Serial Number (0x0C) 
+
+12.Unit Data (0x0D)
+
+14.Channel Value Request (0x0E)
+
+15.Channel Security Data (0x0F)
+
+16.Channel Re-teach Data (0x10)
+
+17.Sync (0x11)
+
+18.Last Reject Code (0x17)
+
+19.Hold (0x18)
+
+20.Get Firmware Version (0x20)
+
+21.Get Dataset Version (0x21)
+
+22.Set Generator (0x4A)
+
+23.Set Modulus (0x4B)
+
+24.Request Key Exchange (0x4C)
+
+25.Poll With ACK (0x56)
+
+26.Event ACK (0x57)
+
+附1：Setup Request rsp
+7F				  			stx
+00				  			seq
+1D				  			length(29)
+F0				  			识币器已执行完毕
+00				  			数据包类型  0 = Banknote validator, 6 = SMART payout fitted, 7 = Note Float fitted.
+30 33 33 34				控制版本(0334) ASCII
+43 4E 59					国家代码 ASCII CNY
+00 00 01					乘数变量
+06								纸币器所使用的最大通道数
+01 05 0A 14 32 64	每个通道所对应的纸币面额 分别是1元 5元 10元 20元 50元 100元
+02 02 02 02 02 02	乘数变量大于0时，设置为2，否则为0
+00 00 64
+04								协议版本
+88F9							CRC

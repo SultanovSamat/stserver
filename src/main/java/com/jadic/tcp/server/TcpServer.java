@@ -46,6 +46,7 @@ public class TcpServer implements ITcpChannelDisposer {
     
     public TcpServer(int localPort, ICmdBizDisposer cmdBizDisposer) {
         this.localPort = localPort;
+        this.cmdBizDisposer = cmdBizDisposer;
         this.tcpChannels = new ConcurrentHashMap<Integer, TcpChannel>();
         this.threadPoolDisposeTcpData = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
@@ -102,7 +103,9 @@ public class TcpServer implements ITcpChannelDisposer {
                         entry = iterator.next();
                         tcpChannel = entry.getValue();
                         if (System.currentTimeMillis() - tcpChannel.getLastRecvDataTime() >= TIME_OUT) {
-                        	DBOper.getDBOper().updateTerminalOffline(tcpChannel.getTerminalId());
+                            if (tcpChannel.getTerminalId() > 0) {
+                                DBOper.getDBOper().updateTerminalOffline(tcpChannel.getTerminalId());
+                            }
                             tcpChannel.close();
                             tcpChannels.remove(entry.getKey());
                         }
@@ -158,6 +161,9 @@ public class TcpServer implements ITcpChannelDisposer {
     protected void removeTcpChannel(Integer channelId) {
         TcpChannel tcpChannel = tcpChannels.remove(channelId);
         if (tcpChannel != null) {
+            if (tcpChannel.getTerminalId() > 0) {
+                DBOper.getDBOper().updateTerminalOffline(tcpChannel.getTerminalId());
+            }
             tcpChannel.close();
             BaseInfo.getBaseInfo().initTerminalChannelId(tcpChannel.getTerminalId());
         }

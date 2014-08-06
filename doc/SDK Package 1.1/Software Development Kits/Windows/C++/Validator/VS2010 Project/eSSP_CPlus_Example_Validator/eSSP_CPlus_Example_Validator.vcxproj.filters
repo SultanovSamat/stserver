@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="entry.cpp" />
+    <ClCompile Include="Classes\CLogging.cpp">
+      <Filter>Classes</Filter>
+    </ClCompile>
+    <ClCompile Include="Classes\CValidator.cpp">
+      <Filter>Classes</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Includes\IO.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\SSPInclude.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\CLogging.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes\CValidator.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
+    <ClInclude Include="Includes\Commands.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Classes">
+      <UniqueIdentifier>{b075a77a-d055-4d73-ae2c-e9ed11fb1f39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes">
+      <UniqueIdentifier>{39040fa3-f348-4fe4-9bdc-c3a94bf637cf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

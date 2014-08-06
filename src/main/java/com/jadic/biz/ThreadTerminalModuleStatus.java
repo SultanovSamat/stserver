@@ -5,6 +5,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.jadic.biz.bean.LongIDBean;
 import com.jadic.biz.bean.ModuleStatus;
 import com.jadic.cmd.req.CmdModuleStatusReq;
 import com.jadic.db.DBOper;
@@ -17,6 +21,8 @@ import com.jadic.utils.KKTool;
  */
 public class ThreadTerminalModuleStatus extends AbstractThreadDisposeDataFromQueue<CmdModuleStatusReq> {
     
+    private final static Logger log = LoggerFactory.getLogger(ThreadTerminalModuleStatus.class);
+    
     private DBOper dbOper;
     
     private Set<Long> terminalIdSet;//有终端模块状态数据的终端ID集合
@@ -28,6 +34,7 @@ public class ThreadTerminalModuleStatus extends AbstractThreadDisposeDataFromQue
 
     @Override
     public void run() {
+        initTerminalIdSet();
         CmdModuleStatusReq cmdReq = null;
         while (!isInterrupted()) {
             while ((cmdReq = getQueuePollData()) != null) {
@@ -35,6 +42,17 @@ public class ThreadTerminalModuleStatus extends AbstractThreadDisposeDataFromQue
             }
             waitNewData();
         }
+    }
+    
+    /**
+     * 初始从数据库中加载已经上过线的终端ID列表
+     */
+    private void initTerminalIdSet() {
+        List<LongIDBean> idList = dbOper.queryTerminalIdsWithOnlineTime();
+        for (LongIDBean idBean : idList) {
+            terminalIdSet.add(idBean.getId());
+        }
+        log.info("terminal-with-online-time count:{}", terminalIdSet.size());
     }
     
     private void disposeCmd(CmdModuleStatusReq cmdReq) {
@@ -60,9 +78,10 @@ public class ThreadTerminalModuleStatus extends AbstractThreadDisposeDataFromQue
                 params.add(ms.getModuleStatus());
             }
             dbOper.updateTerminalStatus(sqlBuilder.toString(), params);
+            log.info("terminal[{}] add new module status", terminalId);
         } else {
             sqlBuilder.append("update tab_terminal_status ");
-            sqlBuilder.append("set onlinestatus=1, lastonlinetime=SYSDATE(), ");
+            sqlBuilder.append("set onlinestatus=1, lastonlinetime=SYSDATE()");
             for (ModuleStatus ms : msList) {
                 sqlBuilder.append(", m").append(ms.getModuleId()).append("status=?");
             }            
@@ -72,6 +91,7 @@ public class ThreadTerminalModuleStatus extends AbstractThreadDisposeDataFromQue
             }
             params.add(terminalId);
             dbOper.updateTerminalStatus(sqlBuilder.toString(), params);
+            log.info("terminal[{}]update module status", terminalId);
         }
     }
 

@@ -35,6 +35,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 
     public ThreadDisposeTcpChannelData(TcpChannel tcpChannel, ICmdBizDisposer cmdBizDisposer) {
         this.tcpChannel = tcpChannel;
+        this.cmdBizDisposer = cmdBizDisposer;
     }
 
     @Override
@@ -133,7 +134,6 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             // this means tcpchannel is logined
             this.tcpChannel.setTerminalVer(cmdReq.getVer());
             this.setTcpchannelTerminalId(cmdReq);
-            log.info("a client login[{}]", tcpChannel);
             CmdLoginRsp cmdRsp = new CmdLoginRsp();
             cmdRsp.setCmdCommonField(cmdReq);
             cmdRsp.setCmdSNoRsp(cmdReq.getCmdSNo());
@@ -153,6 +153,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             }
             cmdRsp.setRet(ret);
             sendData(cmdRsp.getSendBuffer());
+            log.info("a client login, login ret[{}], [{}]", ret, tcpChannel);
         } else {
             log.warn("recv cmd login, but fail to dispose[{}]", tcpChannel);
         }

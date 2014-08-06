@@ -1,0 +1,13 @@
+SMART Hopper SDK - Version Information
+
+1.0
+
+- Initial release
+
+1.1
+
+- Increased comms timeout to 1000ms from 500ms
+- Program now reconnects on 'Key not Set' response
+- Isolated poll response to prevent overwriting the command structure
+- Fixed an issue where the program could lock up after the SMART Empty command
+- Minor improvements to efficiency

@@ -1,0 +1,14 @@
+Note Validator SDK - Version Information
+
+1.0
+
+- Initial release
+
+1.1
+
+- Restructured poll function to use a copy of poll response instead of original data
+- Added new poll with ACK response 'Initialising'
+
+1.2
+
+- Program will now reconnect if 0xFA response is received

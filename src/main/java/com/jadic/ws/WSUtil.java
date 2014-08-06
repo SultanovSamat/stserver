@@ -77,11 +77,11 @@ public final class WSUtil {
         		              "</CHARGEREQ>" +
         		            "</SVCCONT>" +
         		          "</SVC>";
-        String origDomain = "02";
+        String origDomain = "A1";
         String homeDomain = "01";
         String biPCode = "0004";
         String actionCode = "0";
-        String procId = KKTool.getFixedLenString("", 30, '0', true);
+        String procId = KKTool.getStrWithMaxLen(KKTool.getCurrFormatDate("yyyyMMddHHmmssZZZ"), 30, false);
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String operType = KKTool.byteToHexStr(cmdReq.getOperType());
         String cardNo = KKTool.byteArrayToHexStr(cmdReq.getCardNo());
@@ -89,14 +89,14 @@ public final class WSUtil {
         String asn = KKTool.byteArrayToHexStr(cmdReq.getAsn());
         String randNumber = KKTool.byteArrayToHexStr(cmdReq.getRandNumber());
         String cardTradeNo = KKTool.byteArrayToHexStr(cmdReq.getCardTradNo());
-        String cardOldBalance = KKTool.getFixedLenString(String.valueOf(cmdReq.getCardOldBalance()), 10, '0', true);
-        String chargeAmount = KKTool.getFixedLenString(String.valueOf(cmdReq.getChargeAmount()), 10, '0', true);
+        String cardOldBalance = KKTool.getStrWithMaxLen(String.valueOf(cmdReq.getCardOldBalance()), 10, false);
+        String chargeAmount = KKTool.getStrWithMaxLen(String.valueOf(cmdReq.getChargeAmount()), 10, false);
         String tradeType = "02";
         String keyVersion = "01";
         String arithIndex = "00";
         String mac1 = KKTool.byteArrayToHexStr(cmdReq.getMac1());
-        String deptNo = KKTool.getFixedLenString("", 10, '0', true);
-        String operNo = KKTool.getFixedLenString("", 10, '0', true);
+        String deptNo = KKTool.getStrWithMaxLen("", 10, false);
+        String operNo = KKTool.getStrWithMaxLen("", 10, false);
         String chargeDate = KKTool.byteArrayToHexStr(cmdReq.getChargeDate());
         String chargeTime = KKTool.byteArrayToHexStr(cmdReq.getChargeTime());
         

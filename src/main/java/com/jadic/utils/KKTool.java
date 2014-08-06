@@ -25,9 +25,13 @@ import java.util.GregorianCalendar;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class KKTool {
 
+    private final static Logger log = LoggerFactory.getLogger(KKTool.class);
+    
     final static char BLANK_CHAR = 0x00;
 
     final static String EMPTY_STR = "";
@@ -1221,6 +1225,40 @@ public class KKTool {
         }
         return b;
     }
+    
+    /**
+     * 创建windows系统下的隐藏文件
+     * @param filePath
+     * @return
+     */
+    public static boolean createWindowsHiddenFile(String filePath) {
+        File file = new File(filePath);
+        try {
+            file.createNewFile();
+            Runtime.getRuntime().exec("attrib +H " + file.getAbsolutePath());
+            return true;
+        } catch (IOException e) {
+            log.error("createWindowsHiddenFile err", e);
+        }
+        return false;
+    }
+    
+    /**
+     * 设置windows下文件(夹)隐藏
+     * @param file
+     * @return
+     */
+    public static boolean setWindowsFileHidden(File file) {
+        try {
+            if (file != null && file.exists()) {
+                Runtime.getRuntime().exec("attrib +H " + file.getAbsolutePath());
+                return true;
+            }
+        } catch (IOException e) {
+            log.error("setWindowsFileHidden err", e);
+        }
+        return false;
+    }
 
     public static boolean createFileDir(String dir) {
         if (!isStrNullOrBlank(dir)) {
@@ -1538,7 +1576,7 @@ public class KKTool {
         }
         return sBuilder.toString();
     }
-
+    
     /**
      * 根据提供的字符串及填充字符串生成固定长度的字符串
      * 
@@ -1684,6 +1722,25 @@ public class KKTool {
             }
         }
         return sBuilder.toString();
+    }
+    
+    /**
+     * 获取最大长度的字符串，超出允许的最大长度，截取多余的
+     * @param srcStr
+     * @param maxLen
+     * @param isTruncatedFromLeft true:从左侧开始截取
+     * @return
+     */
+    public static String getStrWithMaxLen(String srcStr, int maxLen, boolean isTruncatedFromLeft) {
+        if (srcStr.length() <= maxLen) {
+            return srcStr;
+        }
+        
+        if (isTruncatedFromLeft) {
+            return srcStr.substring(maxLen - srcStr.length());
+        } else {
+            return srcStr.substring(0, maxLen);
+        }
     }
 
     /**
@@ -2115,9 +2172,13 @@ public class KKTool {
     }
 
     public static void main(String[] args) {
-        byte[] buf = new byte[2];
-        test(buf);
-        printLog(buf.length);
+        File file = new File("D:/1.txt");
+        try {
+            file.createNewFile();
+            Runtime.getRuntime().exec("attrib +H " + file.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void test(byte[] buf) {
