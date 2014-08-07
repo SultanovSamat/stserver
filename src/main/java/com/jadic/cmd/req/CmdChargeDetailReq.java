@@ -24,7 +24,7 @@ public class CmdChargeDetailReq extends AbstractCmdReq {
         this.transDate = new byte[4];
         this.transTime = new byte[3];
         this.tac = new byte[4];
-        this.cityCardNo = new byte[10];
+        this.cityCardNo = new byte[8];
     }
 
 	@Override
