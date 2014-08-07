@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -12,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import com.jadic.biz.bean.LongIDBean;
 import com.jadic.biz.bean.TerminalBean;
+import com.jadic.cmd.req.CmdChargeDetailReq;
+import com.jadic.cmd.req.CmdRefundReq;
 import com.jadic.utils.KKTool;
 
 /**
@@ -47,7 +51,49 @@ public final class DBOper extends DefaultDBImpl {
         params.add(terminalId);
         return executeUpdateSingle(SQL.UPDATE_TERMINAL_OFFLINE, params) != -1;
     }
+    
+    public long addNewChargeDetail(CmdChargeDetailReq chargeDetail) {
+        List<Object> params = new ArrayList<Object>();
+        params.add(KKTool.byteArrayToHexStr(chargeDetail.getCityCardNo()));
+        params.add(chargeDetail.getCardType());
+        params.add(new String(chargeDetail.getBankCardNo()));
+        byte[] dt = new byte[7];
+        System.arraycopy(chargeDetail.getTransDate(), 0, dt, 0, 4);
+        System.arraycopy(chargeDetail.getTransTime(), 0, dt, 4, 3);
+        Date chargeTime = KKTool.getDateTime(dt, 0);
+        params.add(new Timestamp(chargeTime.getTime()));
+        params.add(chargeDetail.getChargeType());
+        params.add(chargeDetail.getTransAmount());
+        params.add(chargeDetail.getBalanceBeforeTrans());
+        params.add(KKTool.byteArrayToHexStr(chargeDetail.getTac()));
+        params.add(KKTool.byteArrayToHexStr(chargeDetail.getAsn()));
+        params.add(KKTool.byteArrayToHexStr(chargeDetail.getTsn()));
+        params.add(chargeDetail.getTransSNo());
+        params.add(Long.parseLong(KKTool.byteArrayToHexStr(chargeDetail.getTerminalId())));
+        params.add("");
+        params.add("");
+        params.add("");
+        try {
+            return executeInsertAndRetrieveId(SQL.ADD_CHARGE_DETAIL, params);
+        } catch (SQLException e) {
+            logger.error("addNewChargeDetail fail", e);
+        }
+        return -1;
+    }
 
+    public int addNewRefund(CmdRefundReq refund) {
+        List<Object> params = new ArrayList<Object>();
+        params.add(KKTool.byteArrayToHexStr(refund.getCityCardNo()));
+        params.add(refund.getAmount());
+        params.add(refund.getChargeType());
+        try {
+            return (int)executeInsertAndRetrieveId(SQL.ADD_REFUND, params);
+        } catch (SQLException e) {
+            logger.error("addNewRefund fail", e);
+        }
+        return -1;
+    }
+    
     public void test() {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -68,7 +114,7 @@ public final class DBOper extends DefaultDBImpl {
     }
     
     public static void main(String[] strings) {
-    	DBOper.getDBOper().test();
+    	DBOper.getDBOper().addNewRefund(new CmdRefundReq());
     }
 
 }

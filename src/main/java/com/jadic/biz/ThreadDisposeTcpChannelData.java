@@ -7,15 +7,19 @@ import org.slf4j.LoggerFactory;
 import com.jadic.biz.bean.TerminalBean;
 import com.jadic.cmd.req.AbstractCmdReq;
 import com.jadic.cmd.req.CmdChargeDetailReq;
+import com.jadic.cmd.req.CmdDefaultReq;
 import com.jadic.cmd.req.CmdGetMac2Req;
 import com.jadic.cmd.req.CmdHeartbeatReq;
 import com.jadic.cmd.req.CmdLoginReq;
 import com.jadic.cmd.req.CmdModuleStatusReq;
+import com.jadic.cmd.req.CmdRefundReq;
 import com.jadic.cmd.req.CmdTYRetReq;
-import com.jadic.cmd.req.CmdDefaultReq;
+import com.jadic.cmd.rsp.CmdChargeDetailRsp;
 import com.jadic.cmd.rsp.CmdGetMac2Rsp;
 import com.jadic.cmd.rsp.CmdLoginRsp;
+import com.jadic.cmd.rsp.CmdRefundRsp;
 import com.jadic.cmd.rsp.CmdTYRetRsp;
+import com.jadic.db.DBOper;
 import com.jadic.tcp.server.TcpChannel;
 import com.jadic.utils.Const;
 import com.jadic.utils.KKTool;
@@ -102,6 +106,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         case Const.TER_CHARGE_DETAIL:
         	dealCmdChargeDetail(buffer);
         	break;
+        case Const.TER_REFUND:
+            dealCmdRefund(buffer);
+            break;
         default:
             dealInvalidCmd(buffer, Const.TY_RET_NOT_SUPPORTED);
             log.warn("Unsupported command flag:{}", KKTool.byteArrayToHexStr(KKTool.short2BytesBigEndian(cmdFlag)));
@@ -122,7 +129,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         CmdHeartbeatReq cmdReq = new CmdHeartbeatReq();
         if (cmdReq.disposeData(buffer)) {
             log.debug("recv heartbeat[{}] ", tcpChannel);
-            sendCmdTYRsp(cmdReq, Const.TY_RET_OK);
+            sendCmdTYRetOK(cmdReq);
         } else {
             log.warn("recv cmd heartbeat, but fail to dispose[{}]", tcpChannel);
         }
@@ -162,7 +169,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     private void dealCmdModuleStatus(ChannelBuffer buffer) {
         CmdModuleStatusReq cmdReq = new CmdModuleStatusReq();
         if (cmdReq.disposeData(buffer)) {
-        	sendCmdTYRsp(cmdReq, Const.TY_RET_OK);
+            sendCmdTYRetOK(cmdReq);
             log.info("recv module status[{}]", tcpChannel);
             if (this.cmdBizDisposer != null) {
             	this.cmdBizDisposer.disposeCmdModuleStatus(cmdReq);
@@ -190,12 +197,38 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     private void dealCmdChargeDetail(ChannelBuffer buffer) {
     	CmdChargeDetailReq cmdReq = new CmdChargeDetailReq();
     	if (cmdReq.disposeData(buffer)) {
-    		sendCmdTYRetOK(cmdReq);
+    		byte ret = 1;
+    		long recordId = DBOper.getDBOper().addNewChargeDetail(cmdReq);
+    		if (recordId < 0) {
+    		    ret = 0;
+    		}
+    		CmdChargeDetailRsp cmdRsp = new CmdChargeDetailRsp();
+    		cmdRsp.setCmdCommonField(cmdReq);
+    		cmdRsp.setRet(ret);
+    		cmdRsp.setRecordId(recordId);
+    		sendData(cmdRsp.getSendBuffer());
     		log.info("recv charege detail[{}]", tcpChannel);
     		if (this.cmdBizDisposer != null) {
     			this.cmdBizDisposer.disposeCmdChargeDetail(cmdReq);
     		}
     	}
+    }
+    
+    private void dealCmdRefund(ChannelBuffer buffer) {
+        CmdRefundReq cmdReq = new CmdRefundReq();
+        if (cmdReq.disposeData(buffer)) {
+            byte ret = 1;
+            int recordId = DBOper.getDBOper().addNewRefund(cmdReq);
+            if (recordId < 0) {
+                ret = 0;
+            }
+            CmdRefundRsp cmdRsp = new CmdRefundRsp();
+            cmdRsp.setCmdCommonField(cmdReq);
+            cmdRsp.setRet(ret);
+            cmdRsp.setRecordId(recordId);
+            sendData(cmdRsp.getSendBuffer());
+            log.info("recv cmd refund[{}]", tcpChannel);
+        }
     }
     
     /**

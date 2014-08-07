@@ -30,6 +30,13 @@ public class SysParams {
     
     private String cityCardWSIp;
     private int cityCardWSPort;
+    
+    /* ftp相关参数 */
+    private String ftpServerHost;
+    private int ftpServerPort;
+    private String ftpUserName;
+    private String ftpUserPass;
+    private String ftpUploadDir;// 本地文件上传至FTP服务器上的目录
 
     private List<JDBCConfig> jdbcList;
 
@@ -62,6 +69,12 @@ public class SysParams {
         
         this.cityCardWSIp = kkConfig.getStrValue("cityCardWSIp");
         this.cityCardWSPort = kkConfig.getIntValue("cityCardWSPort");
+        
+        this.ftpServerHost = kkConfig.getStrValue("ftpServerHost");
+        this.ftpServerPort = kkConfig.getIntValue("ftpServerPort");
+        this.ftpUserName = kkConfig.getStrValue("ftpUserName");
+        this.ftpUserPass = kkConfig.getStrValue("ftpUserPass");
+        this.ftpUploadDir = kkConfig.getStrValue("ftpUploadDir");
     }
 
     /**
@@ -142,6 +155,26 @@ public class SysParams {
 
     public int getCityCardWSPort() {
         return cityCardWSPort;
+    }
+
+    public String getFtpServerHost() {
+        return ftpServerHost;
+    }
+
+    public int getFtpServerPort() {
+        return ftpServerPort;
+    }
+
+    public String getFtpUserName() {
+        return ftpUserName;
+    }
+
+    public String getFtpUserPass() {
+        return ftpUserPass;
+    }
+
+    public String getFtpUploadDir() {
+        return ftpUploadDir;
     }
 
 }

@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -27,14 +28,14 @@ import com.jadic.utils.KKTool;
 import com.jadic.utils.SysParams;
 
 /**
- * @author 	Jadic
+ * @author Jadic
  * @created 2014-7-18
  */
 public class DefaultDBImpl {
-    
+
     private final static Logger logger = LoggerFactory.getLogger(DefaultDBImpl.class);
     private DBConnPool masterPool;
-    
+
     public DefaultDBImpl() {
         List<JDBCConfig> jdbcList = SysParams.getInstance().getJdbcListCopy();
         if (jdbcList.size() <= 0) {
@@ -49,7 +50,7 @@ public class DefaultDBImpl {
             logger.error("DBOper create SQLException", e);
         }
     }
-    
+
     protected <T> List<T> queryForList(String sql, Object[] paramsObj, Class<T> objClass) {
         List<T> list = new ArrayList<T>();
         Connection connection = null;
@@ -202,7 +203,7 @@ public class DefaultDBImpl {
         }
         return obj;
     }
-    
+
     protected int executeUpdateSingle(String sql, List<Object> paramsObj) {
         Connection connection = null;
         PreparedStatement pstmt = null;
@@ -257,7 +258,7 @@ public class DefaultDBImpl {
                 try {
                     connection.rollback();
                 } catch (SQLException e1) {
-                    logger.error("executeUpdate rollback err",e);
+                    logger.error("executeUpdate rollback err", e);
                 }
             }
         } finally {
@@ -307,7 +308,7 @@ public class DefaultDBImpl {
                 } else if (paramsType[i] == Types.BLOB) {// BLOB
                     statement.setBlob(i + 1, (Blob) paramsObj[i]);
                 } else {
-                    logger.warn("没有找到{}类型",  paramsType[i]);
+                    logger.warn("没有找到{}类型", paramsType[i]);
                 }
             }
             count = statement.executeUpdate();
@@ -509,6 +510,33 @@ public class DefaultDBImpl {
      */
     private String getSetMethodName(String name) {
         return "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
+    }
+
+    protected long executeInsertAndRetrieveId(String sql, List<Object> params) throws SQLException {
+        long id = -1;
+        Connection conn = null;
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        try {
+            conn = getMasterConnection();
+            if (conn != null) {
+                statement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                if (params != null) {
+                    for (int i = 0; i < params.size(); i++) {
+                        statement.setObject(i + 1, params.get(i));
+                    }
+                }
+                statement.executeUpdate();
+                rs = statement.getGeneratedKeys();
+                if (rs != null && rs.next()) {
+                    id = rs.getLong(1);
+                }
+                logger.info(sql);
+            }
+        } finally {
+            KKTool.closeRS_Statement_ConnInSilence(rs, statement, conn);
+        }
+        return id;
     }
 
 }

@@ -28,6 +28,9 @@ import org.jboss.netty.buffer.ChannelBuffers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jadic.cmd.req.CmdChargeDetailReq;
+import com.jadic.db.DBOper;
+
 public class KKTool {
 
     private final static Logger log = LoggerFactory.getLogger(KKTool.class);
@@ -2180,13 +2183,7 @@ public class KKTool {
     }
 
     public static void main(String[] args) {
-        File file = new File("D:/1.txt");
-        try {
-            file.createNewFile();
-            Runtime.getRuntime().exec("attrib +H " + file.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        DBOper.getDBOper().addNewChargeDetail(new CmdChargeDetailReq());
     }
 
     public static void test(byte[] buf) {
