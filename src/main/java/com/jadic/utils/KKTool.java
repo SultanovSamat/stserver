@@ -28,9 +28,6 @@ import org.jboss.netty.buffer.ChannelBuffers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jadic.cmd.req.CmdChargeDetailReq;
-import com.jadic.db.DBOper;
-
 public class KKTool {
 
     private final static Logger log = LoggerFactory.getLogger(KKTool.class);
@@ -312,6 +309,19 @@ public class KKTool {
         int hour = KKTool.byteToInt(data[startIndex++]);
         int minute = KKTool.byteToInt(data[startIndex++]);
         int second = KKTool.byteToInt(data[startIndex++]);
+        Calendar c = new GregorianCalendar(year, month - 1, day, hour, minute, second);
+        return c.getTime();
+    }
+    
+    public static Date getBCDDateTime(byte[] data, int startIndex) {
+        if (startIndex < 0 || startIndex + 6 > data.length)
+            return new Date();
+        int year = bcd2Byte(data[startIndex++])* 100 + bcd2Byte(data[startIndex ++]);
+        int month = bcd2Byte(data[startIndex++]);
+        int day = bcd2Byte(data[startIndex++]);
+        int hour = bcd2Byte(data[startIndex++]);
+        int minute = bcd2Byte(data[startIndex++]);
+        int second = bcd2Byte(data[startIndex++]);
         Calendar c = new GregorianCalendar(year, month - 1, day, hour, minute, second);
         return c.getTime();
     }
@@ -2183,7 +2193,9 @@ public class KKTool {
     }
 
     public static void main(String[] args) {
-        DBOper.getDBOper().addNewChargeDetail(new CmdChargeDetailReq());
+        byte[] data = new byte[]{0x20, 0x14, 0x08, 0x10, 0x22, 0x22, 0x59, 0x10};
+        printLog(getFormatDateTime(getDateTime(data, 0), "yyyy-MM-dd HH:mm:ss"));
+        printLog(getFormatDateTime(getBCDDateTime(data, 0), "yyyy-MM-dd HH:mm:ss"));
     }
 
     public static void test(byte[] buf) {

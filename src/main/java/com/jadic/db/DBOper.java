@@ -60,7 +60,7 @@ public final class DBOper extends DefaultDBImpl {
         byte[] dt = new byte[7];
         System.arraycopy(chargeDetail.getTransDate(), 0, dt, 0, 4);
         System.arraycopy(chargeDetail.getTransTime(), 0, dt, 4, 3);
-        Date chargeTime = KKTool.getDateTime(dt, 0);
+        Date chargeTime = KKTool.getBCDDateTime(dt, 0);
         params.add(new Timestamp(chargeTime.getTime()));
         params.add(chargeDetail.getChargeType());
         params.add(chargeDetail.getTransAmount());
