@@ -8,24 +8,27 @@ import org.jboss.netty.buffer.ChannelBuffer;
  */
 public class CmdRefundReq extends AbstractCmdReq {
     
-    private byte[] cityCardNo;
-    private int amount;
-    private byte chargeType;
+    private byte[] cityCardNo;//市民卡卡号
+    private int amount;//退款金额
+    private byte[] time;//退款时间
+    //private byte chargeType;
     
     public CmdRefundReq() {
         this.cityCardNo = new byte[10];
+        this.time = new byte[7];
     }
 
     @Override
     protected int getCmdBodySize() {
-        return this.cityCardNo.length + 4 + 1;
+        return this.cityCardNo.length + 4 + this.time.length;
     }
 
     @Override
     protected boolean disposeCmdBody(ChannelBuffer channelBuffer) {
         channelBuffer.readBytes(cityCardNo);
         amount = channelBuffer.readInt();
-        chargeType = channelBuffer.readByte();
+        channelBuffer.readBytes(time);
+        //chargeType = channelBuffer.readByte();
         return true;
     }
 
@@ -37,8 +40,8 @@ public class CmdRefundReq extends AbstractCmdReq {
         return amount;
     }
 
-    public byte getChargeType() {
-        return chargeType;
+    public byte[] getTime() {
+        return time;
     }
 
 }

@@ -85,7 +85,8 @@ public final class DBOper extends DefaultDBImpl {
         List<Object> params = new ArrayList<Object>();
         params.add(KKTool.byteArrayToHexStr(refund.getCityCardNo()));
         params.add(refund.getAmount());
-        params.add(refund.getChargeType());
+        Date refundTime = KKTool.getBCDDateTime(refund.getTime(), 0);
+        params.add(new Timestamp(refundTime.getTime()));
         try {
             return (int)executeInsertAndRetrieveId(SQL.ADD_REFUND, params);
         } catch (SQLException e) {

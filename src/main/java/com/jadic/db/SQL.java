@@ -30,7 +30,7 @@ public final class SQL {
     		                                                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
     
     //增加退款明细
-    public final static String ADD_REFUND               = "insert into tab_refund (CardNo, Amount, Type, Status, InsertTime) " +
+    public final static String ADD_REFUND               = "insert into tab_refund (CardNo, Amount, RefundTime, Status, InsertTime) " +
     		                                                "                values (?, ?, ?, 0, sysdate()) ";
     
 }
