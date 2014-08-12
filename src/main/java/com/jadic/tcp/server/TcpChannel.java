@@ -32,7 +32,7 @@ public class TcpChannel {
 	private long lastRecvDataTime;
 	
 	private String tcpChannelDesc;
-	private long terminalId = -1;
+	private int terminalId = -1;
 	private short terminalVer = -1;
 
 	public TcpChannel(Channel channel, ITcpChannelDisposer tcpDataDisposer) {
@@ -197,11 +197,11 @@ public class TcpChannel {
 		return lastRecvDataTime;
 	}
 
-    public long getTerminalId() {
+    public int getTerminalId() {
         return terminalId;
     }
 
-    public void setTerminalId(long terminalId) {
+    public void setTerminalId(int terminalId) {
         if (this.terminalId != terminalId) {
             this.terminalId = terminalId;
             generateTcpChannelDesc();

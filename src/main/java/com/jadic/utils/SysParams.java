@@ -28,8 +28,12 @@ public class SysParams {
     private String dbUserName;
     private String dbUserPass;
     
+    /* 市民卡相关参数 */
     private String cityCardWSIp;
     private int cityCardWSPort;
+    private String agencyNo;//充值网点代码
+    private String operNo;//操作员代码
+    /* 市民卡相关参数 */
     
     /* ftp相关参数 */
     private String ftpServerHost;
@@ -69,6 +73,8 @@ public class SysParams {
         
         this.cityCardWSIp = kkConfig.getStrValue("cityCardWSIp");
         this.cityCardWSPort = kkConfig.getIntValue("cityCardWSPort");
+        this.agencyNo = kkConfig.getStrValue("agencyNo");
+        this.operNo = kkConfig.getStrValue("operNo");
         
         this.ftpServerHost = kkConfig.getStrValue("ftpServerHost");
         this.ftpServerPort = kkConfig.getIntValue("ftpServerPort");
@@ -175,6 +181,14 @@ public class SysParams {
 
     public String getFtpUploadDir() {
         return ftpUploadDir;
+    }
+
+    public String getAgencyNo() {
+        return agencyNo;
+    }
+
+    public String getOperNo() {
+        return operNo;
     }
 
 }

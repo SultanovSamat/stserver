@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jadic.cmd.req.CmdGetMac2Req;
+import com.jadic.cmd.req.CmdPrepaidCardCheckReq;
+import com.jadic.cmd.rsp.CmdPrepaidCardCheckRsp;
 import com.jadic.utils.KKTool;
 import com.jadic.utils.SysParams;
 import com.jadic.ws.czsmk.CenterProcess;
@@ -63,7 +65,7 @@ public final class WSUtil {
         		            "<SVCHEAD>" +
         		              "<ORIGDOMAIN>%s</ORIGDOMAIN><HOMEDOMAIN>%s</HOMEDOMAIN>" +
         		              "<BIPCODE>%s</BIPCODE><ACTIONCODE>%s</ACTIONCODE>" +
-        		              "<PROCID>%s</PROCID><PROCESSTIME>%s</PROCESSTIME>" +
+        		              "<TRANSIDO>%s</TRANSIDO><PROCESSTIME>%s</PROCESSTIME>" +
         		            "</SVCHEAD>" +
         		            "<SVCCONT>" +
         		              "<CHARGEREQ>" +
@@ -81,7 +83,7 @@ public final class WSUtil {
         String homeDomain = "01";
         String biPCode = "0004";
         String actionCode = "0";
-        String procId = KKTool.getStrWithMaxLen(KKTool.getCurrFormatDate("yyyyMMddHHmmssZZZ"), 30, false);
+        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssZZZ");
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String operType = KKTool.byteToHexStr(cmdReq.getOperType());
         String cardNo = KKTool.byteArrayToHexStr(cmdReq.getCardNo());
@@ -100,7 +102,7 @@ public final class WSUtil {
         String chargeDate = KKTool.byteArrayToHexStr(cmdReq.getChargeDate());
         String chargeTime = KKTool.byteArrayToHexStr(cmdReq.getChargeTime());
         
-        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, procId, processTime, operType, 
+        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, processTime, operType, 
                 cardNo, termNo, asn, randNumber, cardTradeNo, cardOldBalance, chargeAmount, 
                 tradeType, keyVersion, arithIndex, mac1, deptNo, operNo, chargeDate, chargeTime};
         String retXml = centerProcess.callback(String.format(inputXml, args));
@@ -129,6 +131,66 @@ public final class WSUtil {
             log.info("getMac2 parse xml err", e);
         }
         return "";
+    }
+    
+    public void checkPrepaidCard(CmdPrepaidCardCheckReq cmdReq, CmdPrepaidCardCheckRsp cmdRsp) {
+        String inputXml = "<SVC>" +
+                            "<SVCHEAD>" +
+                              "<ORIGDOMAIN>%s</ORIGDOMAIN><HOMEDOMAIN>%s</HOMEDOMAIN>" +
+                              "<BIPCODE>%s</BIPCODE><ACTIONCODE>%s</ACTIONCODE>" +
+                              "<TRANSIDO>%s</TRANSIDO><PROCESSTIME>%s</PROCESSTIME>" +
+                            "</SVCHEAD>" +
+                            "<SVCCONT>" +
+                              "<CARDVERIFYREQ>" +
+                                "<TRADETYPECODE>%s</TRADETYPECODE>" +
+                                "<CARDNO>%s</CARDNO>" +
+                                "<PASSWORD>%s</PASSWORD>" +
+                                "<DEPTNO>%s</DEPTNO>" +
+                                "<OPERNO>%s</OPERNO>" +
+                              "</CARDVERIFYREQ>" +
+                            "</SVCCONT>" +
+                          "</SVC>";
+        String origDomain = "A1";
+        String homeDomain = "01";
+        String biPCode = "0004";
+        String actionCode = "0";
+        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssZZZ");
+        String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
+        String tradeTypeCode = "00";
+        String cardNo = KKTool.byteArrayToHexStr(cmdReq.getCityCardNo());
+        String password = KKTool.byteArrayToHexStr(cmdReq.getPassword());
+        String deptNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getAgencyNo(), 10, false);
+        String operNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getOperNo(), 10, false);
+        
+        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, processTime, 
+                                     tradeTypeCode, cardNo, password, deptNo, operNo};
+        String retXml = centerProcess.callback(String.format(inputXml, args));
+        
+        cmdRsp.setCheckRet((byte)0);
+        try {
+            Document document = DocumentHelper.parseText(retXml);
+            Node respCodeNode = document.selectSingleNode("//SVC/SVCCONT/CARDVERIFYRSP/RESPCODE");
+            if (respCodeNode != null) {
+                String respCode = respCodeNode.getText();
+                if (respCode.equals("0000")) {
+                    cmdRsp.setCheckRet((byte)1);
+                    Node amountNode = document.selectSingleNode("//SVC/SVCCONT/CARDVERIFYRSP/CARDMONEY");
+                    if (amountNode != null) {
+                        cmdRsp.setAmount(Integer.parseInt(amountNode.getText()));
+                        log.debug("succeed to get amount:{}", amountNode.getText());
+                    } else {
+                        log.info("valid CARDVERIFYRSP, but no amount node found");
+                    }
+                } else {
+                    Node errDescNode = document.selectSingleNode("//SVC/SVCCONT/CHANGERSP/RESPDESC");
+                    log.info("fail to get mac2, respCode:{}, desc:{}", respCode, errDescNode != null ? errDescNode.getText() : "no desc");
+                }
+            } else {
+                log.info("invalid response for getting mac2");
+            }
+        } catch (DocumentException e) {
+            log.info("getMac2 parse xml err", e);
+        }
     }
     
     public static String createXML() {

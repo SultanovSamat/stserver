@@ -12,7 +12,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jadic.biz.bean.LongIDBean;
+import com.jadic.biz.bean.IDBean;
 import com.jadic.biz.bean.TerminalBean;
 import com.jadic.cmd.req.CmdChargeDetailReq;
 import com.jadic.cmd.req.CmdRefundReq;
@@ -38,8 +38,8 @@ public final class DBOper extends DefaultDBImpl {
         return queryForList(SQL.QUERY_TERMINAL_INFO, null, TerminalBean.class);
     }
     
-    public List<LongIDBean> queryTerminalIdsWithOnlineTime() {
-        return queryForList(SQL.QUERY_TERMINALIDS_ONLINE, null, LongIDBean.class);
+    public List<IDBean> queryTerminalIdsWithOnlineTime() {
+        return queryForList(SQL.QUERY_TERMINALIDS_ONLINE, null, IDBean.class);
     }
     
     public boolean updateTerminalStatus(String sql, List<Object> params) {
@@ -69,7 +69,7 @@ public final class DBOper extends DefaultDBImpl {
         params.add(KKTool.byteArrayToHexStr(chargeDetail.getAsn()));
         params.add(KKTool.byteArrayToHexStr(chargeDetail.getTsn()));
         params.add(chargeDetail.getTransSNo());
-        params.add(Long.parseLong(KKTool.byteArrayToHexStr(chargeDetail.getTerminalId())));
+        params.add(chargeDetail.getTerminalId());
         params.add("");
         params.add("");
         params.add("");

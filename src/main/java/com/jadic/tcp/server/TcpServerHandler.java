@@ -50,8 +50,8 @@ public class TcpServerHandler extends SimpleChannelHandler {
 	@Override
 	public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
 		TcpChannel tcpChannel = this.tcpServer.getTcpChannel(ctx.getChannel().getId());
-		log.info("a tcp client [{}] disconnected from tcp server, total:{}", tcpChannel != null ? tcpChannel : ctx.getChannel().getRemoteAddress(), tcpServer.getClientsCount());
 		this.tcpServer.removeTcpChannel(ctx.getChannel().getId());
+		log.info("a tcp client [{}] disconnected from tcp server, total:{}", tcpChannel != null ? tcpChannel : ctx.getChannel().getRemoteAddress(), tcpServer.getClientsCount());
 	}
 
 }

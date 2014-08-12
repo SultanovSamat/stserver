@@ -29,7 +29,7 @@ public class ThreadTerminalChargeDetail extends AbstractThreadDisposeDataFromQue
 
     private final static Logger log = LoggerFactory.getLogger(ThreadTerminalChargeDetail.class);
     private final static String AGENCY_FLAG = "ZZZD";
-    private final static int MAX_RECORDS_PER_FILE = 101;
+    private final static int MAX_RECORDS_PER_FILE = 99999999;
     private final static String CITYCODE = "0519";
     private final static String DELIMITER = ",";
     private final static String S0_10 = "0000000000";
@@ -74,11 +74,7 @@ public class ThreadTerminalChargeDetail extends AbstractThreadDisposeDataFromQue
         appendRecord(file, chargeDetail);
         int recordCount = updateFileHead(file, chargeDetail);
         if (recordCount >= MAX_RECORDS_PER_FILE) {
-            fileSNo ++;
-            if (fileSNo > 999999) {
-                fileSNo = 1;
-            }
-            updateFileNextSNo(fileSNo);
+            updateFileNextSNo();
             if (!renameFile(file)) {
                 log.info("file[{}] failed to rename", file.getName());
             }
@@ -105,7 +101,7 @@ public class ThreadTerminalChargeDetail extends AbstractThreadDisposeDataFromQue
                 if (!file.getName().substring(4, 12).equals(today)) {//如果当前获取的文件的日期不是当天的，则需将后缀加上供上传
                     File newFile = new File(file.getAbsolutePath() + Const.CHARGE_DETAIL_FILE_SUFFIX);
                     file.renameTo(newFile);
-                    updateFileNextSNo(++ fileSNo);
+                    updateFileNextSNo();
                     file = null;
                 }
             }
@@ -262,13 +258,17 @@ public class ThreadTerminalChargeDetail extends AbstractThreadDisposeDataFromQue
      * 更新文件批次号到文件中，防止程序终止
      * @param newFileSNo
      */
-    private void updateFileNextSNo(int newFileSNo) {
+    private void updateFileNextSNo() {
+        fileSNo ++;
+        if (fileSNo > 999999) {
+            fileSNo = 1;
+        }
         KKTool.createFileDir(Const.CHARGE_DETAIL_DIR_PARENT);
         File file = new File(Const.CHARGE_DETAIL_DIR_PARENT, FILE_SNO_NAME);
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(file));
-            writer.write(String.valueOf(newFileSNo));
+            writer.write(String.valueOf(fileSNo));
             writer.flush();
         } catch (IOException e) {
             log.error("initFileSNo", e);

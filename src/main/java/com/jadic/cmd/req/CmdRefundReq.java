@@ -14,7 +14,7 @@ public class CmdRefundReq extends AbstractCmdReq {
     //private byte chargeType;
     
     public CmdRefundReq() {
-        this.cityCardNo = new byte[10];
+        this.cityCardNo = new byte[8];
         this.time = new byte[7];
     }
 

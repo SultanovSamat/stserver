@@ -15,7 +15,7 @@ public abstract class AbstractCmd implements ICmd {
 	
 	private short cmdFlagId;	//命令ID
 	private byte clientType;	//终端类型
-	private byte[] terminalId;    //终端ID
+	private int terminalId;    //终端ID
 	private short cmdBodyLen;	//消息体长度
     private short cmdSNo;		//消息流水号
     
@@ -26,7 +26,7 @@ public abstract class AbstractCmd implements ICmd {
     private byte endFlag;		//尾标识
     
     public AbstractCmd() {
-        terminalId = new byte[6];
+        //terminalId = new byte[6];
     }
 
     @Override
@@ -40,7 +40,7 @@ public abstract class AbstractCmd implements ICmd {
             this.headFlag = buffer.readByte();
             this.cmdFlagId = buffer.readShort();
             this.clientType = buffer.readByte();
-            buffer.readBytes(this.terminalId);
+            this.terminalId = buffer.readInt();
             this.cmdBodyLen = buffer.readShort();
             this.cmdSNo = buffer.readShort();
             return disposeCmdBody(buffer);
@@ -69,7 +69,7 @@ public abstract class AbstractCmd implements ICmd {
         	channelBuffer.writeByte(this.headFlag);
         	channelBuffer.writeShort(this.cmdFlagId);
         	channelBuffer.writeByte(this.clientType);
-        	channelBuffer.writeBytes(this.terminalId);
+        	channelBuffer.writeInt(this.terminalId);
         	channelBuffer.writeShort(this.cmdBodyLen);
             channelBuffer.writeShort(this.cmdSNo);
 
@@ -84,7 +84,7 @@ public abstract class AbstractCmd implements ICmd {
     }
 
     protected int getCmdHeadEndSize() {
-        return 16;//1 + 2 + 1 + 6 + 2 + 2 + 1 + 1
+        return 14;//1 + 2 + 1 + 4 + 2 + 2 + 1 + 1
     }
     
     private byte getCRCCheckSum(ChannelBuffer buffer) {
@@ -125,14 +125,12 @@ public abstract class AbstractCmd implements ICmd {
         this.clientType = clientType;
     }
 
-    public byte[] getTerminalId() {
+    public int getTerminalId() {
         return terminalId;
     }
 
-    protected void setTerminalId(byte[] terminalId) {
-        if (isByteArraySameSize(this.terminalId, terminalId)) {
-            this.terminalId = terminalId;
-        }
+    public void setTerminalId(int terminalId) {
+        this.terminalId = terminalId;
     }
 
     public short getCmdSNo() {

@@ -8,11 +8,10 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jadic.biz.bean.LongIDBean;
+import com.jadic.biz.bean.IDBean;
 import com.jadic.biz.bean.ModuleStatus;
 import com.jadic.cmd.req.CmdModuleStatusReq;
 import com.jadic.db.DBOper;
-import com.jadic.utils.KKTool;
 
 /**
  * 实时更新终端模块状态
@@ -25,11 +24,11 @@ public class ThreadTerminalModuleStatus extends AbstractThreadDisposeDataFromQue
     
     private DBOper dbOper;
     
-    private Set<Long> terminalIdSet;//有终端模块状态数据的终端ID集合
+    private Set<Integer> terminalIdSet;//有终端模块状态数据的终端ID集合
     
     public ThreadTerminalModuleStatus() {
         dbOper = DBOper.getDBOper();
-        terminalIdSet = new HashSet<Long>();
+        terminalIdSet = new HashSet<Integer>();
     }
 
     @Override
@@ -48,15 +47,15 @@ public class ThreadTerminalModuleStatus extends AbstractThreadDisposeDataFromQue
      * 初始从数据库中加载已经上过线的终端ID列表
      */
     private void initTerminalIdSet() {
-        List<LongIDBean> idList = dbOper.queryTerminalIdsWithOnlineTime();
-        for (LongIDBean idBean : idList) {
+        List<IDBean> idList = dbOper.queryTerminalIdsWithOnlineTime();
+        for (IDBean idBean : idList) {
             terminalIdSet.add(idBean.getId());
         }
         log.info("terminal-with-online-time count:{}", terminalIdSet.size());
     }
     
     private void disposeCmd(CmdModuleStatusReq cmdReq) {
-        long terminalId = Long.parseLong(KKTool.byteArrayToHexStr(cmdReq.getTerminalId()));
+        int terminalId = cmdReq.getTerminalId();
         StringBuilder sqlBuilder = new StringBuilder();
         List<ModuleStatus>msList = cmdReq.getMsList();
         List<Object> params = new ArrayList<Object>();

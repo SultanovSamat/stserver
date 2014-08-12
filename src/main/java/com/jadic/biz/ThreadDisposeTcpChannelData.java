@@ -109,6 +109,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         case Const.TER_REFUND:
             dealCmdRefund(buffer);
             break;
+        case Const.TER_PREPAID_CARD_CHECK:
+            dealCmdPrepaidCardCheck(buffer);
+            break;
         default:
             dealInvalidCmd(buffer, Const.TY_RET_NOT_SUPPORTED);
             log.warn("Unsupported command flag:{}", KKTool.byteArrayToHexStr(KKTool.short2BytesBigEndian(cmdFlag)));
@@ -160,7 +163,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             }
             cmdRsp.setRet(ret);
             sendData(cmdRsp.getSendBuffer());
-            log.info("a client login, login ret[{}], [{}]", ret, tcpChannel);
+            String posId = KKTool.byteArrayToHexStr(cmdReq.getPosId());
+            String samId = KKTool.byteArrayToHexStr(cmdReq.getSamId());
+            log.info("a client login, login ret[{}], [{}], posId:{}, samID:{}", ret, tcpChannel, posId, samId);
         } else {
             log.warn("recv cmd login, but fail to dispose[{}]", tcpChannel);
         }
@@ -233,6 +238,10 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         }
     }
     
+    private void dealCmdPrepaidCardCheck(ChannelBuffer buffer) {
+        
+    }
+    
     /**
      * 非法命令统一以通用应答处理
      * 
@@ -279,7 +288,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
      */
     private void setTcpchannelTerminalId(AbstractCmdReq cmdReq) {
         if (this.tcpChannel != null) {
-            this.tcpChannel.setTerminalId(Long.parseLong(KKTool.byteArrayToHexStr(cmdReq.getTerminalId())));
+            this.tcpChannel.setTerminalId(cmdReq.getTerminalId());
             TerminalBean terminal = getTerminal(cmdReq);
             if (terminal != null) {
                 int oldChannelId = terminal.getChannelId();
@@ -290,13 +299,13 @@ public class ThreadDisposeTcpChannelData implements Runnable {
                             oldChannelId, terminal.getId());
                 }
             } else {
-                log.warn("can't find terminal bean by terminalId:{}", KKTool.byteArrayToHexStr(cmdReq.getTerminalId()));
+                log.warn("can't find terminal bean by terminalId:{}", cmdReq.getTerminalId());
             }
 
         }
     }
 
     private TerminalBean getTerminal(AbstractCmdReq cmdReq) {
-        return BaseInfo.getBaseInfo().getTerminal(Long.valueOf(KKTool.byteArrayToHexStr(cmdReq.getTerminalId())));
+        return BaseInfo.getBaseInfo().getTerminal(cmdReq.getTerminalId());
     }
 }
