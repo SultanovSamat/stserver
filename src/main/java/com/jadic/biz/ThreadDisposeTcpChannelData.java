@@ -12,11 +12,15 @@ import com.jadic.cmd.req.CmdGetMac2Req;
 import com.jadic.cmd.req.CmdHeartbeatReq;
 import com.jadic.cmd.req.CmdLoginReq;
 import com.jadic.cmd.req.CmdModuleStatusReq;
+import com.jadic.cmd.req.CmdPrepaidCardCheckReq;
+import com.jadic.cmd.req.CmdQueryQFTBalanceReq;
 import com.jadic.cmd.req.CmdRefundReq;
 import com.jadic.cmd.req.CmdTYRetReq;
 import com.jadic.cmd.rsp.CmdChargeDetailRsp;
 import com.jadic.cmd.rsp.CmdGetMac2Rsp;
 import com.jadic.cmd.rsp.CmdLoginRsp;
+import com.jadic.cmd.rsp.CmdPrepaidCardCheckRsp;
+import com.jadic.cmd.rsp.CmdQueryQFTBalanceRsp;
 import com.jadic.cmd.rsp.CmdRefundRsp;
 import com.jadic.cmd.rsp.CmdTYRetRsp;
 import com.jadic.db.DBOper;
@@ -111,6 +115,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             break;
         case Const.TER_PREPAID_CARD_CHECK:
             dealCmdPrepaidCardCheck(buffer);
+            break;
+        case Const.TER_QUERY_QFT_BALANCE:
+            dealCmdQueryQFTBalance(buffer);
             break;
         default:
             dealInvalidCmd(buffer, Const.TY_RET_NOT_SUPPORTED);
@@ -217,7 +224,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     		if (this.cmdBizDisposer != null) {
     			this.cmdBizDisposer.disposeCmdChargeDetail(cmdReq);
     		}
-    	}
+    	} else {
+            log.warn("recv cmd charge detail, but fail to dispose[{}]", tcpChannel);
+        }
     }
     
     private void dealCmdRefund(ChannelBuffer buffer) {
@@ -235,11 +244,35 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             cmdRsp.setRecordId(recordId);
             sendData(cmdRsp.getSendBuffer());
             log.info("recv cmd refund[{}]", tcpChannel);
+        } else {
+            log.warn("recv cmd refund, but fail to dispose[{}]", tcpChannel);
         }
     }
     
     private void dealCmdPrepaidCardCheck(ChannelBuffer buffer) {
-        
+        CmdPrepaidCardCheckReq cmdReq = new CmdPrepaidCardCheckReq();
+        if (cmdReq.disposeData(buffer)) {
+            CmdPrepaidCardCheckRsp cmdRsp = new CmdPrepaidCardCheckRsp();
+            WSUtil.getWsUtil().checkPrepaidCard(cmdReq, cmdRsp);
+            cmdRsp.setCmdCommonField(cmdReq);
+            sendData(cmdRsp.getSendBuffer());
+            log.info("recv cmd prepaid card check, ret:{}, amount:{}", cmdRsp.getCheckRet(), cmdRsp.getAmount());
+        } else {
+            log.warn("recv cmd prepaid card check, but fail to dispose[{}]", tcpChannel);
+        }
+    }
+
+    private void dealCmdQueryQFTBalance(ChannelBuffer buffer) {
+        CmdQueryQFTBalanceReq cmdReq = new CmdQueryQFTBalanceReq();
+        if (cmdReq.disposeData(buffer)) {
+            CmdQueryQFTBalanceRsp cmdRsp = new CmdQueryQFTBalanceRsp();
+            WSUtil.getWsUtil().checkPrepaidCard(cmdReq, cmdRsp);
+            cmdRsp.setCmdCommonField(cmdReq);
+            sendData(cmdRsp.getSendBuffer());
+            log.info("recv cmd query qft balance, ret:{}, amount:{}", cmdRsp.getCheckRet(), cmdRsp.getAmount());
+        } else {
+            log.warn("recv cmd query qft balance, but fail to dispose[{}]", tcpChannel);
+        }
     }
     
     /**

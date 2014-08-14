@@ -183,13 +183,77 @@ public final class WSUtil {
                     }
                 } else {
                     Node errDescNode = document.selectSingleNode("//SVC/SVCCONT/CHANGERSP/RESPDESC");
-                    log.info("fail to get mac2, respCode:{}, desc:{}", respCode, errDescNode != null ? errDescNode.getText() : "no desc");
+                    log.info("fail to check prepaid card, respCode:{}, desc:{}", respCode, errDescNode != null ? errDescNode.getText() : "no desc");
                 }
             } else {
-                log.info("invalid response for getting mac2");
+                log.info("invalid response for checking prepaid card");
             }
         } catch (DocumentException e) {
-            log.info("getMac2 parse xml err", e);
+            log.info("check prepaid card parse xml err", e);
+        } catch (Exception e) {
+            log.error("checkPrepaidCard err", e);
+        }
+    }
+
+    public void queryQFTBalance(CmdPrepaidCardCheckReq cmdReq, CmdPrepaidCardCheckRsp cmdRsp) {
+        String inputXml = "<SVC>" +
+                            "<SVCHEAD>" +
+                              "<ORIGDOMAIN>%s</ORIGDOMAIN><HOMEDOMAIN>%s</HOMEDOMAIN>" +
+                              "<BIPCODE>%s</BIPCODE><ACTIONCODE>%s</ACTIONCODE>" +
+                              "<TRANSIDO>%s</TRANSIDO><PROCESSTIME>%s</PROCESSTIME>" +
+                            "</SVCHEAD>" +
+                            "<SVCCONT>" +
+                              "<GROUPQUERYREQ>" +
+                                "<TRADETYPECODE>%s</TRADETYPECODE>" +
+                                "<CARDNO>%s</CARDNO>" +
+                                "<TRADEMONEY>%s</TRADEMONEY>" +//TODO check if this field name is correct, maybe "password"
+                                "<DEPTNO>%s</DEPTNO>" +
+                                "<OPERNO>%s</OPERNO>" +
+                              "</GROUPQUERYREQ>" +
+                            "</SVCCONT>" +
+                          "</SVC>";
+        String origDomain = "A1";
+        String homeDomain = "01";
+        String biPCode = "0004";
+        String actionCode = "0";
+        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssZZZ");
+        String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
+        String tradeTypeCode = "00";
+        String cardNo = KKTool.byteArrayToHexStr(cmdReq.getCityCardNo());
+        String password = KKTool.byteArrayToHexStr(cmdReq.getPassword());
+        String deptNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getAgencyNo(), 10, false);
+        String operNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getOperNo(), 10, false);
+        
+        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, processTime, 
+                tradeTypeCode, cardNo, password, deptNo, operNo};
+        String retXml = centerProcess.callback(String.format(inputXml, args));
+        
+        cmdRsp.setCheckRet((byte)0);
+        try {
+            Document document = DocumentHelper.parseText(retXml);
+            Node respCodeNode = document.selectSingleNode("//SVC/SVCCONT/GROUPQUERYRSP/RESPCODE");
+            if (respCodeNode != null) {
+                String respCode = respCodeNode.getText();
+                if (respCode.equals("0000")) {
+                    cmdRsp.setCheckRet((byte)1);
+                    Node amountNode = document.selectSingleNode("//SVC/SVCCONT/GROUPQUERYRSP/GROUPACCOUNT");
+                    if (amountNode != null) {
+                        cmdRsp.setAmount(Integer.parseInt(amountNode.getText()));
+                        log.debug("succeed to get amount:{}", amountNode.getText());
+                    } else {
+                        log.info("valid GROUPQUERYRSP, but no amount node found");
+                    }
+                } else {
+                    Node errDescNode = document.selectSingleNode("//SVC/SVCCONT/GROUPQUERYRSP/RESPDESC");
+                    log.info("fail to query qft balance, respCode:{}, desc:{}", respCode, errDescNode != null ? errDescNode.getText() : "no desc");
+                }
+            } else {
+                log.info("invalid response for querying qft balance");
+            }
+        } catch (DocumentException e) {
+            log.info("query qft balance parse xml err", e);
+        } catch (Exception e) {
+            log.error("query qft balance err", e);
         }
     }
     
