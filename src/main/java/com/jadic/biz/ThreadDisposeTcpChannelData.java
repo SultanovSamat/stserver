@@ -253,7 +253,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         CmdPrepaidCardCheckReq cmdReq = new CmdPrepaidCardCheckReq();
         if (cmdReq.disposeData(buffer)) {
             CmdPrepaidCardCheckRsp cmdRsp = new CmdPrepaidCardCheckRsp();
-            WSUtil.getWsUtil().checkPrepaidCard(cmdReq, cmdRsp);
+            //WSUtil.getWsUtil().checkPrepaidCard(cmdReq, cmdRsp);
+            cmdRsp.setCheckRet((byte)1);
+            cmdRsp.setAmount(10000);
             cmdRsp.setCmdCommonField(cmdReq);
             sendData(cmdRsp.getSendBuffer());
             log.info("recv cmd prepaid card check, ret:{}, amount:{}", cmdRsp.getCheckRet(), cmdRsp.getAmount());
@@ -266,7 +268,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         CmdQueryQFTBalanceReq cmdReq = new CmdQueryQFTBalanceReq();
         if (cmdReq.disposeData(buffer)) {
             CmdQueryQFTBalanceRsp cmdRsp = new CmdQueryQFTBalanceRsp();
-            WSUtil.getWsUtil().checkPrepaidCard(cmdReq, cmdRsp);
+//            WSUtil.getWsUtil().checkPrepaidCard(cmdReq, cmdRsp);
+            cmdRsp.setCheckRet((byte)1);
+            cmdRsp.setAmount(1000);
             cmdRsp.setCmdCommonField(cmdReq);
             sendData(cmdRsp.getSendBuffer());
             log.info("recv cmd query qft balance, ret:{}, amount:{}", cmdRsp.getCheckRet(), cmdRsp.getAmount());

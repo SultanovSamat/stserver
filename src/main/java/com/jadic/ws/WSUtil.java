@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import com.jadic.cmd.req.CmdGetMac2Req;
 import com.jadic.cmd.req.CmdPrepaidCardCheckReq;
+import com.jadic.cmd.req.CmdQueryQFTBalanceReq;
 import com.jadic.cmd.rsp.CmdPrepaidCardCheckRsp;
+import com.jadic.cmd.rsp.CmdQueryQFTBalanceRsp;
 import com.jadic.utils.KKTool;
 import com.jadic.utils.SysParams;
 import com.jadic.ws.czsmk.CenterProcess;
@@ -195,7 +197,7 @@ public final class WSUtil {
         }
     }
 
-    public void queryQFTBalance(CmdPrepaidCardCheckReq cmdReq, CmdPrepaidCardCheckRsp cmdRsp) {
+    public void queryQFTBalance(CmdQueryQFTBalanceReq cmdReq, CmdQueryQFTBalanceRsp cmdRsp) {
         String inputXml = "<SVC>" +
                             "<SVCHEAD>" +
                               "<ORIGDOMAIN>%s</ORIGDOMAIN><HOMEDOMAIN>%s</HOMEDOMAIN>" +

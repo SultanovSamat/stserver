@@ -2,6 +2,8 @@ package com.jadic.cmd.rsp;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.jadic.utils.Const;
+
 /**
  * @author 	Jadic
  * @created 2014-8-12
@@ -13,6 +15,7 @@ public class CmdPrepaidCardCheckRsp extends AbstractCmdRsp {
     //private byte[] tradeSNo;//交易流水号，市民卡中心返回 直接用字符串表示，最长30位，后补0x00,如交易号是 1234，那么数据31323334..
     
     public CmdPrepaidCardCheckRsp() {
+        setCmdFlagId(Const.SER_PREPAID_CARD_CHECK);
         //tradeSNo = new byte[30];
     }
 
