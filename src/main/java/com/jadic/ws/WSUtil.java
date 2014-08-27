@@ -30,6 +30,9 @@ import com.jadic.ws.czsmk.CenterProcessPortType;
 public final class WSUtil {
     
     private final static Logger log = LoggerFactory.getLogger(WSUtil.class);
+    private final static byte RET_FAIL             = 0x00;//失败
+    private final static byte RET_OK               = 0x01;//成功
+    private final static byte RET_INVALID_PASSWORD = 0x02;//密码错误
     
     private CenterProcessPortType centerProcess;
     
@@ -168,14 +171,14 @@ public final class WSUtil {
                                      tradeTypeCode, cardNo, password, deptNo, operNo};
         String retXml = centerProcess.callback(String.format(inputXml, args));
         
-        cmdRsp.setCheckRet((byte)0);
+        cmdRsp.setCheckRet(RET_FAIL);
         try {
             Document document = DocumentHelper.parseText(retXml);
             Node respCodeNode = document.selectSingleNode("//SVC/SVCCONT/CARDVERIFYRSP/RESPCODE");
             if (respCodeNode != null) {
                 String respCode = respCodeNode.getText();
                 if (respCode.equals("0000")) {
-                    cmdRsp.setCheckRet((byte)1);
+                    cmdRsp.setCheckRet(RET_OK);
                     Node amountNode = document.selectSingleNode("//SVC/SVCCONT/CARDVERIFYRSP/CARDMONEY");
                     if (amountNode != null) {
                         cmdRsp.setAmount(Integer.parseInt(amountNode.getText()));
@@ -183,6 +186,8 @@ public final class WSUtil {
                     } else {
                         log.info("valid CARDVERIFYRSP, but no amount node found");
                     }
+                } else if (respCode.equals("0001")) {
+                    cmdRsp.setCheckRet(RET_INVALID_PASSWORD);
                 } else {
                     Node errDescNode = document.selectSingleNode("//SVC/SVCCONT/CHANGERSP/RESPDESC");
                     log.info("fail to check prepaid card, respCode:{}, desc:{}", respCode, errDescNode != null ? errDescNode.getText() : "no desc");
@@ -230,14 +235,14 @@ public final class WSUtil {
                 tradeTypeCode, cardNo, password, deptNo, operNo};
         String retXml = centerProcess.callback(String.format(inputXml, args));
         
-        cmdRsp.setCheckRet((byte)0);
+        cmdRsp.setCheckRet(RET_FAIL);
         try {
             Document document = DocumentHelper.parseText(retXml);
             Node respCodeNode = document.selectSingleNode("//SVC/SVCCONT/GROUPQUERYRSP/RESPCODE");
             if (respCodeNode != null) {
                 String respCode = respCodeNode.getText();
                 if (respCode.equals("0000")) {
-                    cmdRsp.setCheckRet((byte)1);
+                    cmdRsp.setCheckRet(RET_OK);
                     Node amountNode = document.selectSingleNode("//SVC/SVCCONT/GROUPQUERYRSP/GROUPACCOUNT");
                     if (amountNode != null) {
                         cmdRsp.setAmount(Integer.parseInt(amountNode.getText()));
@@ -245,6 +250,8 @@ public final class WSUtil {
                     } else {
                         log.info("valid GROUPQUERYRSP, but no amount node found");
                     }
+                } else if (respCode.equals("0001")) {
+                    cmdRsp.setCheckRet(RET_INVALID_PASSWORD);
                 } else {
                     Node errDescNode = document.selectSingleNode("//SVC/SVCCONT/GROUPQUERYRSP/RESPDESC");
                     log.info("fail to query qft balance, respCode:{}, desc:{}", respCode, errDescNode != null ? errDescNode.getText() : "no desc");

@@ -270,7 +270,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             CmdQueryQFTBalanceRsp cmdRsp = new CmdQueryQFTBalanceRsp();
 //            WSUtil.getWsUtil().checkPrepaidCard(cmdReq, cmdRsp);
             cmdRsp.setCheckRet((byte)1);
-            cmdRsp.setAmount(1000);
+            cmdRsp.setAmount(15000);
             cmdRsp.setCmdCommonField(cmdReq);
             sendData(cmdRsp.getSendBuffer());
             log.info("recv cmd query qft balance, ret:{}, amount:{}", cmdRsp.getCheckRet(), cmdRsp.getAmount());
