@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @author Jadic
  * @created 2012-5-24 
  */
