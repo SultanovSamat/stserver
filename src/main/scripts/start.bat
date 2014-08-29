@@ -1,3 +1,4 @@
+title stserver
 @echo off
 set "rootdir=%cd%"
 ::echo %rootdir%
@@ -16,7 +17,7 @@ for /f "delims=" %%c   in ('dir  /b/a-d/s  %LIBS%\*.jar')  do (
 set PUB_LIB=%cp%
 ::echo %PUB_LIB%
 
-set MAIN_CLASS=com.jadic.ws.WSUtil
+set MAIN_CLASS=com.jadic.STServer
 
 ::project class path
 set "CLASSPATH=%CLASSPATH%;%rootdir%\resources;%PUB_LIB%"
