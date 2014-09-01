@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import com.jadic.cmd.req.CmdGetMac2Req;
 import com.jadic.cmd.req.CmdPrepaidCardCheckReq;
-import com.jadic.cmd.req.CmdQueryQFTBalanceReq;
+import com.jadic.cmd.req.CmdQueryZHBBalanceReq;
 import com.jadic.cmd.rsp.CmdPrepaidCardCheckRsp;
-import com.jadic.cmd.rsp.CmdQueryQFTBalanceRsp;
+import com.jadic.cmd.rsp.CmdQueryZHBBalanceRsp;
 import com.jadic.utils.KKTool;
 import com.jadic.utils.SysParams;
 import com.jadic.ws.czsmk.CenterProcess;
@@ -202,7 +202,7 @@ public final class WSUtil {
         }
     }
 
-    public void queryQFTBalance(CmdQueryQFTBalanceReq cmdReq, CmdQueryQFTBalanceRsp cmdRsp) {
+    public void queryZHBBalance(CmdQueryZHBBalanceReq cmdReq, CmdQueryZHBBalanceRsp cmdRsp) {
         String inputXml = "<SVC>" +
                             "<SVCHEAD>" +
                               "<ORIGDOMAIN>%s</ORIGDOMAIN><HOMEDOMAIN>%s</HOMEDOMAIN>" +
@@ -254,15 +254,15 @@ public final class WSUtil {
                     cmdRsp.setCheckRet(RET_INVALID_PASSWORD);
                 } else {
                     Node errDescNode = document.selectSingleNode("//SVC/SVCCONT/GROUPQUERYRSP/RESPDESC");
-                    log.info("fail to query qft balance, respCode:{}, desc:{}", respCode, errDescNode != null ? errDescNode.getText() : "no desc");
+                    log.info("fail to query zhb balance, respCode:{}, desc:{}", respCode, errDescNode != null ? errDescNode.getText() : "no desc");
                 }
             } else {
-                log.info("invalid response for querying qft balance");
+                log.info("invalid response for querying zhb balance");
             }
         } catch (DocumentException e) {
-            log.info("query qft balance parse xml err", e);
+            log.info("query zhb balance parse xml err", e);
         } catch (Exception e) {
-            log.error("query qft balance err", e);
+            log.error("query zhb balance err", e);
         }
     }
     

@@ -10,7 +10,7 @@ import com.jadic.utils.Const;
  */
 public class CmdPrepaidCardCheckRsp extends AbstractCmdRsp {
     
-    private byte checkRet;//校验结果  0:失败 1:成功
+    private byte checkRet;//校验结果  0:失败 1:成功 2：密码错误
     private int amount;//充值卡充值面额
     //private byte[] tradeSNo;//交易流水号，市民卡中心返回 直接用字符串表示，最长30位，后补0x00,如交易号是 1234，那么数据31323334..
     

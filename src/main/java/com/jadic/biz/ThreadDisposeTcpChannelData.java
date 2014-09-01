@@ -11,16 +11,18 @@ import com.jadic.cmd.req.CmdDefaultReq;
 import com.jadic.cmd.req.CmdGetMac2Req;
 import com.jadic.cmd.req.CmdHeartbeatReq;
 import com.jadic.cmd.req.CmdLoginReq;
+import com.jadic.cmd.req.CmdModifyZHBPassReq;
 import com.jadic.cmd.req.CmdModuleStatusReq;
 import com.jadic.cmd.req.CmdPrepaidCardCheckReq;
-import com.jadic.cmd.req.CmdQueryQFTBalanceReq;
+import com.jadic.cmd.req.CmdQueryZHBBalanceReq;
 import com.jadic.cmd.req.CmdRefundReq;
 import com.jadic.cmd.req.CmdTYRetReq;
 import com.jadic.cmd.rsp.CmdChargeDetailRsp;
 import com.jadic.cmd.rsp.CmdGetMac2Rsp;
 import com.jadic.cmd.rsp.CmdLoginRsp;
+import com.jadic.cmd.rsp.CmdModifyZHBPassRsp;
 import com.jadic.cmd.rsp.CmdPrepaidCardCheckRsp;
-import com.jadic.cmd.rsp.CmdQueryQFTBalanceRsp;
+import com.jadic.cmd.rsp.CmdQueryZHBBalanceRsp;
 import com.jadic.cmd.rsp.CmdRefundRsp;
 import com.jadic.cmd.rsp.CmdTYRetRsp;
 import com.jadic.db.DBOper;
@@ -116,8 +118,11 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         case Const.TER_PREPAID_CARD_CHECK:
             dealCmdPrepaidCardCheck(buffer);
             break;
-        case Const.TER_QUERY_QFT_BALANCE:
-            dealCmdQueryQFTBalance(buffer);
+        case Const.TER_QUERY_ZHB_BALANCE:
+            dealCmdQueryZHBBalance(buffer);
+            break;
+        case Const.TER_MODIFY_ZHB_PASS:
+            dealCmdModifyZHBPass(buffer);
             break;
         default:
             dealInvalidCmd(buffer, Const.TY_RET_NOT_SUPPORTED);
@@ -264,18 +269,31 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         }
     }
 
-    private void dealCmdQueryQFTBalance(ChannelBuffer buffer) {
-        CmdQueryQFTBalanceReq cmdReq = new CmdQueryQFTBalanceReq();
+    private void dealCmdQueryZHBBalance(ChannelBuffer buffer) {
+        CmdQueryZHBBalanceReq cmdReq = new CmdQueryZHBBalanceReq();
         if (cmdReq.disposeData(buffer)) {
-            CmdQueryQFTBalanceRsp cmdRsp = new CmdQueryQFTBalanceRsp();
+            CmdQueryZHBBalanceRsp cmdRsp = new CmdQueryZHBBalanceRsp();
 //            WSUtil.getWsUtil().checkPrepaidCard(cmdReq, cmdRsp);
             cmdRsp.setCheckRet((byte)1);
             cmdRsp.setAmount(15000);
             cmdRsp.setCmdCommonField(cmdReq);
             sendData(cmdRsp.getSendBuffer());
-            log.info("recv cmd query qft balance, ret:{}, amount:{}", cmdRsp.getCheckRet(), cmdRsp.getAmount());
+            log.info("recv cmd query zhb balance, ret:{}, amount:{}", cmdRsp.getCheckRet(), cmdRsp.getAmount());
         } else {
-            log.warn("recv cmd query qft balance, but fail to dispose[{}]", tcpChannel);
+            log.warn("recv cmd query zhb balance, but fail to dispose[{}]", tcpChannel);
+        }
+    }
+    
+    private void dealCmdModifyZHBPass(ChannelBuffer buffer) {
+        CmdModifyZHBPassReq cmdReq = new CmdModifyZHBPassReq();
+        if (cmdReq.disposeData(buffer)) {
+            CmdModifyZHBPassRsp cmdRsp = new CmdModifyZHBPassRsp();
+            cmdRsp.setCmdCommonField(cmdReq);
+            cmdRsp.setRet((byte)1);
+            sendData(cmdRsp.getSendBuffer());
+            log.info("recv cmd modify zhb pass, ret:{}", cmdRsp.getRet());
+        } else {
+            log.warn("recv cmd modify zhb pass, but fail to dispose[{}]", tcpChannel);
         }
     }
     

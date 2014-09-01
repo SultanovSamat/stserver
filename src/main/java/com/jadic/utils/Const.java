@@ -20,7 +20,9 @@ public final class Const {
     public final static short TER_CHARGE_DETAIL         = 0x0006;//上传充值交易数据
     public final static short TER_REFUND                = 0x0007;//退款记录登记
     public final static short TER_PREPAID_CARD_CHECK    = 0x0008;//充值卡校验
-    public final static short TER_QUERY_QFT_BALANCE     = 0x0009;//企福通余额查询
+    public final static short TER_QUERY_ZHB_BALANCE     = 0x0009;//账户宝余额查询
+    public final static short TER_MODIFY_ZHB_PASS       = 0x000A;//修改账户宝密码
+    
 
     public final static short SER_TY_RET                = 0x7001;//平台通用应答
     public final static short SER_LOGIN_RET             = 0x7003;//终端注册应答
@@ -28,7 +30,8 @@ public final class Const {
     public final static short SER_CHARGE_DETAIL_RET     = 0x7006;//上传充值交易数据应答，返回充值唯一编号
     public final static short SER_REFUND_RET            = 0x7007;//返回退款唯一记录编号
     public final static short SER_PREPAID_CARD_CHECK    = 0x7008;//充值卡校验应答
-    public final static short SER_QUERY_QFT_BALANCE     = 0x7009;//企福通余额查询应答
+    public final static short SER_QUERY_ZHB_BALANCE     = 0x7009;//账户宝余额查询应答
+    public final static short SER_MODIFY_ZHB_PASS       = 0x700A;//修改账户宝密码应答
     //-----------------------------通讯命令字定义-------------------------
     
     public final static byte TY_RET_OK                  = 0x00;//0：成功/确认  

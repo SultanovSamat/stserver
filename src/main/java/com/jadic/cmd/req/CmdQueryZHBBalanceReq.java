@@ -3,16 +3,16 @@ package com.jadic.cmd.req;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 /**
- * 企福通卡余额查询
+ * 账户宝卡余额查询
  * @author 	Jadic
  * @created 2014-8-14
  */
-public class CmdQueryQFTBalanceReq extends AbstractCmdReq {
+public class CmdQueryZHBBalanceReq extends AbstractCmdReq {
     
     private byte[] cityCardNo;//市民卡卡号
-    private byte[] password;//企福通密码
+    private byte[] password;//账户宝密码
     
-    public CmdQueryQFTBalanceReq() {
+    public CmdQueryZHBBalanceReq() {
         cityCardNo = new byte[8];
         password = new byte[3];
     }
