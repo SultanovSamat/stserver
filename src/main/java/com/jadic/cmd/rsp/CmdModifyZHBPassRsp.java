@@ -2,6 +2,8 @@ package com.jadic.cmd.rsp;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.jadic.utils.Const;
+
 /**
  * 修改账户宝密码应答
  * @author 	Jadic
@@ -10,6 +12,10 @@ import org.jboss.netty.buffer.ChannelBuffer;
 public class CmdModifyZHBPassRsp extends AbstractCmdRsp {
     
     private byte ret;//校验结果  0:失败 1:成功 2：密码错误
+    
+    public CmdModifyZHBPassRsp() {
+    	setCmdFlagId(Const.SER_MODIFY_ZHB_PASS);
+    }
 
     @Override
     protected int getCmdBodySize() {
