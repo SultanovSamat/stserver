@@ -12,10 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jadic.cmd.req.CmdGetMac2Req;
+import com.jadic.cmd.req.CmdModifyZHBPassReq;
 import com.jadic.cmd.req.CmdPrepaidCardCheckReq;
 import com.jadic.cmd.req.CmdQueryZHBBalanceReq;
+import com.jadic.cmd.rsp.CmdModifyZHBPassRsp;
 import com.jadic.cmd.rsp.CmdPrepaidCardCheckRsp;
 import com.jadic.cmd.rsp.CmdQueryZHBBalanceRsp;
+import com.jadic.utils.Const;
 import com.jadic.utils.KKTool;
 import com.jadic.utils.SysParams;
 import com.jadic.ws.czsmk.CenterProcess;
@@ -66,24 +69,7 @@ public final class WSUtil {
 
     public String getMac2(CmdGetMac2Req cmdReq) {
         //for performance, ignore the xml document building
-        String inputXml = "<SVC>" +
-        		            "<SVCHEAD>" +
-        		              "<ORIGDOMAIN>%s</ORIGDOMAIN><HOMEDOMAIN>%s</HOMEDOMAIN>" +
-        		              "<BIPCODE>%s</BIPCODE><ACTIONCODE>%s</ACTIONCODE>" +
-        		              "<TRANSIDO>%s</TRANSIDO><PROCESSTIME>%s</PROCESSTIME>" +
-        		            "</SVCHEAD>" +
-        		            "<SVCCONT>" +
-        		              "<CHARGEREQ>" +
-        		                "<TRADETYPECODE>%s</TRADETYPECODE><CARDNO>%s</CARDNO>" +
-        		                "<TERMNO>%s</TERMNO><ASN>%s</ASN><RNDNUMBER2>%s</RNDNUMBER2>" +
-        		                "<CARDTRADENO>%s</CARDTRADENO><CARDOLDBAL>%s</CARDOLDBAL>" +
-        		                "<TRADEMONEY>%s</TRADEMONEY><TRADETYPE>%s</TRADETYPE>" +
-        		                "<KEYVERSION>%s</KEYVERSION><ARITHINDEX>%s</ARITHINDEX>" +
-        		                "<MAC1>%s</MAC1><DEPTNO>%s</DEPTNO><OPERNO>%s</OPERNO>" +
-        		                "<HOSTDATE>%s</HOSTDATE><HOSTTIME>%s</HOSTTIME>" +
-        		              "</CHARGEREQ>" +
-        		            "</SVCCONT>" +
-        		          "</SVC>";
+        String inputXml = Const.WS_XML_GET_MAC2;
         String origDomain = "A1";
         String homeDomain = "01";
         String biPCode = "0004";
@@ -139,22 +125,8 @@ public final class WSUtil {
     }
     
     public void checkPrepaidCard(CmdPrepaidCardCheckReq cmdReq, CmdPrepaidCardCheckRsp cmdRsp) {
-        String inputXml = "<SVC>" +
-                            "<SVCHEAD>" +
-                              "<ORIGDOMAIN>%s</ORIGDOMAIN><HOMEDOMAIN>%s</HOMEDOMAIN>" +
-                              "<BIPCODE>%s</BIPCODE><ACTIONCODE>%s</ACTIONCODE>" +
-                              "<TRANSIDO>%s</TRANSIDO><PROCESSTIME>%s</PROCESSTIME>" +
-                            "</SVCHEAD>" +
-                            "<SVCCONT>" +
-                              "<CARDVERIFYREQ>" +
-                                "<TRADETYPECODE>%s</TRADETYPECODE>" +
-                                "<CARDNO>%s</CARDNO>" +
-                                "<PASSWORD>%s</PASSWORD>" +
-                                "<DEPTNO>%s</DEPTNO>" +
-                                "<OPERNO>%s</OPERNO>" +
-                              "</CARDVERIFYREQ>" +
-                            "</SVCCONT>" +
-                          "</SVC>";
+        String inputXml = Const.WS_XML_PREPAID_CARD_CHECK;
+        
         String origDomain = "A1";
         String homeDomain = "01";
         String biPCode = "0004";
@@ -203,22 +175,8 @@ public final class WSUtil {
     }
 
     public void queryZHBBalance(CmdQueryZHBBalanceReq cmdReq, CmdQueryZHBBalanceRsp cmdRsp) {
-        String inputXml = "<SVC>" +
-                            "<SVCHEAD>" +
-                              "<ORIGDOMAIN>%s</ORIGDOMAIN><HOMEDOMAIN>%s</HOMEDOMAIN>" +
-                              "<BIPCODE>%s</BIPCODE><ACTIONCODE>%s</ACTIONCODE>" +
-                              "<TRANSIDO>%s</TRANSIDO><PROCESSTIME>%s</PROCESSTIME>" +
-                            "</SVCHEAD>" +
-                            "<SVCCONT>" +
-                              "<GROUPQUERYREQ>" +
-                                "<TRADETYPECODE>%s</TRADETYPECODE>" +
-                                "<CARDNO>%s</CARDNO>" +
-                                "<TRADEMONEY>%s</TRADEMONEY>" +//TODO check if this field name is correct, maybe "password"
-                                "<DEPTNO>%s</DEPTNO>" +
-                                "<OPERNO>%s</OPERNO>" +
-                              "</GROUPQUERYREQ>" +
-                            "</SVCCONT>" +
-                          "</SVC>";
+        String inputXml = Const.WS_XM_GET_ZHB_BALANCE;
+        
         String origDomain = "A1";
         String homeDomain = "01";
         String biPCode = "0004";
@@ -263,6 +221,59 @@ public final class WSUtil {
             log.info("query zhb balance parse xml err", e);
         } catch (Exception e) {
             log.error("query zhb balance err", e);
+        }
+    }
+    
+    public void modifyZHBPassword(CmdModifyZHBPassReq cmdReq, CmdModifyZHBPassRsp cmdRsp) {
+        //for performance, ignore the xml document building
+        String inputXml = Const.WS_XML_MODIFY_ZHB_PASS;
+        String origDomain = "A1";
+        String homeDomain = "01";
+        String biPCode = "0004";
+        String actionCode = "0";
+        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssZZZ");
+        String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
+        String operType = "00";
+        String cardNo = KKTool.byteArrayToHexStr(cmdReq.getCardNo());
+        String termNo = KKTool.byteArrayToHexStr(cmdReq.getTermNo());
+        String oldPass = KKTool.byteArrayToHexStr(cmdReq.getOldPass());
+        String newPass = KKTool.byteArrayToHexStr(cmdReq.getNewPass());
+        String asn = KKTool.byteArrayToHexStr(cmdReq.getAsn());
+        String randNumber = KKTool.byteArrayToHexStr(cmdReq.getRandNumber());
+        String cardTradeNo = KKTool.byteArrayToHexStr(cmdReq.getCardTradNo());
+        String cardOldBalance = KKTool.getStrWithMaxLen(String.valueOf(cmdReq.getCardOldBalance()), 10, false);
+        String chargeAmount = "0";
+        String tradeType = "02";
+        String keyVersion = "01";
+        String arithIndex = "00";
+        String mac1 = KKTool.byteArrayToHexStr(cmdReq.getMac1());
+        String deptNo = KKTool.getStrWithMaxLen("", 10, false);
+        String operNo = KKTool.getStrWithMaxLen("", 10, false);
+        String chargeDate = KKTool.byteArrayToHexStr(cmdReq.getChargeDate());
+        String chargeTime = KKTool.byteArrayToHexStr(cmdReq.getChargeTime());
+        
+        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, processTime, operType, 
+                cardNo, oldPass, newPass, termNo, asn, randNumber, cardTradeNo, cardOldBalance, chargeAmount, 
+                tradeType, keyVersion, arithIndex, mac1, chargeDate, chargeTime, deptNo, operNo};
+        String retXml = centerProcess.callback(String.format(inputXml, args));
+        
+        cmdRsp.setRet(RET_FAIL);
+        try {
+            Document document = DocumentHelper.parseText(retXml);
+            Node respCodeNode = document.selectSingleNode("//SVC/SVCCONT/ACCCHANGEPWDRSP/RESPCODE");
+            if (respCodeNode != null) {
+                String respCode = respCodeNode.getText();
+                if (respCode.equals("0000")) {
+                    cmdRsp.setRet(RET_OK);
+                } else if (respCode.equals("0001")){
+                    cmdRsp.setRet(RET_INVALID_PASSWORD);
+                }
+                log.warn("modify zhb pass, respcode:{}", respCode);
+            } else {
+                log.info("invalid response for modifying zhb pass");
+            }
+        } catch (DocumentException e) {
+            log.info("modify zhb pass parse xml err", e);
         }
     }
     
