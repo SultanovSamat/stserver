@@ -170,7 +170,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
                 } else {// 被占用
                     ret = 1;
                 }
-            } else {
+            } else {//该终端号不存在
                 ret = 2;
             }
             cmdRsp.setRet(ret);
