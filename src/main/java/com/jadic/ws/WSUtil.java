@@ -3,11 +3,6 @@ package com.jadic.ws;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -89,7 +84,7 @@ public final class WSUtil {
     public String getMac2(CmdGetMac2Req cmdReq) {
         //for performance, ignore the xml document building
         String inputXml = Const.WS_XML_GET_MAC2;
-        String origDomain = "A1";
+        String origDomain = "Y1";
         String homeDomain = "01";
         String biPCode = "0004";
         String actionCode = "0";
@@ -118,11 +113,8 @@ public final class WSUtil {
                 tradeType, keyVersion, arithIndex, mac1, deptNo, operNo, chargeDate, chargeTime};
         String input = String.format(inputXml, args);
         log.info("get mac2 input:\n{}", input);
-        if (input != null) {
-            return "12345678";
-        }
         String retXml = centerProcess.callback(input);
-        
+        log.info("get mac2 output:\n{}", retXml);
         try {
             Document document = DocumentHelper.parseText(retXml);
             Node respCodeNode = document.selectSingleNode("//SVC/SVCCONT/CHANGERSP/RESPCODE");
