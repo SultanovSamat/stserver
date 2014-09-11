@@ -3,6 +3,11 @@ package com.jadic.ws;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -66,6 +71,20 @@ public final class WSUtil {
             log.error("WSUtil create url err", e);
         }
     }
+    
+//    private WSUtil() {
+//        JaxWsProxyFactoryBean factoryBean = new JaxWsProxyFactoryBean();
+//        factoryBean.setServiceClass(CenterProcessPortType.class);
+//        factoryBean.setAddress("http://10.0.4.112:9900/CenterProcess.wsdl");
+//        CenterProcessPortType centerProcess = (CenterProcessPortType)factoryBean.create();
+//        
+//        Client proxy = ClientProxy.getClient(centerProcess);
+//        HTTPConduit conduit = (HTTPConduit) proxy.getConduit();
+//        HTTPClientPolicy policy = new HTTPClientPolicy();
+//        policy.setConnectionTimeout(10000); //连接超时时间
+//        policy.setReceiveTimeout(120000);//请求超时时间.
+//        conduit.setClient(policy);
+//    }
 
     public String getMac2(CmdGetMac2Req cmdReq) {
         //for performance, ignore the xml document building
@@ -74,7 +93,8 @@ public final class WSUtil {
         String homeDomain = "01";
         String biPCode = "0004";
         String actionCode = "0";
-        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssZZZ");
+        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+        String procId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String operType = KKTool.byteToHexStr(cmdReq.getOperType());
         String cardNo = KKTool.byteArrayToHexStr(cmdReq.getCardNo());
@@ -88,15 +108,20 @@ public final class WSUtil {
         String keyVersion = "01";
         String arithIndex = "00";
         String mac1 = KKTool.byteArrayToHexStr(cmdReq.getMac1());
-        String deptNo = KKTool.getStrWithMaxLen("", 10, false);
-        String operNo = KKTool.getStrWithMaxLen("", 10, false);
+        String deptNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getAgencyNo(), 10, false);
+        String operNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getOperNo(), 10, false);
         String chargeDate = KKTool.byteArrayToHexStr(cmdReq.getChargeDate());
         String chargeTime = KKTool.byteArrayToHexStr(cmdReq.getChargeTime());
         
-        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, processTime, operType, 
+        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, operType, 
                 cardNo, termNo, asn, randNumber, cardTradeNo, cardOldBalance, chargeAmount, 
                 tradeType, keyVersion, arithIndex, mac1, deptNo, operNo, chargeDate, chargeTime};
-        String retXml = centerProcess.callback(String.format(inputXml, args));
+        String input = String.format(inputXml, args);
+        log.info("get mac2 input:\n{}", input);
+        if (input != null) {
+            return "12345678";
+        }
+        String retXml = centerProcess.callback(input);
         
         try {
             Document document = DocumentHelper.parseText(retXml);
@@ -131,7 +156,8 @@ public final class WSUtil {
         String homeDomain = "01";
         String biPCode = "0004";
         String actionCode = "0";
-        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssZZZ");
+        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+        String procId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String tradeTypeCode = "00";
         String cardNo = KKTool.byteArrayToHexStr(cmdReq.getCityCardNo());
@@ -139,7 +165,7 @@ public final class WSUtil {
         String deptNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getAgencyNo(), 10, false);
         String operNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getOperNo(), 10, false);
         
-        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, processTime, 
+        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, 
                                      tradeTypeCode, cardNo, password, deptNo, operNo};
         String retXml = centerProcess.callback(String.format(inputXml, args));
         
@@ -181,7 +207,8 @@ public final class WSUtil {
         String homeDomain = "01";
         String biPCode = "0004";
         String actionCode = "0";
-        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssZZZ");
+        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+        String procId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String tradeTypeCode = "00";
         String cardNo = KKTool.byteArrayToHexStr(cmdReq.getCityCardNo());
@@ -189,7 +216,7 @@ public final class WSUtil {
         String deptNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getAgencyNo(), 10, false);
         String operNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getOperNo(), 10, false);
         
-        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, processTime, 
+        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, 
                 tradeTypeCode, cardNo, password, deptNo, operNo};
         String retXml = centerProcess.callback(String.format(inputXml, args));
         
@@ -231,7 +258,8 @@ public final class WSUtil {
         String homeDomain = "01";
         String biPCode = "0004";
         String actionCode = "0";
-        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssZZZ");
+        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+        String procId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String operType = "00";
         String cardNo = KKTool.byteArrayToHexStr(cmdReq.getCardNo());
@@ -252,7 +280,7 @@ public final class WSUtil {
         String chargeDate = KKTool.byteArrayToHexStr(cmdReq.getChargeDate());
         String chargeTime = KKTool.byteArrayToHexStr(cmdReq.getChargeTime());
         
-        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, processTime, operType, 
+        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, operType, 
                 cardNo, oldPass, newPass, termNo, asn, randNumber, cardTradeNo, cardOldBalance, chargeAmount, 
                 tradeType, keyVersion, arithIndex, mac1, chargeDate, chargeTime, deptNo, operNo};
         String retXml = centerProcess.callback(String.format(inputXml, args));
@@ -318,33 +346,185 @@ public final class WSUtil {
     }
     
     public String testGetMac2() {
-//        String inputXml = "<SVCCONT><CHARGEREQ><TRADETYPECODE>%s</TRADETYPECODE><CARDNO>%s</CARDNO><TERMNO>%s</TERMNO><ASN>%s</ASN><RNDNUMBER2>%s</RNDNUMBER2><CARDTRADENO>%s</CARDTRADENO><CARDOLDBAL>%s</CARDOLDBAL><TRADEMONEY>%s</TRADEMONEY><TRADETYPE>%s</TRADETYPE><KEYVERSION>%s</KEYVERSION><ARITHINDEX>%s</ARITHINDEX><MAC1>%s</MAC1><DEPTNO>%s</DEPTNO><OPERNO>%s</OPERNO><HOSTDATE>%s</HOSTDATE><HOSTTIME>%s</HOSTTIME></CHARGEREQ></SVCCONT>";
-        String inputXml = "<SVC>" +
-                            "<SVCHEAD>" +
-                              "<ORIGDOMAIN>%s</ORIGDOMAIN><HOMEDOMAIN>%s</HOMEDOMAIN>" +
-                              "<BIPCODE>%s</BIPCODE><ACTIONCODE>%s</ACTIONCODE>" +
-                              "<PROCID>%s</PROCID><PROCESSTIME>%s</PROCESSTIME>" +
-                            "</SVCHEAD>" +
-                            "<SVCCONT>" +
-                              "<CHARGEREQ>" +
-                                "<TRADETYPECODE>%s</TRADETYPECODE><CARDNO>%s</CARDNO>" +
-                                "<TERMNO>%s</TERMNO><ASN>%s</ASN><RNDNUMBER2>%s</RNDNUMBER2>" +
-                                "<CARDTRADENO>%s</CARDTRADENO><CARDOLDBAL>%s</CARDOLDBAL>" +
-                                "<TRADEMONEY>%s</TRADEMONEY><TRADETYPE>%s</TRADETYPE>" +
-                                "<KEYVERSION>%s</KEYVERSION><ARITHINDEX>%s</ARITHINDEX>" +
-                                "<MAC1>%s</MAC1><DEPTNO>%s</DEPTNO><OPERNO>%s</OPERNO>" +
-                                "<HOSTDATE>%s</HOSTDATE><HOSTTIME>%s</HOSTTIME>" +
-                              "</CHARGEREQ>" +
-                            "</SVCCONT>" +
-                          "</SVC>";
-        Object[] args = new String[]{"02", "01", "0004", "0", KKTool.getFixedLenString("", 30, '0', true), KKTool.getCurrFormatDate("yyyyMMddHHmmss"), "00", "9150020686240037", "112233445566", "00112233445566778899", "12345678", "1234", "0000000012", "0000000050", "02", "01", "00", "12345678", "1234567890", "1234567890", "20140722", "142030"};
+        String inputXml = Const.WS_XML_GET_MAC2;
+        Object[] args = new String[]{"Y1", "01", 
+                "0004", "0", 
+                KKTool.getFixedLenString("", 30, '0', true), 
+                KKTool.getFixedLenString("", 30, '0', true),
+                KKTool.getCurrFormatDate("yyyyMMddHHmmss"), 
+                "00", "9150020686240037", 
+                "112233445566", "86000091500086240037", "F196CA64", 
+                "000B", "70495", 
+                "10000", "02", 
+                "01", "00", 
+                "92FA645A", "9998", "9998", 
+                "20140911", "154115"};
         //return String.format(inputXml, args);
-        return centerProcess.callback(String.format(inputXml, args));
+        String input = String.format(inputXml, args);
+        log.info("testMac2 input\n{}", input);
+        return centerProcess.callback(input);
     }
 
+    public void testPrepaidCardCheck() {
+        String inputXml = Const.WS_XML_PREPAID_CARD_CHECK;
+        
+        String origDomain = "02";
+        String homeDomain = "01";
+        String biPCode = "0004";
+        String actionCode = "0";
+        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+        String procId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+        String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
+        String tradeTypeCode = "00";
+        String cardNo = "9150020686240037";
+        String password = "1234567890123456";
+        String deptNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getAgencyNo(), 10, false);
+        String operNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getOperNo(), 10, false);
+        
+        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, 
+                                     tradeTypeCode, cardNo, password, deptNo, operNo};
+        String retXml = centerProcess.callback(String.format(inputXml, args));
+        log.info("prepaidcard xml ret:" + retXml);
+        
+        try {
+            Document document = DocumentHelper.parseText(retXml);
+            Node respCodeNode = document.selectSingleNode("//SVC/SVCCONT/CARDVERIFYRSP/RESPCODE");
+            if (respCodeNode != null) {
+                String respCode = respCodeNode.getText();
+                if (respCode.equals("0000")) {
+                    log.info("respCode:0000");
+                    Node amountNode = document.selectSingleNode("//SVC/SVCCONT/CARDVERIFYRSP/CARDMONEY");
+                    if (amountNode != null) {
+                        log.info("succeed to get amount:{}", amountNode.getText());
+                    } else {
+                        log.info("valid CARDVERIFYRSP, but no amount node found");
+                    }
+                } else if (respCode.equals("0001")) {
+                    log.info("respCode:0001");
+                } else {
+                    Node errDescNode = document.selectSingleNode("//SVC/SVCCONT/CHANGERSP/RESPDESC");
+                    log.info("fail to check prepaid card, respCode:{}, desc:{}", respCode, errDescNode != null ? errDescNode.getText() : "no desc");
+                }
+            } else {
+                log.info("invalid response for checking prepaid card");
+            }
+        } catch (DocumentException e) {
+            log.info("check prepaid card parse xml err", e);
+        } catch (Exception e) {
+            log.error("checkPrepaidCard err", e);
+        }    
+    }
+    
+    public void testQueryZHBBalance() {
+        String inputXml = Const.WS_XM_GET_ZHB_BALANCE;
+        
+        String origDomain = "02";
+        String homeDomain = "01";
+        String biPCode = "0004";
+        String actionCode = "0";
+        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+        String procId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+        String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
+        String tradeTypeCode = "00";
+        String cardNo = "9150020686240037";
+        String password = "123456";
+        String deptNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getAgencyNo(), 10, false);
+        String operNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getOperNo(), 10, false);
+        
+        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, 
+                tradeTypeCode, cardNo, password, deptNo, operNo};
+        String retXml = centerProcess.callback(String.format(inputXml, args));
+        
+        log.info("testQueryZHBBalance xml ret:" + retXml);
+        try {
+            Document document = DocumentHelper.parseText(retXml);
+            Node respCodeNode = document.selectSingleNode("//SVC/SVCCONT/GROUPQUERYRSP/RESPCODE");
+            if (respCodeNode != null) {
+                String respCode = respCodeNode.getText();
+                if (respCode.equals("0000")) {
+                    log.info("respCode:0000");
+                    Node amountNode = document.selectSingleNode("//SVC/SVCCONT/GROUPQUERYRSP/GROUPACCOUNT");
+                    if (amountNode != null) {
+                        log.info("succeed to get amount:{}", amountNode.getText());
+                    } else {
+                        log.info("valid GROUPQUERYRSP, but no amount node found");
+                    }
+                } else if (respCode.equals("0001")) {
+                    log.info("respCode:0001");
+                } else {
+                    Node errDescNode = document.selectSingleNode("//SVC/SVCCONT/GROUPQUERYRSP/RESPDESC");
+                    log.info("fail to query zhb balance, respCode:{}, desc:{}", respCode, errDescNode != null ? errDescNode.getText() : "no desc");
+                }
+            } else {
+                log.info("invalid response for querying zhb balance");
+            }
+        } catch (DocumentException e) {
+            log.info("query zhb balance parse xml err", e);
+        } catch (Exception e) {
+            log.error("query zhb balance err", e);
+        }    
+    }
+    
+    public void testModifyZHBPass() {
+        String inputXml = Const.WS_XML_MODIFY_ZHB_PASS;
+        String origDomain = "02";
+        String homeDomain = "01";
+        String biPCode = "0004";
+        String actionCode = "0";
+        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+        String procId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+        String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
+        String operType = "00";
+        String cardNo = "9150020686240037";
+        String termNo = "112233445566";
+        String oldPass = "123456";
+        String newPass = "234567";
+        String asn = "00112233445566778899";
+        String randNumber = "12345678";
+        String cardTradeNo = "1234";
+        String cardOldBalance = "12";
+        String chargeAmount = "0";
+        String tradeType = "02";
+        String keyVersion = "01";
+        String arithIndex = "00";
+        String mac1 = "12345678";
+        String deptNo = KKTool.getStrWithMaxLen("", 10, false);
+        String operNo = KKTool.getStrWithMaxLen("", 10, false);
+        String chargeDate = KKTool.getCurrFormatDate("yyyyMMdd");
+        String chargeTime = KKTool.getCurrFormatDate("HHmmss");
+        
+        Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, operType, 
+                cardNo, oldPass, newPass, termNo, asn, randNumber, cardTradeNo, cardOldBalance, chargeAmount, 
+                tradeType, keyVersion, arithIndex, mac1, chargeDate, chargeTime, deptNo, operNo};
+        String retXml = centerProcess.callback(String.format(inputXml, args));
+        
+        log.info("testModifyZHBPass xml ret:" + retXml);
+        try {
+            Document document = DocumentHelper.parseText(retXml);
+            Node respCodeNode = document.selectSingleNode("//SVC/SVCCONT/ACCCHANGEPWDRSP/RESPCODE");
+            if (respCodeNode != null) {
+                String respCode = respCodeNode.getText();
+                if (respCode.equals("0000")) {
+                    log.info("respCode:0000");
+                } else if (respCode.equals("0001")){
+                    log.info("respCode:0001");
+                }
+                log.info("modify zhb pass, respcode:{}", respCode);
+            } else {
+                log.info("invalid response for modifying zhb pass");
+            }
+        } catch (DocumentException e) {
+            log.info("modify zhb pass parse xml err", e);
+        }    
+    }
+    
     public static void main(String[] arg) {
         log.info("test start");
-        log.info(WSUtil.getWsUtil().testGetMac2());
+        WSUtil wsUtil = WSUtil.getWsUtil();
+        log.info(wsUtil.testGetMac2());
+//        wsUtil.testPrepaidCardCheck();
+//        wsUtil.testQueryZHBBalance();
+//        wsUtil.testModifyZHBPass();
         log.info("test end");
     }
     

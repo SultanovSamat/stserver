@@ -202,7 +202,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             log.info("recv get mac2[{}]", tcpChannel);
             CmdGetMac2Rsp cmdRsp = new CmdGetMac2Rsp();
             cmdRsp.setCmdCommonField(cmdReq);
-            String sMac2 = "00000000";//WSUtil.getWsUtil().getMac2(cmdReq);
+            String sMac2 = WSUtil.getWsUtil().getMac2(cmdReq);//"00000000"
             byte[] mac2 = KKTool.strToHexBytes(sMac2, 4, 'F');
             cmdRsp.setMac2(mac2);
             cmdRsp.setRet((byte)0);

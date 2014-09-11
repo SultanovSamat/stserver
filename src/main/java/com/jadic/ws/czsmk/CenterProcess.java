@@ -8,6 +8,8 @@ import javax.xml.ws.WebServiceClient;
 import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.Service;
 
+import com.jadic.utils.SysParams;
+
 /**
  * gSOAP 2.8.0 generated service definition
  *
@@ -23,8 +25,8 @@ public class CenterProcess extends Service {
 
     public final static URL WSDL_LOCATION;
 
-    public final static QName SERVICE = new QName("http://10.0.4.116:9900/CenterProcess.wsdl", "CenterProcess");
-    public final static QName CenterProcess = new QName("http://10.0.4.116:9900/CenterProcess.wsdl", "CenterProcess");
+    public final static QName SERVICE = new QName("http://" + SysParams.getInstance().getCityCardWSIp() + ":" + SysParams.getInstance().getCityCardWSPort() + "/CenterProcess.wsdl", "CenterProcess");
+    public final static QName CenterProcess = new QName("http://" + SysParams.getInstance().getCityCardWSIp() + ":" + SysParams.getInstance().getCityCardWSPort() + "/CenterProcess.wsdl", "CenterProcess");
     static {
         URL url = null;
         try {
@@ -39,6 +41,7 @@ public class CenterProcess extends Service {
 
     public CenterProcess(URL wsdlLocation) {
         super(wsdlLocation, SERVICE);
+        System.out.println("new CenterProcess:" + wsdlLocation + "," + SERVICE);
     }
 
     public CenterProcess(URL wsdlLocation, QName serviceName) {

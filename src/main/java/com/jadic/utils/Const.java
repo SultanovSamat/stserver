@@ -59,6 +59,7 @@ public final class Const {
                                                        "<BIPCODE>%s</BIPCODE>" +
                                                        "<ACTIONCODE>%s</ACTIONCODE>" +
                                                        "<TRANSIDO>%s</TRANSIDO>" +
+                                                       "<PROCID>%s</PROCID>" +
                                                        "<PROCESSTIME>%s</PROCESSTIME>" +
                                                      "</SVCHEAD>" +
                                                      "<SVCCONT>" +
@@ -91,6 +92,7 @@ public final class Const {
                                                                   "<BIPCODE>%s</BIPCODE>" +
                                                                   "<ACTIONCODE>%s</ACTIONCODE>" +
                                                                   "<TRANSIDO>%s</TRANSIDO>" +
+                                                                  "<PROCID>%s</PROCID>" +
                                                                   "<PROCESSTIME>%s</PROCESSTIME>" +
                                                                 "</SVCHEAD>" +
                                                                 "<SVCCONT>" +
@@ -112,6 +114,7 @@ public final class Const {
                                                               "<BIPCODE>%s</BIPCODE>" +
                                                               "<ACTIONCODE>%s</ACTIONCODE>" +
                                                               "<TRANSIDO>%s</TRANSIDO>" +
+                                                              "<PROCID>%s</PROCID>" +
                                                               "<PROCESSTIME>%s</PROCESSTIME>" +
                                                             "</SVCHEAD>" +
                                                             "<SVCCONT>" +
@@ -133,6 +136,7 @@ public final class Const {
                                                               "<BIPCODE>%s</BIPCODE>" +
                                                               "<ACTIONCODE>%s</ACTIONCODE>" +
                                                               "<TRANSIDO>%s</TRANSIDO>" +
+                                                              "<PROCID>%s</PROCID>" +
                                                               "<PROCESSTIME>%s</PROCESSTIME>" +
                                                             "</SVCHEAD>" +
                                                             "<SVCCONT>" +
