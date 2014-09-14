@@ -45,6 +45,7 @@ public final class Const {
     public final static byte LOGIN_RET_TER_NOT_USE      = 0x03;//3:终端被停用 
     public final static byte LOGIN_RET_ID_INVALID       = 0x04;//4:身份不合法
     
+    public final static String INITIAL_DATA_DIR			 = "data/initData";
     public final static String CHARGE_DETAIL_DIR_PARENT  = "data/chargeDetail";
     public final static String CHARGE_DETAIL_DIR         = CHARGE_DETAIL_DIR_PARENT + "/current";
     public final static String CHARGE_DETAIL_BAK_DIR     = CHARGE_DETAIL_DIR_PARENT + "/bak";

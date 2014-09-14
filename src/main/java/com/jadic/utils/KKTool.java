@@ -2193,9 +2193,8 @@ public class KKTool {
     }
 
     public static void main(String[] args) {
-        byte[] data = new byte[]{0x20, 0x14, 0x08, 0x10, 0x22, 0x22, 0x59, 0x10};
-        printLog(getFormatDateTime(getDateTime(data, 0), "yyyy-MM-dd HH:mm:ss"));
-        printLog(getFormatDateTime(getBCDDateTime(data, 0), "yyyy-MM-dd HH:mm:ss"));
+        byte[] data = strToHexBytes("C2061B7D", 4, 'F');
+        printLog(byteArrayToHexStr(data));
     }
 
     public static void test(byte[] buf) {

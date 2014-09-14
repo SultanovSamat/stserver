@@ -33,7 +33,7 @@ public class CmdGetMac2Rsp extends AbstractCmdRsp {
 
     public void setMac2(byte[] mac2) {
         if (isByteArraySameSize(mac2, this.mac2)) {
-            System.arraycopy(this.mac2, 0, mac2, 0, mac2.length);
+            System.arraycopy(mac2, 0, this.mac2, 0, mac2.length);
         }
     }
 

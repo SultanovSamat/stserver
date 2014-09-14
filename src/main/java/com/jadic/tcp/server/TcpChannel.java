@@ -11,6 +11,8 @@ import org.jboss.netty.channel.Channel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jadic.utils.KKTool;
+
 /**
  * wrapped with {@link org.jboss.netty.channel.Channel}
  * @author 	Jadic
@@ -21,6 +23,7 @@ public class TcpChannel {
     final static int MAX_BUF_SIZE = 100000;
 	
     private final static Logger log = LoggerFactory.getLogger(TcpChannel.class);
+    private final static Logger sendDataLog = LoggerFactory.getLogger("sendData");
 
     private ITcpChannelDisposer tcpDataDisposer;
 	private Queue<ChannelBuffer> bufQueue;
@@ -102,6 +105,7 @@ public class TcpChannel {
 	 */
 	public boolean sendData(ChannelBuffer buffer) {
 		if (channel != null && channel.isConnected()) {
+			sendDataLog.info(KKTool.channelBufferReadableBytesToHexStr(buffer));
 			channel.write(buffer);
 			return true;
 		}

@@ -1,7 +1,16 @@
 package com.jadic.ws;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -37,6 +46,22 @@ public final class WSUtil {
     private final static byte RET_OK               = 0x01;//成功
     private final static byte RET_INVALID_PASSWORD = 0x02;//密码错误
     
+    private final static String SNO_PREFIX = "YKDQ";//流水号、交易号的前缀
+    
+    private final static long MAX_SNO = 999999999999L;
+    private ExecutorService threadPool;
+    private final static String SNO_FILE_NAME = "sNo4CityCardWS.txt";
+    private long sNo = 0;
+    
+    private final static String origDomain = "Y1";
+    private final static String homeDomain = "01";
+    private final static String biPCode = "0004";
+    private final static String actionCode = "0";
+    private final static String keyVersion = "01";
+    private final static String arithIndex = "00";
+    private final static String deptNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getAgencyNo(), 10, false);
+    private final static String operNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getOperNo(), 10, false);    
+    
     private CenterProcessPortType centerProcess;
     
     private final static WSUtil wsUtil = getWsUtil();
@@ -53,6 +78,7 @@ public final class WSUtil {
     }
     
     private WSUtil(){
+    	initSNoFromFile();
         StringBuilder wsdlBuilder = new StringBuilder("http://");
         wsdlBuilder.append(SysParams.getInstance().getCityCardWSIp()).append(":");
         wsdlBuilder.append(SysParams.getInstance().getCityCardWSPort()).append("/");
@@ -65,31 +91,89 @@ public final class WSUtil {
         } catch (MalformedURLException e) {
             log.error("WSUtil create url err", e);
         }
+        threadPool = Executors.newSingleThreadExecutor();
     }
     
-//    private WSUtil() {
-//        JaxWsProxyFactoryBean factoryBean = new JaxWsProxyFactoryBean();
-//        factoryBean.setServiceClass(CenterProcessPortType.class);
-//        factoryBean.setAddress("http://10.0.4.112:9900/CenterProcess.wsdl");
-//        CenterProcessPortType centerProcess = (CenterProcessPortType)factoryBean.create();
-//        
-//        Client proxy = ClientProxy.getClient(centerProcess);
-//        HTTPConduit conduit = (HTTPConduit) proxy.getConduit();
-//        HTTPClientPolicy policy = new HTTPClientPolicy();
-//        policy.setConnectionTimeout(10000); //连接超时时间
-//        policy.setReceiveTimeout(120000);//请求超时时间.
-//        conduit.setClient(policy);
-//    }
+    private long getNextSNo() {
+    	sNo ++;
+        if (sNo > MAX_SNO) {
+        	sNo = 1;
+        }    	
+    	long nextSNo = sNo;
+    	updateFileNextSNo();
+    	return nextSNo;
+    }
+    
+    /**
+     * 初次启动时从文件中获取
+     */
+    private void initSNoFromFile() {
+    	this.sNo = 1;
+        KKTool.createFileDir(Const.INITIAL_DATA_DIR);
+        File file = new File(Const.INITIAL_DATA_DIR, SNO_FILE_NAME);
+        if (file.exists()) {
+            BufferedReader reader = null;
+            try {
+                reader = new BufferedReader(new FileReader(file));
+                sNo = Long.parseLong(reader.readLine());
+                if (sNo > MAX_SNO) {
+                	sNo = 1;
+                }                
+            } catch (FileNotFoundException e) {
+                log.error("initSNoFromFile", e);
+            } catch (IOException e) {
+                log.error("initSNoFromFile", e);
+            } finally {
+                KKTool.closeReaderInSilence(reader);
+            }
+        } else {
+            BufferedWriter writer = null;
+            try {
+                writer = new BufferedWriter(new FileWriter(file));
+                writer.write(String.valueOf(sNo));
+            } catch (IOException e) {
+                log.error("initSNoFromFile", e);
+            } finally {
+                KKTool.closeWriterInSilence(writer);
+            }
 
+        }
+    }
+    
+    /**
+     * 更新文件批次号到文件中，防止程序终止
+     * @param newFileSNo
+     */
+    private void updateFileNextSNo() {
+        threadPool.execute(new Runnable() {
+			@Override
+			public void run() {
+		        KKTool.createFileDir(Const.CHARGE_DETAIL_DIR_PARENT);
+		        File file = new File(Const.CHARGE_DETAIL_DIR_PARENT, SNO_FILE_NAME);
+		        BufferedWriter writer = null;
+		        try {
+		            writer = new BufferedWriter(new FileWriter(file));
+		            writer.write(String.valueOf(sNo));
+		            writer.flush();
+		        } catch (IOException e) {
+		            log.error("updateFileNextSNo", e);
+		        } finally {
+		            KKTool.closeWriterInSilence(writer);
+		        }
+			}
+		});
+    }
+
+    private String getNextTransId() {
+    	return SNO_PREFIX + KKTool.getFixedLenString(String.valueOf(getNextSNo()), 12, '0', true);
+    }
+    
     public String getMac2(CmdGetMac2Req cmdReq) {
         //for performance, ignore the xml document building
         String inputXml = Const.WS_XML_GET_MAC2;
-        String origDomain = "Y1";
-        String homeDomain = "01";
-        String biPCode = "0004";
-        String actionCode = "0";
-        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
-        String procId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+
+        String transId = getNextTransId();
+        String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String operType = KKTool.byteToHexStr(cmdReq.getOperType());
         String cardNo = KKTool.byteArrayToHexStr(cmdReq.getCardNo());
@@ -100,11 +184,7 @@ public final class WSUtil {
         String cardOldBalance = KKTool.getStrWithMaxLen(String.valueOf(cmdReq.getCardOldBalance()), 10, false);
         String chargeAmount = KKTool.getStrWithMaxLen(String.valueOf(cmdReq.getChargeAmount()), 10, false);
         String tradeType = "02";
-        String keyVersion = "01";
-        String arithIndex = "00";
         String mac1 = KKTool.byteArrayToHexStr(cmdReq.getMac1());
-        String deptNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getAgencyNo(), 10, false);
-        String operNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getOperNo(), 10, false);
         String chargeDate = KKTool.byteArrayToHexStr(cmdReq.getChargeDate());
         String chargeTime = KKTool.byteArrayToHexStr(cmdReq.getChargeTime());
         
@@ -144,18 +224,12 @@ public final class WSUtil {
     public void checkPrepaidCard(CmdPrepaidCardCheckReq cmdReq, CmdPrepaidCardCheckRsp cmdRsp) {
         String inputXml = Const.WS_XML_PREPAID_CARD_CHECK;
         
-        String origDomain = "A1";
-        String homeDomain = "01";
-        String biPCode = "0004";
-        String actionCode = "0";
-        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
-        String procId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+        String transId = getNextTransId();
+        String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String tradeTypeCode = "00";
         String cardNo = KKTool.byteArrayToHexStr(cmdReq.getCityCardNo());
         String password = KKTool.byteArrayToHexStr(cmdReq.getPassword());
-        String deptNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getAgencyNo(), 10, false);
-        String operNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getOperNo(), 10, false);
         
         Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, 
                                      tradeTypeCode, cardNo, password, deptNo, operNo};
@@ -195,18 +269,12 @@ public final class WSUtil {
     public void queryZHBBalance(CmdQueryZHBBalanceReq cmdReq, CmdQueryZHBBalanceRsp cmdRsp) {
         String inputXml = Const.WS_XM_GET_ZHB_BALANCE;
         
-        String origDomain = "A1";
-        String homeDomain = "01";
-        String biPCode = "0004";
-        String actionCode = "0";
-        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
-        String procId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+        String transId = getNextTransId();
+        String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String tradeTypeCode = "00";
         String cardNo = KKTool.byteArrayToHexStr(cmdReq.getCityCardNo());
         String password = KKTool.byteArrayToHexStr(cmdReq.getPassword());
-        String deptNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getAgencyNo(), 10, false);
-        String operNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getOperNo(), 10, false);
         
         Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, 
                 tradeTypeCode, cardNo, password, deptNo, operNo};
@@ -246,12 +314,9 @@ public final class WSUtil {
     public void modifyZHBPassword(CmdModifyZHBPassReq cmdReq, CmdModifyZHBPassRsp cmdRsp) {
         //for performance, ignore the xml document building
         String inputXml = Const.WS_XML_MODIFY_ZHB_PASS;
-        String origDomain = "A1";
-        String homeDomain = "01";
-        String biPCode = "0004";
-        String actionCode = "0";
-        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
-        String procId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+
+        String transId = getNextTransId();
+        String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String operType = "00";
         String cardNo = KKTool.byteArrayToHexStr(cmdReq.getCardNo());
@@ -264,11 +329,9 @@ public final class WSUtil {
         String cardOldBalance = KKTool.getStrWithMaxLen(String.valueOf(cmdReq.getCardOldBalance()), 10, false);
         String chargeAmount = "0";
         String tradeType = "02";
-        String keyVersion = "01";
-        String arithIndex = "00";
+
         String mac1 = KKTool.byteArrayToHexStr(cmdReq.getMac1());
-        String deptNo = KKTool.getStrWithMaxLen("", 10, false);
-        String operNo = KKTool.getStrWithMaxLen("", 10, false);
+
         String chargeDate = KKTool.byteArrayToHexStr(cmdReq.getChargeDate());
         String chargeTime = KKTool.byteArrayToHexStr(cmdReq.getChargeTime());
         
@@ -341,8 +404,8 @@ public final class WSUtil {
         String inputXml = Const.WS_XML_GET_MAC2;
         Object[] args = new String[]{"Y1", "01", 
                 "0004", "0", 
-                KKTool.getFixedLenString("", 30, '0', true), 
-                KKTool.getFixedLenString("", 30, '0', true),
+                "YDKQ900000000001", 
+                "YDKQ900000000001",
                 KKTool.getCurrFormatDate("yyyyMMddHHmmss"), 
                 "00", "9150020686240037", 
                 "112233445566", "86000091500086240037", "F196CA64", 
@@ -360,18 +423,12 @@ public final class WSUtil {
     public void testPrepaidCardCheck() {
         String inputXml = Const.WS_XML_PREPAID_CARD_CHECK;
         
-        String origDomain = "02";
-        String homeDomain = "01";
-        String biPCode = "0004";
-        String actionCode = "0";
-        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
-        String procId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+        String transId = getNextTransId();
+        String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String tradeTypeCode = "00";
         String cardNo = "9150020686240037";
         String password = "1234567890123456";
-        String deptNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getAgencyNo(), 10, false);
-        String operNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getOperNo(), 10, false);
         
         Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, 
                                      tradeTypeCode, cardNo, password, deptNo, operNo};
@@ -410,18 +467,12 @@ public final class WSUtil {
     public void testQueryZHBBalance() {
         String inputXml = Const.WS_XM_GET_ZHB_BALANCE;
         
-        String origDomain = "02";
-        String homeDomain = "01";
-        String biPCode = "0004";
-        String actionCode = "0";
-        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
-        String procId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+        String transId = getNextTransId();
+        String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String tradeTypeCode = "00";
         String cardNo = "9150020686240037";
         String password = "123456";
-        String deptNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getAgencyNo(), 10, false);
-        String operNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getOperNo(), 10, false);
         
         Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, 
                 tradeTypeCode, cardNo, password, deptNo, operNo};
@@ -459,12 +510,9 @@ public final class WSUtil {
     
     public void testModifyZHBPass() {
         String inputXml = Const.WS_XML_MODIFY_ZHB_PASS;
-        String origDomain = "02";
-        String homeDomain = "01";
-        String biPCode = "0004";
-        String actionCode = "0";
-        String transId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
-        String procId = KKTool.getCurrFormatDate("yyyyMMddHHmmssSSS");
+
+        String transId = getNextTransId();
+        String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String operType = "00";
         String cardNo = "9150020686240037";
@@ -477,11 +525,7 @@ public final class WSUtil {
         String cardOldBalance = "12";
         String chargeAmount = "0";
         String tradeType = "02";
-        String keyVersion = "01";
-        String arithIndex = "00";
         String mac1 = "12345678";
-        String deptNo = KKTool.getStrWithMaxLen("", 10, false);
-        String operNo = KKTool.getStrWithMaxLen("", 10, false);
         String chargeDate = KKTool.getCurrFormatDate("yyyyMMdd");
         String chargeTime = KKTool.getCurrFormatDate("HHmmss");
         

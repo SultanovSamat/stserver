@@ -203,9 +203,14 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             CmdGetMac2Rsp cmdRsp = new CmdGetMac2Rsp();
             cmdRsp.setCmdCommonField(cmdReq);
             String sMac2 = WSUtil.getWsUtil().getMac2(cmdReq);//"00000000"
-            byte[] mac2 = KKTool.strToHexBytes(sMac2, 4, 'F');
-            cmdRsp.setMac2(mac2);
             cmdRsp.setRet((byte)0);
+            log.info("mac2:{}", sMac2);
+            if (!sMac2.equals("")) {
+            	byte[] mac2 = KKTool.strToHexBytes(sMac2, 4, 'F');
+            	cmdRsp.setMac2(mac2);
+            	cmdRsp.setRet((byte)1);
+            	log.info("mac2:{}, cmdRsp.mac2:{}", KKTool.byteArrayToHexStr(mac2), KKTool.byteArrayToHexStr(cmdRsp.getMac2()));
+            }
             sendData(cmdRsp.getSendBuffer());
         } else {
             log.warn("recv cmd get mac2, but fail to dispose[{}]", tcpChannel);
