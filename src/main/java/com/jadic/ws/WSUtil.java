@@ -55,7 +55,7 @@ public final class WSUtil {
     
     private final static String origDomain = "Y1";
     private final static String homeDomain = "01";
-    private final static String biPCode = "0004";
+    //private final static String biPCode = "0004";
     private final static String actionCode = "0";
     private final static String keyVersion = "01";
     private final static String arithIndex = "00";
@@ -148,8 +148,8 @@ public final class WSUtil {
         threadPool.execute(new Runnable() {
 			@Override
 			public void run() {
-		        KKTool.createFileDir(Const.CHARGE_DETAIL_DIR_PARENT);
-		        File file = new File(Const.CHARGE_DETAIL_DIR_PARENT, SNO_FILE_NAME);
+		        KKTool.createFileDir(Const.INITIAL_DATA_DIR);
+		        File file = new File(Const.INITIAL_DATA_DIR, SNO_FILE_NAME);
 		        BufferedWriter writer = null;
 		        try {
 		            writer = new BufferedWriter(new FileWriter(file));
@@ -171,7 +171,7 @@ public final class WSUtil {
     public String getMac2(CmdGetMac2Req cmdReq) {
         //for performance, ignore the xml document building
         String inputXml = Const.WS_XML_GET_MAC2;
-
+        String biPCode = "0004";
         String transId = getNextTransId();
         String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
@@ -223,7 +223,7 @@ public final class WSUtil {
     
     public void checkPrepaidCard(CmdPrepaidCardCheckReq cmdReq, CmdPrepaidCardCheckRsp cmdRsp) {
         String inputXml = Const.WS_XML_PREPAID_CARD_CHECK;
-        
+        String biPCode = "0011";
         String transId = getNextTransId();
         String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
@@ -268,7 +268,7 @@ public final class WSUtil {
 
     public void queryZHBBalance(CmdQueryZHBBalanceReq cmdReq, CmdQueryZHBBalanceRsp cmdRsp) {
         String inputXml = Const.WS_XM_GET_ZHB_BALANCE;
-        
+        String biPCode = "0007";
         String transId = getNextTransId();
         String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
@@ -278,7 +278,9 @@ public final class WSUtil {
         
         Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, 
                 tradeTypeCode, cardNo, password, deptNo, operNo};
-        String retXml = centerProcess.callback(String.format(inputXml, args));
+        String input = String.format(inputXml, args);
+        log.info("query zhb balance input:\n{}", input);
+        String retXml = centerProcess.callback(input);
         
         cmdRsp.setCheckRet(RET_FAIL);
         try {
@@ -314,7 +316,7 @@ public final class WSUtil {
     public void modifyZHBPassword(CmdModifyZHBPassReq cmdReq, CmdModifyZHBPassRsp cmdRsp) {
         //for performance, ignore the xml document building
         String inputXml = Const.WS_XML_MODIFY_ZHB_PASS;
-
+        String biPCode = "0012";
         String transId = getNextTransId();
         String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
@@ -422,17 +424,19 @@ public final class WSUtil {
 
     public void testPrepaidCardCheck() {
         String inputXml = Const.WS_XML_PREPAID_CARD_CHECK;
-        
+        String biPCode = "0011";
         String transId = getNextTransId();
         String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String tradeTypeCode = "00";
         String cardNo = "9150020686240037";
-        String password = "1234567890123456";
+        String password = "0031256112212864";
         
         Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, 
                                      tradeTypeCode, cardNo, password, deptNo, operNo};
-        String retXml = centerProcess.callback(String.format(inputXml, args));
+        String input = String.format(inputXml, args);
+        log.info("input:\n{}", input);
+        String retXml = centerProcess.callback(input);
         log.info("prepaidcard xml ret:" + retXml);
         
         try {
@@ -466,17 +470,19 @@ public final class WSUtil {
     
     public void testQueryZHBBalance() {
         String inputXml = Const.WS_XM_GET_ZHB_BALANCE;
-        
+        String biPCode = "0007";
         String transId = getNextTransId();
         String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String tradeTypeCode = "00";
         String cardNo = "9150020686240037";
-        String password = "123456";
+        String password = "111111";
         
         Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, 
                 tradeTypeCode, cardNo, password, deptNo, operNo};
-        String retXml = centerProcess.callback(String.format(inputXml, args));
+        String input = String.format(inputXml, args);
+        log.info("input:\n{}", input);
+        String retXml = centerProcess.callback(input);
         
         log.info("testQueryZHBBalance xml ret:" + retXml);
         try {
@@ -510,7 +516,7 @@ public final class WSUtil {
     
     public void testModifyZHBPass() {
         String inputXml = Const.WS_XML_MODIFY_ZHB_PASS;
-
+        String biPCode = "0012";
         String transId = getNextTransId();
         String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
@@ -557,9 +563,9 @@ public final class WSUtil {
     public static void main(String[] arg) {
         log.info("test start");
         WSUtil wsUtil = WSUtil.getWsUtil();
-        log.info(wsUtil.testGetMac2());
+//        log.info(wsUtil.testGetMac2());
 //        wsUtil.testPrepaidCardCheck();
-//        wsUtil.testQueryZHBBalance();
+        wsUtil.testQueryZHBBalance();
 //        wsUtil.testModifyZHBPass();
         log.info("test end");
     }

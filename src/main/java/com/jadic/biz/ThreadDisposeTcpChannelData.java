@@ -278,9 +278,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         CmdQueryZHBBalanceReq cmdReq = new CmdQueryZHBBalanceReq();
         if (cmdReq.disposeData(buffer)) {
             CmdQueryZHBBalanceRsp cmdRsp = new CmdQueryZHBBalanceRsp();
-//            WSUtil.getWsUtil().checkPrepaidCard(cmdReq, cmdRsp);
-            cmdRsp.setCheckRet((byte)1);
-            cmdRsp.setAmount(15000);
+            WSUtil.getWsUtil().queryZHBBalance(cmdReq, cmdRsp);
+//            cmdRsp.setCheckRet((byte)1);
+//            cmdRsp.setAmount(15000);
             cmdRsp.setCmdCommonField(cmdReq);
             sendData(cmdRsp.getSendBuffer());
             log.info("recv cmd query zhb balance, ret:{}, amount:{}", cmdRsp.getCheckRet(), cmdRsp.getAmount());

@@ -110,7 +110,7 @@ public final class Const {
     //获取账户宝余额
     public final static String WS_XM_GET_ZHB_BALANCE = "<SVC>" +
                                                             "<SVCHEAD>" +
-                                                              "<ORIGDOMAIN>%s</ORIGDOMAIN" +
+                                                              "<ORIGDOMAIN>%s</ORIGDOMAIN>" +
                                                               "<HOMEDOMAIN>%s</HOMEDOMAIN>" +
                                                               "<BIPCODE>%s</BIPCODE>" +
                                                               "<ACTIONCODE>%s</ACTIONCODE>" +
