@@ -177,6 +177,7 @@ public final class WSUtil {
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String operType = KKTool.byteToHexStr(cmdReq.getOperType());
         String cardNo = KKTool.byteArrayToHexStr(cmdReq.getCardNo());
+        String password = new String(cmdReq.getPassword()).trim();
         String termNo = KKTool.byteArrayToHexStr(cmdReq.getTermNo());
         String asn = KKTool.byteArrayToHexStr(cmdReq.getAsn());
         String randNumber = KKTool.byteArrayToHexStr(cmdReq.getRandNumber());
@@ -189,7 +190,7 @@ public final class WSUtil {
         String chargeTime = KKTool.byteArrayToHexStr(cmdReq.getChargeTime());
         
         Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, operType, 
-                cardNo, termNo, asn, randNumber, cardTradeNo, cardOldBalance, chargeAmount, 
+                cardNo, password, termNo, asn, randNumber, cardTradeNo, cardOldBalance, chargeAmount, 
                 tradeType, keyVersion, arithIndex, mac1, deptNo, operNo, chargeDate, chargeTime};
         String input = String.format(inputXml, args);
         log.info("get mac2 input:\n{}", input);

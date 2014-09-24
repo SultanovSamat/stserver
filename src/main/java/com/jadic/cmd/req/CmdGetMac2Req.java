@@ -10,6 +10,7 @@ public class CmdGetMac2Req extends AbstractCmdReq {
 
     private byte operType;
     private byte[] cardNo;
+    private byte[] password;
     private byte[] termNo;
     private byte[] asn;
     private byte[] randNumber;
@@ -22,6 +23,7 @@ public class CmdGetMac2Req extends AbstractCmdReq {
 
     public CmdGetMac2Req() {
         this.cardNo = new byte[8];
+        this.password = new byte[19];
         this.termNo = new byte[6];
         this.asn = new byte[10];
         this.randNumber = new byte[4];
@@ -33,8 +35,8 @@ public class CmdGetMac2Req extends AbstractCmdReq {
 
     @Override
     protected int getCmdBodySize() {
-        return 1 + cardNo.length + termNo.length + asn.length + randNumber.length 
-                + cardTradNo.length + 4 + 4 + mac1.length
+        return 1 + cardNo.length + password.length + termNo.length + asn.length 
+        		+ randNumber.length + cardTradNo.length + 4 + 4 + mac1.length
                 + chargeDate.length + chargeTime.length;
     }
 
@@ -42,6 +44,7 @@ public class CmdGetMac2Req extends AbstractCmdReq {
     protected boolean disposeCmdBody(ChannelBuffer channelBuffer) {
         this.operType = channelBuffer.readByte();
         channelBuffer.readBytes(this.cardNo);
+        channelBuffer.readBytes(this.password);
         channelBuffer.readBytes(this.termNo);
         channelBuffer.readBytes(this.asn);
         channelBuffer.readBytes(this.randNumber);
@@ -62,7 +65,11 @@ public class CmdGetMac2Req extends AbstractCmdReq {
         return cardNo;
     }
 
-    public byte[] getTermNo() {
+    public byte[] getPassword() {
+		return password;
+	}
+
+	public byte[] getTermNo() {
         return termNo;
     }
 

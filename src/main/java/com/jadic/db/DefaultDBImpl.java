@@ -58,6 +58,10 @@ public class DefaultDBImpl {
         ResultSet rs = null;
         try {
             connection = getMasterConnection();
+            if (connection == null) {
+            	logger.warn("connection is null");
+            	return list;
+            }
             pstmt = connection.prepareStatement(sql);
             if (paramsObj != null) {
                 for (int i = 0; i < paramsObj.length; i++) {
@@ -158,7 +162,7 @@ public class DefaultDBImpl {
     }
 
     protected Connection getMasterConnection() throws SQLException {
-        return masterPool.getConnection();
+        return masterPool != null ? masterPool.getConnection() : null;
     }
 
     public static void release() {
@@ -183,6 +187,9 @@ public class DefaultDBImpl {
         ResultSet rs = null;
         try {
             connection = getMasterConnection();
+            if (connection == null) {
+            	return obj;
+            }
             statement = connection.prepareStatement(sql);
             if (paramsObj != null) {
                 // 注入参数
@@ -209,6 +216,9 @@ public class DefaultDBImpl {
         PreparedStatement pstmt = null;
         try {
             connection = getMasterConnection();
+            if (connection == null) {
+            	return -1;
+            }
             pstmt = connection.prepareStatement(sql);
 
             if (paramsObj != null) {
@@ -237,6 +247,9 @@ public class DefaultDBImpl {
         boolean autoCommit = true;
         try {
             connection = getMasterConnection();
+            if (connection == null) {
+            	return -1;
+            }
             pstmt = connection.prepareStatement(sql);
             autoCommit = connection.getAutoCommit();
             connection.setAutoCommit(false);
@@ -290,6 +303,9 @@ public class DefaultDBImpl {
         ResultSet resultSet = null;
         try {
             connection = getMasterConnection();
+            if (connection == null) {
+            	return -1;
+            }
             statement = connection.prepareStatement(sql);
             // 注入参数
             for (int i = 0; i < paramsObj.length; i++) {
@@ -338,6 +354,9 @@ public class DefaultDBImpl {
 
         try {
             connection = getMasterConnection();
+            if (connection == null) {
+            	return t;
+            }
             pstmt = connection.prepareStatement(sql);
             // 注入参数
             if (paramsObj != null) {
@@ -393,6 +412,9 @@ public class DefaultDBImpl {
         ResultSet rs = null;
         try {
             connection = getMasterConnection();
+            if (connection == null) {
+            	return list;
+            }
             pstmt = connection.prepareStatement(sql);
 
             if (paramsObj != null) {

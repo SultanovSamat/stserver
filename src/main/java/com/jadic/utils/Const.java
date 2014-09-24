@@ -67,6 +67,7 @@ public final class Const {
                                                        "<CHARGEREQ>" +
                                                          "<TRADETYPECODE>%s</TRADETYPECODE>" +
                                                          "<CARDNO>%s</CARDNO>" +
+                                                         "<PASSWORD>%s</PASSWORD>" +
                                                          "<TERMNO>%s</TERMNO>" +
                                                          "<ASN>%s</ASN>" +
                                                          "<RNDNUMBER2>%s</RNDNUMBER2>" +
