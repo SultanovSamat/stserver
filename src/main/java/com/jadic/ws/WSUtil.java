@@ -64,7 +64,7 @@ public final class WSUtil {
     
     private CenterProcessPortType centerProcess;
     
-    private final static WSUtil wsUtil = getWsUtil();
+    private static WSUtil wsUtil = getWsUtil();
     
     public static WSUtil getWsUtil() {
         if (wsUtil == null) {
@@ -90,8 +90,12 @@ public final class WSUtil {
             centerProcess = new CenterProcess(url).getCenterProcess();
         } catch (MalformedURLException e) {
             log.error("WSUtil create url err", e);
+            wsUtil = null;
         }
-        threadPool = Executors.newSingleThreadExecutor();
+        
+        if (threadPool == null) {
+            threadPool = Executors.newSingleThreadExecutor();
+        }
     }
     
     private long getNextSNo() {
