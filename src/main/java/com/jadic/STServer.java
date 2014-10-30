@@ -9,6 +9,7 @@ import com.jadic.cmd.req.CmdChargeDetailReq;
 import com.jadic.db.DBOper;
 import com.jadic.tcp.server.TcpServer;
 import com.jadic.utils.SysParams;
+import com.jadic.ws.WSUtil;
 
 /**
  * @author Jadic
@@ -26,6 +27,7 @@ public class STServer implements ICmdBizDisposer{
         tcpServer = new TcpServer(sysParams.getLocalTcpPort(), this);
         threadModuleStatus = new ThreadTerminalModuleStatus();
         threadTransaction = new ThreadTerminalChargeDetail();
+        WSUtil.getWsUtil();
     }
     
     public void start() {
