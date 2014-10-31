@@ -91,8 +91,7 @@ public final class WSUtil {
 		try {
 			url = new URL(wsdlBuilder.toString());
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("new Url err", e);
 		}
         log.info("url:" + url);
         createServiceClient();
@@ -102,6 +101,7 @@ public final class WSUtil {
     
     private void createServiceClient() {
     	try {
+    	    log.info("");
             centerProcess = new CenterProcess(url).getCenterProcess();
             Map<String, Object> requestContext = ((BindingProvider)centerProcess).getRequestContext();
             requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, 5000);

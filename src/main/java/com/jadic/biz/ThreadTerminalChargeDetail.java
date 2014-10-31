@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.jadic.cmd.req.CmdChargeDetailReq;
 import com.jadic.utils.Const;
 import com.jadic.utils.KKTool;
+import com.jadic.utils.SysParams;
 
 /**
  * 根据终端交易数据生成交易文件 
@@ -36,10 +37,10 @@ public class ThreadTerminalChargeDetail extends AbstractThreadDisposeDataFromQue
     private final static String S0_8 = "00000000";
     private final static String TRANS_STATUS = "1";
     private final static String TRANS_TYPE = "02";
-    private final static String AGENCY_NO = "1234";
-    private final static String SAM = "11111111";
-    private final static String POSID = "12345678";
-    private final static String OPERNO = "1234";
+    private final static String AGENCY_NO = SysParams.getInstance().getAgencyNo();//"1234";
+    private final static String SAM = SysParams.getInstance().getSamId();//"11111111";
+    private final static String POSID = SysParams.getInstance().getPosId();//"123456";
+    private final static String OPERNO = SysParams.getInstance().getOperNo();//"1234";
     
     public final static String FILE_SNO_NAME = "fileSNo.txt";
 

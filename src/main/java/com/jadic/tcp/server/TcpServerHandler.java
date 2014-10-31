@@ -37,7 +37,7 @@ public class TcpServerHandler extends SimpleChannelHandler {
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
 		TcpChannel tcpChannel = this.tcpServer.getTcpChannel(ctx.getChannel().getId());
-		log.error("{} exception caught", tcpChannel, e);
+		log.error("{} exception caught:{}", tcpChannel, e);
 		this.tcpServer.removeTcpChannel(ctx.getChannel().getId());
 	}
 

@@ -33,6 +33,8 @@ public class SysParams {
     private int cityCardWSPort;
     private String agencyNo;//充值网点代码
     private String operNo;//操作员代码
+    private String posId;//pos编号
+    private String samId;//sam编号
     /* 市民卡相关参数 */
     
     /* ftp相关参数 */
@@ -73,8 +75,10 @@ public class SysParams {
         
         this.cityCardWSIp = kkConfig.getStrValue("cityCardWSIp");
         this.cityCardWSPort = kkConfig.getIntValue("cityCardWSPort");
-        this.agencyNo = kkConfig.getStrValue("agencyNo");
-        this.operNo = kkConfig.getStrValue("operNo");
+        this.agencyNo = kkConfig.getStrValue("agencyNo", "9998");
+        this.operNo = kkConfig.getStrValue("operNo", "9998");
+        this.posId = kkConfig.getStrValue("posId", "123456");
+        this.samId = kkConfig.getStrValue("samId", "12345678");
         
         this.ftpServerHost = kkConfig.getStrValue("ftpServerHost");
         this.ftpServerPort = kkConfig.getIntValue("ftpServerPort");
@@ -191,6 +195,14 @@ public class SysParams {
         return operNo;
     }
 
+    public String getPosId() {
+        return posId;
+    }
+
+    public String getSamId() {
+        return samId;
+    }
+
 }
 
 class KKConfig {
@@ -223,6 +235,15 @@ class KKConfig {
     public String getStrValue(String key) {
         if (this.properties.containsKey(key)) {
             return this.properties.getProperty(key, "").trim();
+        }
+        return "";
+    }
+    
+    public String getStrValue(String key, String defaultValue) {
+        if (this.properties.containsKey(key)) {
+            return this.properties.getProperty(key, "").trim();
+        } else if (defaultValue != null) {
+            return defaultValue;
         }
         return "";
     }
