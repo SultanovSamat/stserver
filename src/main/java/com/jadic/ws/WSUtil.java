@@ -9,11 +9,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import javax.xml.ws.BindingProvider;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -35,7 +32,6 @@ import com.jadic.utils.KKTool;
 import com.jadic.utils.SysParams;
 import com.jadic.ws.czsmk.CenterProcess;
 import com.jadic.ws.czsmk.CenterProcessPortType;
-import com.sun.xml.internal.ws.client.BindingProviderProperties;
 
 /**
  * wsdl2java for czsmk command:
@@ -101,11 +97,11 @@ public final class WSUtil {
     
     private void createServiceClient() {
     	try {
-    	    log.info("");
+    	    log.info("create WS client, url:{}", url);
             centerProcess = new CenterProcess(url).getCenterProcess();
-            Map<String, Object> requestContext = ((BindingProvider)centerProcess).getRequestContext();
-            requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, 5000);
-            requestContext.put(BindingProviderProperties.CONNECT_TIMEOUT, 2000);
+//            Map<String, Object> requestContext = ((BindingProvider)centerProcess).getRequestContext();
+//            requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, 5000);
+//            requestContext.put(BindingProviderProperties.CONNECT_TIMEOUT, 2000);
         } catch (Exception e) {
 			log.error("create WSUtil err:", e);
 			centerProcess = null;
@@ -198,10 +194,36 @@ public final class WSUtil {
     	return SNO_PREFIX + KKTool.getFixedLenString(String.valueOf(getNextSNo()), 12, '0', true);
     }
     
+    /**
+     * 所有ws调用统一入口
+     * @param inputXml
+     * @return
+     */
+    private String callService(String inputXml) {
+        String retXml = null;
+        if (isServiceClientOK() && centerProcess != null) {
+            try {
+                retXml = centerProcess.callback(inputXml);
+                log.debug("callService succ, input:{}, output:{}", inputXml, retXml);
+            } catch (Exception e){
+                log.error("call service err, input:{}", inputXml, e);
+                centerProcess = null;
+            }
+        }
+        return retXml;
+    }
+    
+    /**
+     * 获取mac2
+     * 调整成功后，加上12位流水号
+     * @param cmdReq
+     * @return
+     */
     public String getMac2(CmdGetMac2Req cmdReq) {
-    	if (!isServiceClientOK()) {
-    		return "";
-    	}
+        if (cmdReq == null) {
+            return "";
+        }
+        
         //for performance, ignore the xml document building
         String inputXml = Const.WS_XML_GET_MAC2;
         String biPCode = "0004";
@@ -226,15 +248,9 @@ public final class WSUtil {
                 cardNo, password, termNo, asn, randNumber, cardTradeNo, cardOldBalance, chargeAmount, 
                 tradeType, keyVersion, arithIndex, mac1, deptNo, operNo, chargeDate, chargeTime};
         String input = String.format(inputXml, args);
-        log.info("get mac2 input:\n{}", input);
-        String retXml = null;
-        try {
-        	retXml = centerProcess.callback(input);
-		} catch (Exception e) {
-			log.error("get mac2 callback err", e);
-			retXml = null;
-		}
-        log.info("get mac2 output:\n{}", retXml);
+
+        String retXml = callService(input);
+        
         if (retXml == null) {
         	return "";
         }
@@ -247,7 +263,7 @@ public final class WSUtil {
                     Node mac2Node = document.selectSingleNode("//SVC/SVCCONT/CHANGERSP/MAC2");
                     if (mac2Node != null) {
                         log.info("succeed to get mac2:{}", mac2Node.getText());
-                        return mac2Node.getText();
+                        return mac2Node.getText() + transId.substring(4);
                     } else {
                         log.info("valid response for getting mac2, but no mac2 node found");
                     }
@@ -265,9 +281,11 @@ public final class WSUtil {
     }
     
     public void checkPrepaidCard(CmdPrepaidCardCheckReq cmdReq, CmdPrepaidCardCheckRsp cmdRsp) {
-    	if (!isServiceClientOK()) {
-    		return;
-    	}
+        if (cmdReq == null || cmdRsp == null) {
+            return;
+        }
+        cmdRsp.setCheckRet(RET_FAIL);
+        
         String inputXml = Const.WS_XML_PREPAID_CARD_CHECK;
         String biPCode = "0011";
         String transId = getNextTransId();
@@ -280,17 +298,11 @@ public final class WSUtil {
         Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, 
                                      tradeTypeCode, cardNo, password, deptNo, operNo};
         
-        String retXml = null;
-        try {
-        	retXml = centerProcess.callback(String.format(inputXml, args));
-		} catch (Exception e) {
-			log.error("checkPrepaidCard callback err", e);
-			retXml = null;
-		}
-        cmdRsp.setCheckRet(RET_FAIL);
+        String retXml = callService(String.format(inputXml, args));
         if (retXml == null) {
         	return ;
         }
+        
         try {
             Document document = DocumentHelper.parseText(retXml);
             Node respCodeNode = document.selectSingleNode("//SVC/SVCCONT/CARDVERIFYRSP/RESPCODE");
@@ -322,9 +334,11 @@ public final class WSUtil {
     }
 
     public void queryZHBBalance(CmdQueryZHBBalanceReq cmdReq, CmdQueryZHBBalanceRsp cmdRsp) {
-    	if (!isServiceClientOK()) {
-    		return;
+    	if (cmdReq == null || cmdRsp == null) {
+    	    return;
     	}
+    	cmdRsp.setCheckRet(RET_FAIL);
+    	
         String inputXml = Const.WS_XM_GET_ZHB_BALANCE;
         String biPCode = "0007";
         String transId = getNextTransId();
@@ -337,18 +351,12 @@ public final class WSUtil {
         Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, 
                 tradeTypeCode, cardNo, password, deptNo, operNo};
         String input = String.format(inputXml, args);
-        log.info("query zhb balance input:\n{}", input);
-        String retXml = null;
-        try {
-        	retXml = centerProcess.callback(input);
-		} catch (Exception e) {
-			log.error("queryZHBBalance callback err", e);
-			retXml = null;
-		}
-        cmdRsp.setCheckRet(RET_FAIL);
+        
+        String retXml = callService(input);
         if (retXml == null) {
         	return;
         }
+
         try {
             Document document = DocumentHelper.parseText(retXml);
             Node respCodeNode = document.selectSingleNode("//SVC/SVCCONT/GROUPQUERYRSP/RESPCODE");
@@ -380,9 +388,11 @@ public final class WSUtil {
     }
     
     public void modifyZHBPassword(CmdModifyZHBPassReq cmdReq, CmdModifyZHBPassRsp cmdRsp) {
-    	if (!isServiceClientOK()) {
-    		return;
-    	}
+        if (cmdReq == null || cmdRsp == null) {
+            return;
+        }
+        cmdRsp.setRet(RET_FAIL);
+        
         //for performance, ignore the xml document building
         String inputXml = Const.WS_XML_MODIFY_ZHB_PASS;
         String biPCode = "0012";
@@ -409,14 +419,8 @@ public final class WSUtil {
         Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode, transId, procId, processTime, operType, 
                 cardNo, oldPass, newPass, termNo, asn, randNumber, cardTradeNo, cardOldBalance, chargeAmount, 
                 tradeType, keyVersion, arithIndex, mac1, chargeDate, chargeTime, deptNo, operNo};
-        String retXml = null;
-        try {
-        	retXml = centerProcess.callback(String.format(inputXml, args));
-		} catch (Exception e) {
-			log.error("modifyZHBPassword callback err", e);
-			retXml = null;
-		}
-        cmdRsp.setRet(RET_FAIL);
+
+        String retXml = callService(String.format(inputXml, args));
         if (retXml == null) {
         	return;
         }
@@ -639,8 +643,7 @@ public final class WSUtil {
     }
     
     public static void main(String[] arg) {
-    	String s = null;
-        log.info("test start {}", s);
+    	WSUtil.getWsUtil();
 //        WSUtil wsUtil = WSUtil.getWsUtil();
 ////        log.info(wsUtil.testGetMac2());
 ////        wsUtil.testPrepaidCardCheck();
