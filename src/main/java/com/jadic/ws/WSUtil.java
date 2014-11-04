@@ -71,7 +71,7 @@ public final class WSUtil {
         if (wsUtil == null) {
             synchronized (log) {
                 if (wsUtil == null) {
-                    return new WSUtil();
+                    wsUtil = new WSUtil();
                 }
             }
         }
@@ -96,6 +96,9 @@ public final class WSUtil {
     }
     
     private void createServiceClient() {
+        if (centerProcess != null) {
+            return ;
+        }
     	try {
     	    log.info("create WS client, url:{}", url);
             centerProcess = new CenterProcess(url).getCenterProcess();
