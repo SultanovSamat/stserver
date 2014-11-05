@@ -264,9 +264,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         CmdPrepaidCardCheckReq cmdReq = new CmdPrepaidCardCheckReq();
         if (cmdReq.disposeData(buffer)) {
             CmdPrepaidCardCheckRsp cmdRsp = new CmdPrepaidCardCheckRsp();
-            //WSUtil.getWsUtil().checkPrepaidCard(cmdReq, cmdRsp);
-            cmdRsp.setCheckRet((byte)1);
-            cmdRsp.setAmount(10000);
+            WSUtil.getWsUtil().checkPrepaidCard(cmdReq, cmdRsp);
+//            cmdRsp.setCheckRet((byte)1);
+//            cmdRsp.setAmount(10000);
             cmdRsp.setCmdCommonField(cmdReq);
             sendData(cmdRsp.getSendBuffer());
             log.info("recv cmd prepaid card check, ret:{}, amount:{}", cmdRsp.getCheckRet(), cmdRsp.getAmount());
@@ -280,8 +280,6 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         if (cmdReq.disposeData(buffer)) {
             CmdQueryZHBBalanceRsp cmdRsp = new CmdQueryZHBBalanceRsp();
             WSUtil.getWsUtil().queryZHBBalance(cmdReq, cmdRsp);
-//            cmdRsp.setCheckRet((byte)1);
-//            cmdRsp.setAmount(15000);
             cmdRsp.setCmdCommonField(cmdReq);
             sendData(cmdRsp.getSendBuffer());
             log.info("recv cmd query zhb balance, ret:{}, amount:{}", cmdRsp.getCheckRet(), cmdRsp.getAmount());
@@ -295,7 +293,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         if (cmdReq.disposeData(buffer)) {
             CmdModifyZHBPassRsp cmdRsp = new CmdModifyZHBPassRsp();
             cmdRsp.setCmdCommonField(cmdReq);
-            cmdRsp.setRet((byte)1);
+            WSUtil.getWsUtil().modifyZHBPassword(cmdReq, cmdRsp);
             sendData(cmdRsp.getSendBuffer());
             log.info("recv cmd modify zhb pass, ret:{}", cmdRsp.getRet());
         } else {

@@ -174,7 +174,8 @@ public class ThreadTerminalChargeDetail extends AbstractThreadDisposeDataFromQue
             writer.append(POSID).append(DELIMITER);
             writer.append(OPERNO).append(DELIMITER);
             writer.append(KKTool.byteArrayToHexStr(chargeDetail.getTac())).append(DELIMITER);
-            writer.append(KKTool.getLeftFillFixedLenStr(String.valueOf(chargeDetail.getTransSNo()), 16, '0'));
+            writer.append(AGENCY_FLAG);//流水号前追加ZZZD标识
+            writer.append(KKTool.getLeftFillFixedLenStr(KKTool.byteArrayToHexStr(chargeDetail.getTransSNo()), 12, '0'));
             writer.append('\r').append('\n');
             
             writer.flush();

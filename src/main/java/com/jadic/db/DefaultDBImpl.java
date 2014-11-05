@@ -35,11 +35,20 @@ public class DefaultDBImpl {
 
     private final static Logger logger = LoggerFactory.getLogger(DefaultDBImpl.class);
     private DBConnPool masterPool;
+    private List<JDBCConfig> jdbcList;
 
     public DefaultDBImpl() {
-        List<JDBCConfig> jdbcList = SysParams.getInstance().getJdbcListCopy();
+        jdbcList = SysParams.getInstance().getJdbcListCopy();
         if (jdbcList.size() <= 0) {
             logger.error("no jdbc config is set, please check");
+            return;
+        }
+        
+        getMasterPool();
+    }
+    
+    private void getMasterPool() {
+        if (masterPool != null) {
             return;
         }
         try {
@@ -48,7 +57,7 @@ public class DefaultDBImpl {
             logger.error("DBOper create ClassNotFoundException", e);
         } catch (SQLException e) {
             logger.error("DBOper create SQLException", e);
-        }
+        }        
     }
 
     protected <T> List<T> queryForList(String sql, Object[] paramsObj, Class<T> objClass) {
@@ -162,6 +171,7 @@ public class DefaultDBImpl {
     }
 
     protected Connection getMasterConnection() throws SQLException {
+        getMasterPool();
         return masterPool != null ? masterPool.getConnection() : null;
     }
 

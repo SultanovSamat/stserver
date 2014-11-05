@@ -46,7 +46,7 @@ public final class WSUtil {
     private final static byte RET_OK               = 0x01;//成功
     private final static byte RET_INVALID_PASSWORD = 0x02;//密码错误
     
-    private final static String SNO_PREFIX = "YKDQ";//流水号、交易号的前缀
+    private final static String SNO_PREFIX = "ZZZD";//流水号、交易号的前缀 (自助终端的缩写)
     
     private final static long MAX_SNO = 999999999999L;
     private ExecutorService threadPool;

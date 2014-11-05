@@ -2,12 +2,14 @@ package com.jadic;
 
 import com.jadic.biz.BaseInfo;
 import com.jadic.biz.ICmdBizDisposer;
-import com.jadic.biz.ThreadTerminalModuleStatus;
 import com.jadic.biz.ThreadTerminalChargeDetail;
-import com.jadic.cmd.req.CmdModuleStatusReq;
+import com.jadic.biz.ThreadTerminalModuleStatus;
+import com.jadic.biz.ThreadUploadPosDealData;
 import com.jadic.cmd.req.CmdChargeDetailReq;
+import com.jadic.cmd.req.CmdModuleStatusReq;
 import com.jadic.db.DBOper;
 import com.jadic.tcp.server.TcpServer;
+import com.jadic.utils.KKSimpleTimer;
 import com.jadic.utils.SysParams;
 import com.jadic.ws.WSUtil;
 
@@ -21,6 +23,8 @@ public class STServer implements ICmdBizDisposer{
     private SysParams sysParams = SysParams.getInstance();
     private ThreadTerminalModuleStatus threadModuleStatus;
     private ThreadTerminalChargeDetail threadTransaction;
+    private ThreadUploadPosDealData threadUploadPosDealData;
+    private KKSimpleTimer loadBaseInfoTimer;
     
     public STServer() {
         loadBaseInfo();
@@ -34,6 +38,15 @@ public class STServer implements ICmdBizDisposer{
         tcpServer.start();
         threadModuleStatus.start();
         threadTransaction.start();
+        loadBaseInfoTimer = new KKSimpleTimer(new Runnable() {
+            @Override
+            public void run() {
+                BaseInfo.getBaseInfo().updateBaseInfo(DBOper.getDBOper().queryTerminals());
+            }
+        }, 300, 300);
+        loadBaseInfoTimer.start();
+        threadUploadPosDealData = new ThreadUploadPosDealData();
+        threadUploadPosDealData.start();
     }
     
     private void loadBaseInfo() {

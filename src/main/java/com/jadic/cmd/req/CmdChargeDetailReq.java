@@ -13,7 +13,7 @@ public class CmdChargeDetailReq extends AbstractCmdReq {
     private int transAmount;        //交易金额
     private int balanceBeforeTrans; //交易前余额
     private byte[] tac;             //TAC认证码
-    private int transSNo;           //交易流水号
+    private byte[] transSNo;           //交易流水号
     private byte chargeType;        //充值类型
     private byte[] cityCardNo;      //市民卡卡号
     
@@ -24,6 +24,7 @@ public class CmdChargeDetailReq extends AbstractCmdReq {
         this.transDate = new byte[4];
         this.transTime = new byte[3];
         this.tac = new byte[4];
+        this.transSNo = new byte[6];
         this.cityCardNo = new byte[8];
     }
 
@@ -38,7 +39,7 @@ public class CmdChargeDetailReq extends AbstractCmdReq {
   	          + 4 
 	          + 4 
 	          + tac.length 
-	          + 4
+	          + transSNo.length
 	          + 1
 	          + cityCardNo.length;
 	}
@@ -54,7 +55,7 @@ public class CmdChargeDetailReq extends AbstractCmdReq {
 	    transAmount = channelBuffer.readInt();
 	    balanceBeforeTrans = channelBuffer.readInt();
 	    channelBuffer.readBytes(tac);
-	    transSNo = channelBuffer.readInt();
+	    channelBuffer.readBytes(transSNo);
 	    chargeType = channelBuffer.readByte();
 	    channelBuffer.readBytes(cityCardNo);
 		return true;
@@ -96,7 +97,7 @@ public class CmdChargeDetailReq extends AbstractCmdReq {
         return tac;
     }
 
-    public int getTransSNo() {
+    public byte[] getTransSNo() {
         return transSNo;
     }
 
