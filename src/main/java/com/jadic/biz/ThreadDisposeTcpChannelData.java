@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import com.jadic.biz.bean.TerminalBean;
 import com.jadic.cmd.req.AbstractCmdReq;
 import com.jadic.cmd.req.CmdChargeDetailReq;
+import com.jadic.cmd.req.CmdCheckCityCardTypeReq;
 import com.jadic.cmd.req.CmdDefaultReq;
 import com.jadic.cmd.req.CmdGetMac2Req;
 import com.jadic.cmd.req.CmdHeartbeatReq;
@@ -18,6 +19,7 @@ import com.jadic.cmd.req.CmdQueryZHBBalanceReq;
 import com.jadic.cmd.req.CmdRefundReq;
 import com.jadic.cmd.req.CmdTYRetReq;
 import com.jadic.cmd.rsp.CmdChargeDetailRsp;
+import com.jadic.cmd.rsp.CmdCheckCityCardTypeRsp;
 import com.jadic.cmd.rsp.CmdGetMac2Rsp;
 import com.jadic.cmd.rsp.CmdLoginRsp;
 import com.jadic.cmd.rsp.CmdModifyZHBPassRsp;
@@ -123,6 +125,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             break;
         case Const.TER_MODIFY_ZHB_PASS:
             dealCmdModifyZHBPass(buffer);
+            break;
+        case Const.TER_CHECK_CITY_CARD_TYPE:
+            dealCmdCheckCityCardType(buffer);
             break;
         default:
             dealInvalidCmd(buffer, Const.TY_RET_NOT_SUPPORTED);
@@ -298,6 +303,19 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             log.info("recv cmd modify zhb pass, ret:{}", cmdRsp.getRet());
         } else {
             log.warn("recv cmd modify zhb pass, but fail to dispose[{}]", tcpChannel);
+        }
+    }
+    
+    private void dealCmdCheckCityCardType(ChannelBuffer buffer) {
+        CmdCheckCityCardTypeReq cmdReq = new CmdCheckCityCardTypeReq();
+        if (cmdReq.disposeData(buffer)) {
+            CmdCheckCityCardTypeRsp cmdRsp = new CmdCheckCityCardTypeRsp();
+            cmdRsp.setCmdCommonField(cmdReq);
+            //
+            sendData(cmdRsp.getSendBuffer());
+            log.info("recv cmd check city card type:{}", cmdRsp.getType());
+        } else {
+            log.warn("recv cmd check city card type, but fail to dispose[{}]", tcpChannel);
         }
     }
     
