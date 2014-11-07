@@ -24,6 +24,7 @@ import com.jadic.cmd.req.CmdGetMac2Req;
 import com.jadic.cmd.req.CmdModifyZHBPassReq;
 import com.jadic.cmd.req.CmdPrepaidCardCheckReq;
 import com.jadic.cmd.req.CmdQueryZHBBalanceReq;
+import com.jadic.cmd.rsp.CmdGetMac2Rsp;
 import com.jadic.cmd.rsp.CmdModifyZHBPassRsp;
 import com.jadic.cmd.rsp.CmdPrepaidCardCheckRsp;
 import com.jadic.cmd.rsp.CmdQueryZHBBalanceRsp;
@@ -217,15 +218,17 @@ public final class WSUtil {
     }
     
     /**
-     * 获取mac2
-     * 调整成功后，加上12位流水号
+     * 获取mac2<br>
+     * 调整成功后，加上12位流水号<br>
+     * 若有相关错误提示返回至客户端<br>
      * @param cmdReq
      * @return
      */
-    public String getMac2(CmdGetMac2Req cmdReq) {
-        if (cmdReq == null) {
-            return "";
+    public void getMac2(CmdGetMac2Req cmdReq, CmdGetMac2Rsp cmdRsp) {
+        if (cmdReq == null || cmdRsp == null) {
+            return ;
         }
+        cmdRsp.setRet(RET_FAIL);
         
         //for performance, ignore the xml document building
         String inputXml = Const.WS_XML_GET_MAC2;
@@ -251,11 +254,11 @@ public final class WSUtil {
                 cardNo, password, termNo, asn, randNumber, cardTradeNo, cardOldBalance, chargeAmount, 
                 tradeType, keyVersion, arithIndex, mac1, deptNo, operNo, chargeDate, chargeTime};
         String input = String.format(inputXml, args);
-
+        
         String retXml = callService(input);
         
         if (retXml == null) {
-        	return "";
+            return ;
         }
         try {
             Document document = DocumentHelper.parseText(retXml);
@@ -265,13 +268,28 @@ public final class WSUtil {
                 if (respCode.equals("0000")) {
                     Node mac2Node = document.selectSingleNode("//SVC/SVCCONT/CHANGERSP/MAC2");
                     if (mac2Node != null) {
+                        String sMac2 = mac2Node.getText();
+                        byte[] mac2 = KKTool.strToHexBytes(sMac2, 4, 'F');
+                        cmdRsp.setMac2(mac2);
+                        cmdRsp.setTranSNo(KKTool.strToHexBytes(transId.substring(4), 6, '0'));
+                        cmdRsp.setRet((byte)1);
                         log.info("succeed to get mac2:{}", mac2Node.getText());
-                        return mac2Node.getText() + transId.substring(4);
                     } else {
                         log.info("valid response for getting mac2, but no mac2 node found");
                     }
                 } else {
                     Node errDescNode = document.selectSingleNode("//SVC/SVCCONT/CHANGERSP/RESPDESC");
+                    if (errDescNode != null) {
+                        String errTip = errDescNode.getText();
+                        int startIndex = errTip.indexOf("ErrMsg:");
+                        if (startIndex >= 0) {//Calling Local Service Failed. ErrMsg:A094780516:原余额加充值金额不能大于5000元. The Service Id:0004
+                            int endIndex = errTip.indexOf("The Service Id");
+                            if (endIndex - 7 > startIndex) {
+                                errTip = errTip.substring(startIndex + 7, endIndex);
+                                cmdRsp.setErrTip(errTip.getBytes());
+                            }
+                        }
+                    }
                     log.info("fail to get mac2, respCode:{}, desc:{}", respCode, errDescNode != null ? errDescNode.getText() : "no desc");
                 }
             } else {
@@ -280,7 +298,6 @@ public final class WSUtil {
         } catch (DocumentException e) {
             log.info("getMac2 parse xml err", e);
         }
-        return "";
     }
     
     public void checkPrepaidCard(CmdPrepaidCardCheckReq cmdReq, CmdPrepaidCardCheckRsp cmdRsp) {
@@ -646,13 +663,17 @@ public final class WSUtil {
     }
     
     public static void main(String[] arg) {
-    	WSUtil.getWsUtil();
-//        WSUtil wsUtil = WSUtil.getWsUtil();
-////        log.info(wsUtil.testGetMac2());
-////        wsUtil.testPrepaidCardCheck();
-//        wsUtil.testQueryZHBBalance();
-////        wsUtil.testModifyZHBPass();
-//        log.info("test end");
+        CmdGetMac2Rsp cmdRsp = new CmdGetMac2Rsp();
+        String errTip = "Calling Local Service Failed. ErrMsg:电子钱包账户无效. The Service Id:0004: B000P00206";
+        int startIndex = errTip.indexOf("ErrMsg:");
+        if (startIndex >= 0) {//Calling Local Service Failed. ErrMsg:A094780516:原余额加充值金额不能大于5000元. The Service Id:0004
+            int endIndex = errTip.indexOf("The Service Id");
+            if (endIndex - 18 > startIndex) {
+                errTip = errTip.substring(startIndex + 18, endIndex);
+                System.out.println(errTip);
+                cmdRsp.setErrTip(errTip.getBytes());
+            }
+        }
     }
     
 }
