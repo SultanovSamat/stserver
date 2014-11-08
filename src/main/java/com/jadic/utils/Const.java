@@ -23,7 +23,6 @@ public final class Const {
     public final static short TER_QUERY_ZHB_BALANCE     = 0x0009;//账户宝余额查询
     public final static short TER_MODIFY_ZHB_PASS       = 0x000A;//修改账户宝密码
     public final static short TER_CHECK_CITY_CARD_TYPE  = 0x000B;//检测市民卡类型 是否记名卡
-    
 
     public final static short SER_TY_RET                = 0x7001;//平台通用应答
     public final static short SER_LOGIN_RET             = 0x7003;//终端注册应答
@@ -52,118 +51,109 @@ public final class Const {
     public final static String CHARGE_DETAIL_DIR         = CHARGE_DETAIL_DIR_PARENT + "/current";
     public final static String CHARGE_DETAIL_BAK_DIR     = CHARGE_DETAIL_DIR_PARENT + "/bak";
     public final static String CHARGE_DETAIL_FILE_SUFFIX = ".sup";
-    
-  //--------------------------------------市民卡接口调用XML字符串--------------------------------------
+
+    //-------------------------------市民卡卡片种类-------------------------------
+    public final static byte CITY_CARD_TYPE_UNKNOWN = 0x00;//未知卡
+    public final static byte CITY_CARD_TYPE_NAMED   = 0x01;//记名卡
+    public final static byte CITY_CARD_TYPE_UNNAMED = 0x01;//不记名卡
+    //-------------------------------市民卡卡片种类-------------------------------
+
+    //-----------------------------常州市民卡接口业务代码-----------------------------
+    public final static String BIPCODE_GET_MAC2             = "0004";//获取MAC2
+    public final static String BIPCODE_QUERY_ZHB_BALANCE    = "0007";//查询账户宝余额
+    public final static String BIPCODE_CHECK_PREPAID_CARD   = "0011";//校验充值卡面额
+    public final static String BIPCODE_MODIFY_ZHB_PASSWORD  = "0012";//修改账户宝密码
+    public final static String BIPCODE_GET_CITY_CARD_TYPE   = "0015";//获取市民卡是否记名
+    //-----------------------------常州市民卡接口业务代码-----------------------------
+
+    //--------------------------------------市民卡接口调用XML字符串--------------------------------------
+    //XML共用Head部分
+    public final static String WS_XML_HEAD  = "<SVC>" +
+                                                "<SVCHEAD>" +
+                                                  "<ORIGDOMAIN>%s</ORIGDOMAIN>" +
+                                                  "<HOMEDOMAIN>%s</HOMEDOMAIN>" +
+                                                  "<BIPCODE>%s</BIPCODE>" +
+                                                  "<ACTIONCODE>%s</ACTIONCODE>" +
+                                                  "<TRANSIDO>%s</TRANSIDO>" +
+                                                  "<PROCID>%s</PROCID>" +
+                                                  "<PROCESSTIME>%s</PROCESSTIME>" +
+                                                "</SVCHEAD>" +
+                                                "<SVCCONT>";
+    public final static String WS_XML_END  =    "</SVCCONT>" +
+                                              "</SVC>";
     //圈存,获取mac2
-    public final static String WS_XML_GET_MAC2 = "<SVC>" +
-                                                     "<SVCHEAD>" +
-                                                       "<ORIGDOMAIN>%s</ORIGDOMAIN>" +
-                                                       "<HOMEDOMAIN>%s</HOMEDOMAIN>" +
-                                                       "<BIPCODE>%s</BIPCODE>" +
-                                                       "<ACTIONCODE>%s</ACTIONCODE>" +
-                                                       "<TRANSIDO>%s</TRANSIDO>" +
-                                                       "<PROCID>%s</PROCID>" +
-                                                       "<PROCESSTIME>%s</PROCESSTIME>" +
-                                                     "</SVCHEAD>" +
-                                                     "<SVCCONT>" +
-                                                       "<CHARGEREQ>" +
-                                                         "<TRADETYPECODE>%s</TRADETYPECODE>" +
-                                                         "<CARDNO>%s</CARDNO>" +
-                                                         "<PASSWORD>%s</PASSWORD>" +
-                                                         "<TERMNO>%s</TERMNO>" +
-                                                         "<ASN>%s</ASN>" +
-                                                         "<RNDNUMBER2>%s</RNDNUMBER2>" +
-                                                         "<CARDTRADENO>%s</CARDTRADENO>" +
-                                                         "<CARDOLDBAL>%s</CARDOLDBAL>" +
-                                                         "<TRADEMONEY>%s</TRADEMONEY>" +
-                                                         "<TRADETYPE>%s</TRADETYPE>" +
-                                                         "<KEYVERSION>%s</KEYVERSION>" +
-                                                         "<ARITHINDEX>%s</ARITHINDEX>" +
-                                                         "<MAC1>%s</MAC1>" +
-                                                         "<DEPTNO>%s</DEPTNO>" +
-                                                         "<OPERNO>%s</OPERNO>" +
-                                                         "<HOSTDATE>%s</HOSTDATE>" +
-                                                         "<HOSTTIME>%s</HOSTTIME>" +
-                                                       "</CHARGEREQ>" +
-                                                     "</SVCCONT>" +
-                                                   "</SVC>";
+    public final static String WS_XML_GET_MAC2   = WS_XML_HEAD +
+                                                   "<CHARGEREQ>" +
+                                                     "<TRADETYPECODE>%s</TRADETYPECODE>" +
+                                                     "<CARDNO>%s</CARDNO>" +
+                                                     "<PASSWORD>%s</PASSWORD>" +
+                                                     "<TERMNO>%s</TERMNO>" +
+                                                     "<ASN>%s</ASN>" +
+                                                     "<RNDNUMBER2>%s</RNDNUMBER2>" +
+                                                     "<CARDTRADENO>%s</CARDTRADENO>" +
+                                                     "<CARDOLDBAL>%s</CARDOLDBAL>" +
+                                                     "<TRADEMONEY>%s</TRADEMONEY>" +
+                                                     "<TRADETYPE>%s</TRADETYPE>" +
+                                                     "<KEYVERSION>%s</KEYVERSION>" +
+                                                     "<ARITHINDEX>%s</ARITHINDEX>" +
+                                                     "<MAC1>%s</MAC1>" +
+                                                     "<DEPTNO>%s</DEPTNO>" +
+                                                     "<OPERNO>%s</OPERNO>" +
+                                                     "<HOSTDATE>%s</HOSTDATE>" +
+                                                     "<HOSTTIME>%s</HOSTTIME>" +
+                                                   "</CHARGEREQ>" +
+                                                   WS_XML_END;
    
     //充值卡校验
-    public final static String WS_XML_PREPAID_CARD_CHECK = "<SVC>" +
-                                                                "<SVCHEAD>" +
-                                                                  "<ORIGDOMAIN>%s</ORIGDOMAIN>" +
-                                                                  "<HOMEDOMAIN>%s</HOMEDOMAIN>" +
-                                                                  "<BIPCODE>%s</BIPCODE>" +
-                                                                  "<ACTIONCODE>%s</ACTIONCODE>" +
-                                                                  "<TRANSIDO>%s</TRANSIDO>" +
-                                                                  "<PROCID>%s</PROCID>" +
-                                                                  "<PROCESSTIME>%s</PROCESSTIME>" +
-                                                                "</SVCHEAD>" +
-                                                                "<SVCCONT>" +
-                                                                  "<CARDVERIFYREQ>" +
-                                                                    "<TRADETYPECODE>%s</TRADETYPECODE>" +
-                                                                    "<CARDNO>%s</CARDNO>" +
-                                                                    "<PASSWORD>%s</PASSWORD>" +
-                                                                    "<DEPTNO>%s</DEPTNO>" +
-                                                                    "<OPERNO>%s</OPERNO>" +
-                                                                  "</CARDVERIFYREQ>" +
-                                                                "</SVCCONT>" +
-                                                              "</SVC>";
+    public final static String WS_XML_PREPAID_CARD_CHECK = WS_XML_HEAD +
+                                                          "<CARDVERIFYREQ>" +
+                                                            "<TRADETYPECODE>%s</TRADETYPECODE>" +
+                                                            "<CARDNO>%s</CARDNO>" +
+                                                            "<PASSWORD>%s</PASSWORD>" +
+                                                            "<DEPTNO>%s</DEPTNO>" +
+                                                            "<OPERNO>%s</OPERNO>" +
+                                                          "</CARDVERIFYREQ>" +
+                                                          WS_XML_END;
 
     //获取账户宝余额
-    public final static String WS_XM_GET_ZHB_BALANCE = "<SVC>" +
-                                                            "<SVCHEAD>" +
-                                                              "<ORIGDOMAIN>%s</ORIGDOMAIN>" +
-                                                              "<HOMEDOMAIN>%s</HOMEDOMAIN>" +
-                                                              "<BIPCODE>%s</BIPCODE>" +
-                                                              "<ACTIONCODE>%s</ACTIONCODE>" +
-                                                              "<TRANSIDO>%s</TRANSIDO>" +
-                                                              "<PROCID>%s</PROCID>" +
-                                                              "<PROCESSTIME>%s</PROCESSTIME>" +
-                                                            "</SVCHEAD>" +
-                                                            "<SVCCONT>" +
-                                                              "<GROUPQUERYREQ>" +
-                                                                "<TRADETYPECODE>%s</TRADETYPECODE>" +
-                                                                "<CARDNO>%s</CARDNO>" +
-                                                                "<TRADEMONEY>%s</TRADEMONEY>" +//TODO check if this field name is correct, maybe "password"
-                                                                "<DEPTNO>%s</DEPTNO>" +
-                                                                "<OPERNO>%s</OPERNO>" +
-                                                              "</GROUPQUERYREQ>" +
-                                                            "</SVCCONT>" +
-                                                          "</SVC>"; 
+    public final static String WS_XM_GET_ZHB_BALANCE = WS_XML_HEAD +
+                                                      "<GROUPQUERYREQ>" +
+                                                        "<TRADETYPECODE>%s</TRADETYPECODE>" +
+                                                        "<CARDNO>%s</CARDNO>" +
+                                                        "<TRADEMONEY>%s</TRADEMONEY>" +//TODO check if this field name is correct, maybe "password"
+                                                        "<DEPTNO>%s</DEPTNO>" +
+                                                        "<OPERNO>%s</OPERNO>" +
+                                                      "</GROUPQUERYREQ>" +
+                                                      WS_XML_END;
 
     //修改账户宝密码
-    public final static String WS_XML_MODIFY_ZHB_PASS = "<SVC>" +
-                                                            "<SVCHEAD>" +
-                                                              "<ORIGDOMAIN>%s</ORIGDOMAIN>" +
-                                                              "<HOMEDOMAIN>%s</HOMEDOMAIN>" +
-                                                              "<BIPCODE>%s</BIPCODE>" +
-                                                              "<ACTIONCODE>%s</ACTIONCODE>" +
-                                                              "<TRANSIDO>%s</TRANSIDO>" +
-                                                              "<PROCID>%s</PROCID>" +
-                                                              "<PROCESSTIME>%s</PROCESSTIME>" +
-                                                            "</SVCHEAD>" +
-                                                            "<SVCCONT>" +
-                                                              "<ACCCHANGEPWDREQ>" +
-                                                                "<TRADETYPECODE>%s</TRADETYPECODE>" +
-                                                                "<CARDNO>%s</CARDNO>" +
-                                                                "<OLDPASSWORD>%s</OLDPASSWORD>" +
-                                                                "<NEWPASSWORD>%s</NEWPASSWORD>" +
-                                                                "<TERMNO>%s</TERMNO><ASN>%s</ASN>" +
-                                                                "<RNDNUMBER2>%s</RNDNUMBER2>" +
-                                                                "<CARDTRADENO>%s</CARDTRADENO>" +
-                                                                "<CARDOLDBAL>%s</CARDOLDBAL>" +
-                                                                "<TRADEMONEY>%s</TRADEMONEY>" +
-                                                                "<TRADETYPE>%s</TRADETYPE>" +
-                                                                "<KEYVERSION>%s</KEYVERSION>" +
-                                                                "<ARITHINDEX>%s</ARITHINDEX>" +
-                                                                "<MAC1>%s</MAC1>" +
-                                                                "<HOSTDATE>%s</HOSTDATE>" +
-                                                                "<HOSTTIME>%s</HOSTTIME>" +
-                                                                "<DEPTNO>%s</DEPTNO>" +
-                                                                "<OPERNO>%s</OPERNO>" +
-                                                              "</ACCCHANGEPWDREQ>" +
-                                                            "</SVCCONT>" +
-                                                          "</SVC>";
-  //--------------------------------------市民卡接口调用XML字符串--------------------------------------
+    public final static String WS_XML_MODIFY_ZHB_PASS = WS_XML_HEAD +
+                                                      "<ACCCHANGEPWDREQ>" +
+                                                        "<TRADETYPECODE>%s</TRADETYPECODE>" +
+                                                        "<CARDNO>%s</CARDNO>" +
+                                                        "<OLDPASSWORD>%s</OLDPASSWORD>" +
+                                                        "<NEWPASSWORD>%s</NEWPASSWORD>" +
+                                                        "<TERMNO>%s</TERMNO><ASN>%s</ASN>" +
+                                                        "<RNDNUMBER2>%s</RNDNUMBER2>" +
+                                                        "<CARDTRADENO>%s</CARDTRADENO>" +
+                                                        "<CARDOLDBAL>%s</CARDOLDBAL>" +
+                                                        "<TRADEMONEY>%s</TRADEMONEY>" +
+                                                        "<TRADETYPE>%s</TRADETYPE>" +
+                                                        "<KEYVERSION>%s</KEYVERSION>" +
+                                                        "<ARITHINDEX>%s</ARITHINDEX>" +
+                                                        "<MAC1>%s</MAC1>" +
+                                                        "<HOSTDATE>%s</HOSTDATE>" +
+                                                        "<HOSTTIME>%s</HOSTTIME>" +
+                                                        "<DEPTNO>%s</DEPTNO>" +
+                                                        "<OPERNO>%s</OPERNO>" +
+                                                      "</ACCCHANGEPWDREQ>" +
+                                                      WS_XML_END;
+
+    //检查市民卡是否记名
+    public final static String WS_XML_CHECK_CITY_CARD_TYPE = WS_XML_HEAD +
+                                                            "<CUSTRECTYPEQUERYREQ>" +
+                                                            "  <CARDNO>%s</CARDNO>" +
+                                                            "</CUSTRECTYPEQUERYREQ>" +
+                                                             WS_XML_END;
+    //--------------------------------------市民卡接口调用XML字符串--------------------------------------
 }

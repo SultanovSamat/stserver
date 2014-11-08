@@ -302,7 +302,10 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         if (cmdReq.disposeData(buffer)) {
             CmdCheckCityCardTypeRsp cmdRsp = new CmdCheckCityCardTypeRsp();
             cmdRsp.setCmdCommonField(cmdReq);
-            //
+            cmdRsp.setCityCardNo(cmdReq.getCityCardNo());
+            String cityCardNo = KKTool.byteArrayToHexStr(cmdReq.getCityCardNo());
+            byte cityCardType = WSUtil.getWsUtil().checkCityCardType(cityCardNo);
+            cmdRsp.setType(cityCardType);
             sendData(cmdRsp.getSendBuffer());
             log.info("recv cmd check city card type:{}", cmdRsp.getType());
         } else {

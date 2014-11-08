@@ -10,20 +10,23 @@ import com.jadic.utils.Const;
  * @created 2014-11-6
  */
 public class CmdCheckCityCardTypeRsp extends AbstractCmdRsp {
-    
+
+    private byte[] cityCardNo;//市民卡卡号
     private byte type;//0:未知 1:记名 2:不记名
     
     public CmdCheckCityCardTypeRsp() {
+        cityCardNo = new byte[8];
         setCmdFlagId(Const.SER_CHECK_CITY_CARD_TYPE);
     }
 
     @Override
     protected int getCmdBodySize() {
-        return 1;
+        return cityCardNo.length + 1;
     }
 
     @Override
     protected boolean fillCmdBody(ChannelBuffer channelBuffer) {
+        channelBuffer.writeBytes(cityCardNo);
         channelBuffer.writeByte(type);
         return true;
     }
@@ -36,4 +39,13 @@ public class CmdCheckCityCardTypeRsp extends AbstractCmdRsp {
         this.type = type;
     }
 
+    public byte[] getCityCardNo() {
+        return cityCardNo;
+    }
+
+    public void setCityCardNo(byte[] cityCardNo) {
+        if (isByteArraySameSize(cityCardNo, this.cityCardNo)) {
+            System.arraycopy(cityCardNo, 0, this.cityCardNo, 0, cityCardNo.length);
+        }
+    }
 }

@@ -172,7 +172,6 @@ public final class WSUtil {
     
     /**
      * 更新文件批次号到文件中，防止程序终止
-     * @param newFileSNo
      */
     private void updateFileNextSNo() {
         threadPool.execute(new Runnable() {
@@ -216,6 +215,46 @@ public final class WSUtil {
         }
         return retXml;
     }
+
+    /**
+     * 检测市民卡种类  0:未知  1:记名卡  2:不记名卡
+     * @param cityCardNo
+     * @return
+     */
+    public byte checkCityCardType(String cityCardNo) {
+        byte type = Const.CITY_CARD_TYPE_UNKNOWN;
+        if (!KKTool.isStrNullOrBlank(cityCardNo)) {
+            String inputXml = Const.WS_XML_CHECK_CITY_CARD_TYPE;
+            String biPCode = Const.BIPCODE_GET_CITY_CARD_TYPE;
+            String transId = getNextTransId();
+            String procId = transId;
+            String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
+            Object[] args = new String[]{origDomain, homeDomain, biPCode, actionCode,
+                                         transId, procId, processTime, cityCardNo};
+
+            String input = String.format(inputXml, args);
+            String retXml = callService(input);
+            if (retXml != null) {
+                try {
+                    Document document = DocumentHelper.parseText(retXml);
+                    Node respCodeNode = document.selectSingleNode("//SVC/SVCCONT/CUSTRECTYPEQUERYRSP/RESPCODE");
+                    if (respCodeNode != null) {
+                        String respCode = respCodeNode.getText();
+                        if (respCode.equals("0000")) {
+                            type = Const.CITY_CARD_TYPE_NAMED;//记名卡
+                        } else if (respCode.equals("0001")) {
+                            type = Const.CITY_CARD_TYPE_UNNAMED;//不记名卡
+                        }
+                    } else {
+                        log.info("invalid response for check city card type");
+                    }
+                } catch (DocumentException e) {
+                    log.info("getMac2 parse xml err", e);
+                }
+            }
+        }
+        return type;//未知卡
+    }
     
     /**
      * 获取mac2<br>
@@ -232,7 +271,7 @@ public final class WSUtil {
         
         //for performance, ignore the xml document building
         String inputXml = Const.WS_XML_GET_MAC2;
-        String biPCode = "0004";
+        String biPCode = Const.BIPCODE_GET_MAC2;
         String transId = getNextTransId();
         String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
@@ -272,7 +311,7 @@ public final class WSUtil {
                         byte[] mac2 = KKTool.strToHexBytes(sMac2, 4, 'F');
                         cmdRsp.setMac2(mac2);
                         cmdRsp.setTranSNo(KKTool.strToHexBytes(transId.substring(4), 6, '0'));
-                        cmdRsp.setRet((byte)1);
+                        cmdRsp.setRet((byte) 1);
                         log.info("succeed to get mac2:{}", mac2Node.getText());
                     } else {
                         log.info("valid response for getting mac2, but no mac2 node found");
@@ -299,7 +338,12 @@ public final class WSUtil {
             log.info("getMac2 parse xml err", e);
         }
     }
-    
+
+    /**
+     * 校验充值卡面额
+     * @param cmdReq
+     * @param cmdRsp
+     */
     public void checkPrepaidCard(CmdPrepaidCardCheckReq cmdReq, CmdPrepaidCardCheckRsp cmdRsp) {
         if (cmdReq == null || cmdRsp == null) {
             return;
@@ -307,7 +351,7 @@ public final class WSUtil {
         cmdRsp.setCheckRet(RET_FAIL);
         
         String inputXml = Const.WS_XML_PREPAID_CARD_CHECK;
-        String biPCode = "0011";
+        String biPCode = Const.BIPCODE_CHECK_PREPAID_CARD;
         String transId = getNextTransId();
         String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
@@ -353,6 +397,11 @@ public final class WSUtil {
         }
     }
 
+    /**
+     * 查询账户宝余额
+     * @param cmdReq
+     * @param cmdRsp
+     */
     public void queryZHBBalance(CmdQueryZHBBalanceReq cmdReq, CmdQueryZHBBalanceRsp cmdRsp) {
     	if (cmdReq == null || cmdRsp == null) {
     	    return;
@@ -360,7 +409,7 @@ public final class WSUtil {
     	cmdRsp.setCheckRet(RET_FAIL);
     	
         String inputXml = Const.WS_XM_GET_ZHB_BALANCE;
-        String biPCode = "0007";
+        String biPCode = Const.BIPCODE_QUERY_ZHB_BALANCE;
         String transId = getNextTransId();
         String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
@@ -406,7 +455,12 @@ public final class WSUtil {
             log.error("query zhb balance err", e);
         }
     }
-    
+
+    /**
+     * 修改账户宝密码
+     * @param cmdReq
+     * @param cmdRsp
+     */
     public void modifyZHBPassword(CmdModifyZHBPassReq cmdReq, CmdModifyZHBPassRsp cmdRsp) {
         if (cmdReq == null || cmdRsp == null) {
             return;
@@ -415,7 +469,7 @@ public final class WSUtil {
         
         //for performance, ignore the xml document building
         String inputXml = Const.WS_XML_MODIFY_ZHB_PASS;
-        String biPCode = "0012";
+        String biPCode = Const.BIPCODE_MODIFY_ZHB_PASSWORD;
         String transId = getNextTransId();
         String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
