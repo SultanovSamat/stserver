@@ -55,7 +55,8 @@ public final class Const {
     //-------------------------------市民卡卡片种类-------------------------------
     public final static byte CITY_CARD_TYPE_UNKNOWN = 0x00;//未知卡
     public final static byte CITY_CARD_TYPE_NAMED   = 0x01;//记名卡
-    public final static byte CITY_CARD_TYPE_UNNAMED = 0x01;//不记名卡
+    public final static byte CITY_CARD_TYPE_UNNAMED = 0x02;//不记名卡
+    public final static byte CITY_CARD_TYPE_INVALID = 0x03;//无效卡
     //-------------------------------市民卡卡片种类-------------------------------
 
     //-----------------------------常州市民卡接口业务代码-----------------------------
@@ -152,7 +153,7 @@ public final class Const {
     //检查市民卡是否记名
     public final static String WS_XML_CHECK_CITY_CARD_TYPE = WS_XML_HEAD +
                                                             "<CUSTRECTYPEQUERYREQ>" +
-                                                            "  <CARDNO>%s</CARDNO>" +
+                                                              "<CARDNO>%s</CARDNO>" +
                                                             "</CUSTRECTYPEQUERYREQ>" +
                                                              WS_XML_END;
     //--------------------------------------市民卡接口调用XML字符串--------------------------------------

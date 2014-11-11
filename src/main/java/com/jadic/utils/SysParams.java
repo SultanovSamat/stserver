@@ -75,10 +75,10 @@ public class SysParams {
         
         this.cityCardWSIp = kkConfig.getStrValue("cityCardWSIp");
         this.cityCardWSPort = kkConfig.getIntValue("cityCardWSPort");
-        this.agencyNo = kkConfig.getStrValue("agencyNo", "9998");
-        this.operNo = kkConfig.getStrValue("operNo", "9998");
+        this.agencyNo = kkConfig.getStrValue("agencyNo", "99ZZ");
+        this.operNo = kkConfig.getStrValue("operNo", "99ZZ01");
         this.posId = kkConfig.getStrValue("posId", "123456");
-        this.samId = kkConfig.getStrValue("samId", "12345678");
+        this.samId = kkConfig.getStrValue("samId", "990000000006");
         
         this.ftpServerHost = kkConfig.getStrValue("ftpServerHost");
         this.ftpServerPort = kkConfig.getIntValue("ftpServerPort");

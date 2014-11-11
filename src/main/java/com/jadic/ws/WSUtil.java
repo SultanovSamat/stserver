@@ -54,7 +54,7 @@ public final class WSUtil {
     private final static String SNO_FILE_NAME = "sNo4CityCardWS.txt";
     private long sNo = 0;
     
-    private final static String origDomain = "Y1";
+    private final static String origDomain = "Z1";
     private final static String homeDomain = "01";
     //private final static String biPCode = "0004";
     private final static String actionCode = "0";
@@ -217,7 +217,7 @@ public final class WSUtil {
     }
 
     /**
-     * 检测市民卡种类  0:未知  1:记名卡  2:不记名卡
+     * 检测市民卡种类  0:未知  1:记名卡  2:不记名卡 3:无效卡
      * @param cityCardNo
      * @return
      */
@@ -237,13 +237,15 @@ public final class WSUtil {
             if (retXml != null) {
                 try {
                     Document document = DocumentHelper.parseText(retXml);
-                    Node respCodeNode = document.selectSingleNode("//SVC/SVCCONT/CUSTRECTYPEQUERYRSP/RESPCODE");
-                    if (respCodeNode != null) {
+                    Node respCodeNode = document.selectSingleNode("//SVC/SVCCONT/CUSTRECTYPEQUERYRSP/CUSTRECTYPE");
+                    if (respCodeNode != null) {//0000:记名卡 0001:不记名卡 0002:卡状态异常或此卡不存在
                         String respCode = respCodeNode.getText();
                         if (respCode.equals("0000")) {
                             type = Const.CITY_CARD_TYPE_NAMED;//记名卡
                         } else if (respCode.equals("0001")) {
                             type = Const.CITY_CARD_TYPE_UNNAMED;//不记名卡
+                        } else {
+                            type = Const.CITY_CARD_TYPE_INVALID;//无效卡
                         }
                     } else {
                         log.info("invalid response for check city card type");
@@ -253,7 +255,7 @@ public final class WSUtil {
                 }
             }
         }
-        return type;//未知卡
+        return type;//默认未知卡
     }
     
     /**
