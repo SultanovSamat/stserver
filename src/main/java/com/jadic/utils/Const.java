@@ -53,10 +53,16 @@ public final class Const {
     public final static String CHARGE_DETAIL_FILE_SUFFIX = ".sup";
 
     //-------------------------------市民卡卡片种类-------------------------------
-    public final static byte CITY_CARD_TYPE_UNKNOWN = 0x00;//未知卡
-    public final static byte CITY_CARD_TYPE_NAMED   = 0x01;//记名卡
-    public final static byte CITY_CARD_TYPE_UNNAMED = 0x02;//不记名卡
-    public final static byte CITY_CARD_TYPE_INVALID = 0x03;//无效卡
+    public final static String S_CITY_CARD_TYPE_NAMED   = "0000";//记名卡
+    public final static String S_CITY_CARD_TYPE_UNNAMED = "0001";//不记名卡
+    public final static String S_CITY_CARD_TYPE_INVALID = "0002";//无效卡
+    public final static String S_CITY_CARD_TYPE_JFCARD  = "0003";//金福卡
+    
+    public final static byte CITY_CARD_TYPE_UNKNOWN = (byte)0xFF;//未知卡
+    public final static byte CITY_CARD_TYPE_NAMED   = 0x00;//记名卡
+    public final static byte CITY_CARD_TYPE_UNNAMED = 0x01;//不记名卡
+    public final static byte CITY_CARD_TYPE_INVALID = 0x02;//无效卡
+    public final static byte CITY_CARD_TYPE_JFCARD  = 0x03;//金福卡
     //-------------------------------市民卡卡片种类-------------------------------
 
     //-----------------------------常州市民卡接口业务代码-----------------------------

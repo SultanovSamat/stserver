@@ -217,7 +217,7 @@ public final class WSUtil {
     }
 
     /**
-     * 检测市民卡种类  0:未知  1:记名卡  2:不记名卡 3:无效卡
+     * 检测市民卡种类  0xFF:未知  00:记名卡  01:不记名卡 02:无效卡 03:金福卡
      * @param cityCardNo
      * @return
      */
@@ -238,15 +238,23 @@ public final class WSUtil {
                 try {
                     Document document = DocumentHelper.parseText(retXml);
                     Node respCodeNode = document.selectSingleNode("//SVC/SVCCONT/CUSTRECTYPEQUERYRSP/CUSTRECTYPE");
-                    if (respCodeNode != null) {//0000:记名卡 0001:不记名卡 0002:卡状态异常或此卡不存在
+                    if (respCodeNode != null) {//0000:记名卡 0001:不记名卡 0002:卡状态异常或此卡不存在 0003:金福卡
                         String respCode = respCodeNode.getText();
-                        if (respCode.equals("0000")) {
-                            type = Const.CITY_CARD_TYPE_NAMED;//记名卡
-                        } else if (respCode.equals("0001")) {
-                            type = Const.CITY_CARD_TYPE_UNNAMED;//不记名卡
-                        } else {
-                            type = Const.CITY_CARD_TYPE_INVALID;//无效卡
+                        try {
+                            type = Byte.parseByte(respCode);
+                        } catch (Exception e) {
+                            type = Const.CITY_CARD_TYPE_INVALID;
                         }
+                        
+//                        if (respCode.equals(Const.S_CITY_CARD_TYPE_NAMED)) {
+//                            type = Const.CITY_CARD_TYPE_NAMED;//记名卡
+//                        } else if (respCode.equals(Const.S_CITY_CARD_TYPE_UNNAMED)) {
+//                            type = Const.CITY_CARD_TYPE_UNNAMED;//不记名卡
+//                        } else if (respCode.equals(Const.S_CITY_CARD_TYPE_INVALID)){
+//                            type = Const.CITY_CARD_TYPE_INVALID;//无效卡
+//                        } else if (respCode.equals(Const.S_CITY_CARD_TYPE_JFCARD)) {
+//                            type = Const.CITY_CARD_TYPE_JFCARD;//金福卡
+//                        }
                     } else {
                         log.info("invalid response for check city card type");
                     }
