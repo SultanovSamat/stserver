@@ -4,6 +4,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 
 public class CmdChargeDetailReq extends AbstractCmdReq {
 
+    private byte status;            //交易状态
     private byte[] asn;             //IC应用序列号
     private byte[] tsn;             //IC交易序列号
     private byte[] bankCardNo;      //没有的话直接填19个空格，如果是充值卡直接填写16位充值卡卡号，后三位补空格
@@ -13,7 +14,7 @@ public class CmdChargeDetailReq extends AbstractCmdReq {
     private int transAmount;        //交易金额
     private int balanceBeforeTrans; //交易前余额
     private byte[] tac;             //TAC认证码
-    private byte[] transSNo;           //交易流水号
+    private byte[] transSNo;        //交易流水号
     private byte chargeType;        //充值类型
     private byte[] cityCardNo;      //市民卡卡号
     
@@ -30,7 +31,8 @@ public class CmdChargeDetailReq extends AbstractCmdReq {
 
 	@Override
 	protected int getCmdBodySize() {
-		return asn.length 
+		return 1 
+		      + asn.length 
 	          + tsn.length 
 	          + bankCardNo.length 
 	          + 1 
@@ -46,6 +48,7 @@ public class CmdChargeDetailReq extends AbstractCmdReq {
 
 	@Override
 	protected boolean disposeCmdBody(ChannelBuffer channelBuffer) {
+	    status = channelBuffer.readByte();
 	    channelBuffer.readBytes(asn);
 	    channelBuffer.readBytes(tsn);
 	    channelBuffer.readBytes(bankCardNo);
@@ -60,6 +63,10 @@ public class CmdChargeDetailReq extends AbstractCmdReq {
 	    channelBuffer.readBytes(cityCardNo);
 		return true;
 	}
+
+    public byte getStatus() {
+        return status;
+    }
 
     public byte[] getAsn() {
         return asn;

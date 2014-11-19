@@ -24,10 +24,10 @@ public final class SQL {
     		                                                "where terminalId = ? ";
     //新增充值明细
     public final static String ADD_CHARGE_DETAIL        = "insert into tab_charge_detail " +
-    		                                                "(CityCardNo, CardType, BankCardNo, ChargeTime, ChargeType, " +
+    		                                                "(Status, CityCardNo, CardType, BankCardNo, ChargeTime, ChargeType, " +
     		                                                " ChargeAmount, BalanceBeforeCharge, TAC, ASN, TSN, ChargeSNo, " +
     		                                                " TerminalId, PosId, SAMID, AgencyNo) " +
-    		                                                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+    		                                                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
     
     //增加退款明细
     public final static String ADD_REFUND               = "insert into tab_refund (CardNo, Amount, RefundTime, Status, InsertTime) " +

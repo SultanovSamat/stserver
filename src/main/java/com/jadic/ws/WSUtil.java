@@ -49,7 +49,7 @@ public final class WSUtil {
     
     private final static String SNO_PREFIX = "ZZZD";//流水号、交易号的前缀 (自助终端的缩写)
     
-    private final static long MAX_SNO = 999999999999L;
+    private final static long MAX_SNO = 999999L;
     private ExecutorService threadPool;
     private final static String SNO_FILE_NAME = "sNo4CityCardWS.txt";
     private long sNo = 0;
@@ -194,7 +194,7 @@ public final class WSUtil {
     }
 
     private String getNextTransId() {
-    	return SNO_PREFIX + KKTool.getFixedLenString(String.valueOf(getNextSNo()), 12, '0', true);
+    	return SNO_PREFIX + KKTool.getCurrFormatDate("yyMMdd") + KKTool.getFixedLenString(String.valueOf(getNextSNo()), 12, '0', true);
     }
     
     /**
@@ -282,7 +282,12 @@ public final class WSUtil {
         //for performance, ignore the xml document building
         String inputXml = Const.WS_XML_GET_MAC2;
         String biPCode = Const.BIPCODE_GET_MAC2;
-        String transId = getNextTransId();
+        String transId = null;
+        if (cmdReq.isFirstReq()) {
+            transId = getNextTransId();
+        } else {
+            transId = SNO_PREFIX + KKTool.byteArrayToHexStr(cmdReq.getTranSNo());
+        }
         String procId = transId;
         String processTime = KKTool.getCurrFormatDate("yyyyMMddHHmmss");
         String operType = KKTool.byteToHexStr(cmdReq.getOperType());

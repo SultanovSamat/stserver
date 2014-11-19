@@ -20,6 +20,8 @@ public class CmdGetMac2Req extends AbstractCmdReq {
     private byte[] mac1;
     private byte[] chargeDate;
     private byte[] chargeTime;
+    private byte status;//0:第一次获取mac2 1:非第一次
+    private byte[] tranSNo;//交易流水号，供补写卡时采用与第一次获取mac2时采用的流水号
 
     public CmdGetMac2Req() {
         this.cardNo = new byte[8];
@@ -31,13 +33,14 @@ public class CmdGetMac2Req extends AbstractCmdReq {
         this.mac1 = new byte[4];
         this.chargeDate = new byte[4];
         this.chargeTime = new byte[3];
+        this.tranSNo = new byte[6];
     }
 
     @Override
     protected int getCmdBodySize() {
         return 1 + cardNo.length + password.length + termNo.length + asn.length 
         		+ randNumber.length + cardTradNo.length + 4 + 4 + mac1.length
-                + chargeDate.length + chargeTime.length;
+                + chargeDate.length + chargeTime.length + 1 + tranSNo.length;
     }
 
     @Override
@@ -54,6 +57,8 @@ public class CmdGetMac2Req extends AbstractCmdReq {
         channelBuffer.readBytes(this.mac1);
         channelBuffer.readBytes(this.chargeDate);
         channelBuffer.readBytes(this.chargeTime);
+        this.status = channelBuffer.readByte();
+        channelBuffer.readBytes(this.tranSNo);
         return true;
     }
 
@@ -105,4 +110,15 @@ public class CmdGetMac2Req extends AbstractCmdReq {
         return chargeTime;
     }
 
+    public byte getStatus() {
+        return status;
+    }
+
+    public byte[] getTranSNo() {
+        return tranSNo;
+    }
+
+    public boolean isFirstReq() {
+        return this.status == 0;
+    }
 }

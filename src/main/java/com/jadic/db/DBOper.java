@@ -54,6 +54,7 @@ public final class DBOper extends DefaultDBImpl {
     
     public long addNewChargeDetail(CmdChargeDetailReq chargeDetail) {
         List<Object> params = new ArrayList<Object>();
+        params.add(chargeDetail.getStatus());
         params.add(KKTool.byteArrayToHexStr(chargeDetail.getCityCardNo()));
         params.add(chargeDetail.getCardType());
         params.add(new String(chargeDetail.getBankCardNo()));

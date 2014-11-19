@@ -35,7 +35,7 @@ public class ThreadTerminalChargeDetail extends AbstractThreadDisposeDataFromQue
     private final static String DELIMITER = ",";
     private final static String S0_10 = "0000000000";
     private final static String S0_8 = "00000000";
-    private final static String TRANS_STATUS = "1";
+    //private final static String TRANS_STATUS = "1";
     private final static String TRANS_TYPE = "02";
     private final static String AGENCY_NO = SysParams.getInstance().getAgencyNo();//"1234";
     private final static String SAM = SysParams.getInstance().getSamId();//"11111111";
@@ -159,7 +159,7 @@ public class ThreadTerminalChargeDetail extends AbstractThreadDisposeDataFromQue
         try {
             writer = new BufferedWriter(new FileWriter(file, true));
             
-            writer.append(TRANS_STATUS).append(DELIMITER);
+            writer.append(String.valueOf(chargeDetail.getStatus())).append(DELIMITER);
             writer.append(KKTool.getLeftFillFixedLenStr(KKTool.byteArrayToHexStr(chargeDetail.getAsn()), 20, '0')).append(DELIMITER);
             writer.append(KKTool.getLeftFillFixedLenStr(KKTool.byteArrayToHexStr(chargeDetail.getTsn()), 4, '0')).append(DELIMITER);
             writer.append(KKTool.getRightFillFixedLenStr(new String(chargeDetail.getBankCardNo()).trim(), 19, ' ')).append(DELIMITER);
