@@ -53,6 +53,7 @@ public final class WSUtil {
     private ExecutorService threadPool;
     private final static String SNO_FILE_NAME = "sNo4CityCardWS.txt";
     private long sNo = 0;
+    private String currDate = KKTool.getCurrFormatDate("yyMMdd");
     
     private final static String origDomain = "Z1";
     private final static String homeDomain = "01";
@@ -124,11 +125,10 @@ public final class WSUtil {
     private long getNextSNo() {
     	sNo ++;
         if (sNo > MAX_SNO) {
-        	sNo = 1;
+        	sNo = 0;
         }    	
-    	long nextSNo = sNo;
     	updateFileNextSNo();
-    	return nextSNo;
+    	return sNo;
     }
     
     /**
@@ -138,20 +138,30 @@ public final class WSUtil {
     	if (this.sNo > 0) {
     		return;
     	}
-    	this.sNo = 1;
+    	this.sNo = -1;
+    	this.currDate = KKTool.getCurrFormatDate("yyMMdd");
         KKTool.createFileDir(Const.INITIAL_DATA_DIR);
         File file = new File(Const.INITIAL_DATA_DIR, SNO_FILE_NAME);
         if (file.exists()) {
             BufferedReader reader = null;
             try {
                 reader = new BufferedReader(new FileReader(file));
-                sNo = Long.parseLong(reader.readLine());
-                if (sNo > MAX_SNO) {
-                	sNo = 1;
-                }                
+                String dateSNo = reader.readLine().trim();
+                if (dateSNo != null && dateSNo.length() == 12) {
+                    String date = dateSNo.substring(0, 6);
+                    //文件中记录的日期没有超过当前日期，则获取流水号，否则流水号从1开始重新记
+                    if (this.currDate.compareTo(date) == 0) {
+                        this.sNo = Long.parseLong(dateSNo.substring(6));
+                        if (this.sNo > MAX_SNO) {
+                            this.sNo = 1;
+                        }            
+                    }
+                }
             } catch (FileNotFoundException e) {
                 log.error("initSNoFromFile", e);
             } catch (IOException e) {
+                log.error("initSNoFromFile", e);
+            } catch (Exception e) {
                 log.error("initSNoFromFile", e);
             } finally {
                 KKTool.closeReaderInSilence(reader);
@@ -160,7 +170,8 @@ public final class WSUtil {
             BufferedWriter writer = null;
             try {
                 writer = new BufferedWriter(new FileWriter(file));
-                writer.write(String.valueOf(sNo));
+                writer.write(this.currDate + KKTool.getFixedLenString(String.valueOf(sNo), 6, '0', true));
+                writer.flush();
             } catch (IOException e) {
                 log.error("initSNoFromFile", e);
             } finally {
@@ -174,6 +185,7 @@ public final class WSUtil {
      * 更新文件批次号到文件中，防止程序终止
      */
     private void updateFileNextSNo() {
+        final String date = this.currDate;
         threadPool.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -182,7 +194,7 @@ public final class WSUtil {
 		        BufferedWriter writer = null;
 		        try {
 		            writer = new BufferedWriter(new FileWriter(file));
-		            writer.write(String.valueOf(sNo));
+		            writer.write(date + KKTool.getFixedLenString(String.valueOf(sNo), 6, '0', true));
 		            writer.flush();
 		        } catch (IOException e) {
 		            log.error("updateFileNextSNo", e);
@@ -194,7 +206,11 @@ public final class WSUtil {
     }
 
     private String getNextTransId() {
-    	return SNO_PREFIX + KKTool.getCurrFormatDate("yyMMdd") + KKTool.getFixedLenString(String.valueOf(getNextSNo()), 12, '0', true);
+        String date = KKTool.getCurrFormatDate("yyMMdd");
+        if (date.compareTo(this.currDate) > 0) {
+            this.currDate = date;
+        }
+    	return SNO_PREFIX + date + KKTool.getFixedLenString(String.valueOf(getNextSNo()), 6, '0', true);
     }
     
     /**

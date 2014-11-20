@@ -4,9 +4,14 @@
  */
 package com.jadic.utils;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Reader;
@@ -2193,8 +2198,41 @@ public class KKTool {
     }
 
     public static void main(String[] args) {
-        byte[] data = strToHexBytes("C2061B7D", 4, 'F');
-        printLog(byteArrayToHexStr(data));
+        KKTool.createFileDir(Const.INITIAL_DATA_DIR);
+        File file = new File(Const.INITIAL_DATA_DIR, "test");
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(file));
+            writer.append(String.valueOf(1)).append("\r\n");
+            writer.write(KKTool.getCurrFormatDate("yyMMdd"));
+            writer.flush();
+        } catch (IOException e) {
+            log.error("updateFileNextSNo", e);
+        } finally {
+            KKTool.closeWriterInSilence(writer);
+        }
+        
+        long sNo = 0;
+        KKTool.createFileDir(Const.INITIAL_DATA_DIR);
+        file = new File(Const.INITIAL_DATA_DIR, "test");
+        if (file.exists()) {
+            BufferedReader reader = null;
+            try {
+                reader = new BufferedReader(new FileReader(file));
+                sNo = Long.parseLong(reader.readLine());
+                if (sNo > 99999) {
+                    sNo = 1;
+                }                
+                printLog("sno:" + sNo);
+                printLog("date:" + reader.readLine());
+            } catch (FileNotFoundException e) {
+                log.error("initSNoFromFile", e);
+            } catch (IOException e) {
+                log.error("initSNoFromFile", e);
+            } finally {
+                KKTool.closeReaderInSilence(reader);
+            }
+        }
     }
 
     public static void test(byte[] buf) {

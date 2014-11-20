@@ -71,12 +71,12 @@ public class ThreadUploadPosDealData extends Thread {
 						}
 						
 						if (isRenameSucceeded) {
-						    log.info("Pos deal data[{}]upload succ, move this file to bak dir", file.getName());
+						    log.info("Pos deal data[{}] upload succ, move this file to bak dir", file.getName());
 						} else {
-						    log.info("Pos deal data[{}]upload succ, but fail to move this file to bak dir", file.getName());
+						    log.info("Pos deal data[{}] upload succ, but fail to move this file to bak dir", file.getName());
 						}
 					} else {
-					    log.warn("Pos deal data[{}]upload fail, upload result:{}", file.getName(), uploadStatus);
+					    log.warn("Pos deal data[{}] upload fail, upload result:{}", file.getName(), uploadStatus);
 					}
 				}
 			} catch (Exception e) {
