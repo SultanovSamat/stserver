@@ -1,25 +1,5 @@
 package com.jadic.ws;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.jadic.cmd.req.CmdGetMac2Req;
 import com.jadic.cmd.req.CmdModifyZHBPassReq;
 import com.jadic.cmd.req.CmdPrepaidCardCheckReq;
@@ -33,6 +13,15 @@ import com.jadic.utils.KKTool;
 import com.jadic.utils.SysParams;
 import com.jadic.ws.czsmk.CenterProcess;
 import com.jadic.ws.czsmk.CenterProcessPortType;
+import org.dom4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * wsdl2java for czsmk command:
@@ -85,7 +74,7 @@ public final class WSUtil {
         StringBuilder wsdlBuilder = new StringBuilder("http://");
         wsdlBuilder.append(SysParams.getInstance().getCityCardWSIp()).append(":");
         wsdlBuilder.append(SysParams.getInstance().getCityCardWSPort()).append("/");
-        wsdlBuilder.append("CenterProcess.wsdl");
+        wsdlBuilder.append("CenterProcess.wsdl").append("?wsdl");
 		try {
 			url = new URL(wsdlBuilder.toString());
 		} catch (MalformedURLException e) {
