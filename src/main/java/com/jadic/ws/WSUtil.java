@@ -737,17 +737,8 @@ public final class WSUtil {
     }
     
     public static void main(String[] arg) {
-        CmdGetMac2Rsp cmdRsp = new CmdGetMac2Rsp();
-        String errTip = "Calling Local Service Failed. ErrMsg:电子钱包账户无效. The Service Id:0004: B000P00206";
-        int startIndex = errTip.indexOf("ErrMsg:");
-        if (startIndex >= 0) {//Calling Local Service Failed. ErrMsg:A094780516:原余额加充值金额不能大于5000元. The Service Id:0004
-            int endIndex = errTip.indexOf("The Service Id");
-            if (endIndex - 18 > startIndex) {
-                errTip = errTip.substring(startIndex + 18, endIndex);
-                System.out.println(errTip);
-                cmdRsp.setErrTip(errTip.getBytes());
-            }
-        }
+        WSUtil wsUtil = WSUtil.getWsUtil();
+        wsUtil.checkCityCardType("123");
     }
     
 }

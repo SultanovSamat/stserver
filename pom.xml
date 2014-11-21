@@ -11,7 +11,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <cxf.version>2.7.12</cxf.version>
+    <cxf.version>2.2.9</cxf.version>
   </properties>
   <dependencies>
     <dependency>
@@ -62,17 +62,6 @@
       <scope>test</scope>
 	</dependency>
 	
-    <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-frontend-jaxws</artifactId>
-        <version>${cxf.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.apache.cxf</groupId>
-        <artifactId>cxf-rt-transports-http</artifactId>
-        <version>${cxf.version}</version>
-    </dependency>	
-    
 	<dependency>
 	    <groupId>mysql</groupId>
 	    <artifactId>mysql-connector-java</artifactId>
