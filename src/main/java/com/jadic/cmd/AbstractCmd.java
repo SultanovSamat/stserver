@@ -26,7 +26,6 @@ public abstract class AbstractCmd implements ICmd {
     private byte endFlag;		//尾标识
     
     public AbstractCmd() {
-        //terminalId = new byte[6];
     }
 
     @Override

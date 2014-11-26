@@ -39,7 +39,7 @@ public class ThreadTerminalChargeDetail extends AbstractThreadDisposeDataFromQue
     private final static String TRANS_TYPE = "02";
     private final static String AGENCY_NO = SysParams.getInstance().getAgencyNo();//"1234";
     private final static String SAM = SysParams.getInstance().getSamId();//"11111111";
-    private final static String POSID = SysParams.getInstance().getPosId();//"123456";
+    //private final static String POSID = SysParams.getInstance().getPosId();//"123456";
     private final static String OPERNO = SysParams.getInstance().getOperNo();//"1234";
     
     public final static String FILE_SNO_NAME = "fileSNo.txt";
@@ -171,7 +171,8 @@ public class ThreadTerminalChargeDetail extends AbstractThreadDisposeDataFromQue
             writer.append(KKTool.getLeftFillFixedLenStr(String.valueOf(chargeDetail.getBalanceBeforeTrans()), 10, '0')).append(DELIMITER);
             writer.append(AGENCY_NO).append(DELIMITER);
             writer.append(SAM).append(DELIMITER);
-            writer.append(POSID).append(DELIMITER);
+            //writer.append(POSID).append(DELIMITER);
+            writer.append(KKTool.getStrWithMaxLen(String.valueOf(chargeDetail.getTerminalId()), 6, true)).append(DELIMITER);
             writer.append(OPERNO).append(DELIMITER);
             writer.append(KKTool.byteArrayToHexStr(chargeDetail.getTac())).append(DELIMITER);
             writer.append(AGENCY_FLAG);//流水号前追加ZZZD标识

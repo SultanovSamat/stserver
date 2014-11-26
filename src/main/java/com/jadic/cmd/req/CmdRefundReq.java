@@ -11,7 +11,7 @@ public class CmdRefundReq extends AbstractCmdReq {
     private byte[] cityCardNo;//市民卡卡号
     private int amount;//退款金额
     private byte[] time;//退款时间
-    //private byte chargeType;
+    private byte chargeType;
     
     public CmdRefundReq() {
         this.cityCardNo = new byte[8];
@@ -20,7 +20,7 @@ public class CmdRefundReq extends AbstractCmdReq {
 
     @Override
     protected int getCmdBodySize() {
-        return this.cityCardNo.length + 4 + this.time.length;
+        return this.cityCardNo.length + 4 + this.time.length + 1;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class CmdRefundReq extends AbstractCmdReq {
         channelBuffer.readBytes(cityCardNo);
         amount = channelBuffer.readInt();
         channelBuffer.readBytes(time);
-        //chargeType = channelBuffer.readByte();
+        chargeType = channelBuffer.readByte();
         return true;
     }
 
@@ -42,6 +42,10 @@ public class CmdRefundReq extends AbstractCmdReq {
 
     public byte[] getTime() {
         return time;
+    }
+
+    public byte getChargeType() {
+        return chargeType;
     }
 
 }

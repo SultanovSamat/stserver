@@ -52,6 +52,7 @@ public final class WSUtil {
     private final static String arithIndex = "00";
     private final static String deptNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getAgencyNo(), 10, false);
     private final static String operNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getOperNo(), 10, false);    
+    private final static String SAMID = KKTool.getFixedLenString(SysParams.getInstance().getSamId(), 12, '0', true, false);
     
     private URL url;
     private CenterProcessPortType centerProcess;
@@ -298,7 +299,7 @@ public final class WSUtil {
         String operType = KKTool.byteToHexStr(cmdReq.getOperType());
         String cardNo = KKTool.byteArrayToHexStr(cmdReq.getCardNo());
         String password = new String(cmdReq.getPassword()).trim();
-        String termNo = KKTool.byteArrayToHexStr(cmdReq.getTermNo());
+        String termNo = SAMID;//KKTool.byteArrayToHexStr(cmdReq.getTermNo());
         String asn = KKTool.byteArrayToHexStr(cmdReq.getAsn());
         String randNumber = KKTool.byteArrayToHexStr(cmdReq.getRandNumber());
         String cardTradeNo = KKTool.byteArrayToHexStr(cmdReq.getCardTradNo());

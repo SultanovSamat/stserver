@@ -1763,7 +1763,7 @@ public class KKTool {
         }
         
         if (isTruncatedFromLeft) {
-            return srcStr.substring(maxLen - srcStr.length());
+            return srcStr.substring(srcStr.length() - maxLen);
         } else {
             return srcStr.substring(0, maxLen);
         }

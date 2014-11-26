@@ -218,9 +218,14 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     	CmdChargeDetailReq cmdReq = new CmdChargeDetailReq();
     	if (cmdReq.disposeData(buffer)) {
     		byte ret = 1;
-    		long recordId = DBOper.getDBOper().addNewChargeDetail(cmdReq);
-    		if (recordId < 0) {
-    		    ret = 0;
+    		long recordId = 0;
+    		byte chargeStatus = cmdReq.getStatus();
+    		byte chargeType = cmdReq.getChargeType();
+    		if (chargeStatus == Const.CHARGE_DETAIL_STATUS_SUCC) {//仅保存成功交易的记录，失败的记录会有退款记录
+        		recordId = DBOper.getDBOper().addNewChargeDetail(cmdReq);
+        		if (recordId < 0) {
+        		    ret = 0;
+        		}
     		}
     		CmdChargeDetailRsp cmdRsp = new CmdChargeDetailRsp();
     		cmdRsp.setCmdCommonField(cmdReq);
@@ -229,7 +234,10 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     		sendData(cmdRsp.getSendBuffer());
     		log.info("recv charege detail[{}]", tcpChannel);
     		if (this.cmdBizDisposer != null) {
-    			this.cmdBizDisposer.disposeCmdChargeDetail(cmdReq);
+    		    //只上传成功的现金和银行卡充值记录
+    		    if (chargeStatus == Const.CHARGE_DETAIL_STATUS_SUCC && chargeType <= Const.CHARGE_TYPE_BANK_CARD) {
+    		        this.cmdBizDisposer.disposeCmdChargeDetail(cmdReq);
+    		    }
     		}
     	} else {
             log.warn("recv cmd charge detail, but fail to dispose[{}]", tcpChannel);
@@ -261,8 +269,6 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         if (cmdReq.disposeData(buffer)) {
             CmdPrepaidCardCheckRsp cmdRsp = new CmdPrepaidCardCheckRsp();
             WSUtil.getWsUtil().checkPrepaidCard(cmdReq, cmdRsp);
-//            cmdRsp.setCheckRet((byte)1);
-//            cmdRsp.setAmount(10000);
             cmdRsp.setCmdCommonField(cmdReq);
             sendData(cmdRsp.getSendBuffer());
             log.info("recv cmd prepaid card check, ret:{}, amount:{}", cmdRsp.getCheckRet(), cmdRsp.getAmount());

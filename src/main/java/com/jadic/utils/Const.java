@@ -46,6 +46,17 @@ public final class Const {
     public final static byte LOGIN_RET_TER_NOT_USE      = 0x03;//3:终端被停用 
     public final static byte LOGIN_RET_ID_INVALID       = 0x04;//4:身份不合法
     
+    //------------------------------------充值记录状态------------------------------------
+    public final static byte CHARGE_DETAIL_STATUS_SUCC  = 0x01;//1:成功
+    public final static byte CHARGE_DETAIL_STATUS_MIDD  = 0x02;//2:中间状态
+    public final static byte CHARGE_DETAIL_STATUS_FAIL  = 0x03;//3:失败
+    
+    //--------------------------------------充值类型--------------------------------------
+    public final static byte CHARGE_TYPE_CASH           = 0x00;//现金充值
+    public final static byte CHARGE_TYPE_BANK_CARD      = 0x01;//银行卡充值
+    public final static byte CHARGE_TYPE_PREPAID_CARD   = 0x02;//充值卡充值
+    public final static byte CHARGE_TYPE_ZHB            = 0x03;//企福通充值/专有账户充值
+    
     public final static String INITIAL_DATA_DIR			 = "data/initData";
     public final static String CHARGE_DETAIL_DIR_PARENT  = "data/chargeDetail";
     public final static String CHARGE_DETAIL_DIR         = CHARGE_DETAIL_DIR_PARENT + "/current";

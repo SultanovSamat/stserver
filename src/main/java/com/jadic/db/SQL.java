@@ -26,11 +26,12 @@ public final class SQL {
     public final static String ADD_CHARGE_DETAIL        = "insert into tab_charge_detail " +
     		                                                "(Status, CityCardNo, CardType, BankCardNo, ChargeTime, ChargeType, " +
     		                                                " ChargeAmount, BalanceBeforeCharge, TAC, ASN, TSN, ChargeSNo, " +
-    		                                                " TerminalId, PosId, SAMID, AgencyNo) " +
-    		                                                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+    		                                                " TerminalId, PosId, SAMID, AgencyNo, SysTime) " +
+    		                                                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, sysdate()) ";
     
     //增加退款明细
-    public final static String ADD_REFUND               = "insert into tab_refund (CardNo, Amount, RefundTime, Status, InsertTime) " +
-    		                                                "                values (?, ?, ?, 0, sysdate()) ";
+    public final static String ADD_REFUND               = "insert into tab_refund " +
+    		                                                "(CardNo, Amount, RefundTime, Status, InsertTime, TerminalID, ChargeType) " +
+    		                                                "                values (?, ?, ?, 0, sysdate(), ?, ?) ";
     
 }

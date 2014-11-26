@@ -69,7 +69,7 @@ public final class DBOper extends DefaultDBImpl {
         params.add(KKTool.byteArrayToHexStr(chargeDetail.getTac()));
         params.add(KKTool.byteArrayToHexStr(chargeDetail.getAsn()));
         params.add(KKTool.byteArrayToHexStr(chargeDetail.getTsn()));
-        params.add(chargeDetail.getTransSNo());
+        params.add(Long.valueOf(KKTool.byteArrayToHexStr(chargeDetail.getTransSNo())));
         params.add(chargeDetail.getTerminalId());
         params.add("");
         params.add("");
@@ -88,6 +88,8 @@ public final class DBOper extends DefaultDBImpl {
         params.add(refund.getAmount());
         Date refundTime = KKTool.getBCDDateTime(refund.getTime(), 0);
         params.add(new Timestamp(refundTime.getTime()));
+        params.add(refund.getTerminalId());
+        params.add(refund.getChargeType());
         try {
             return (int)executeInsertAndRetrieveId(SQL.ADD_REFUND, params);
         } catch (SQLException e) {
