@@ -15,8 +15,12 @@ public class CmdRefundRsp extends AbstractCmdRsp {
     private int recordId;//退款记录唯一编号
     
     public CmdRefundRsp() {
-        this.setCmdFlagId(Const.SER_REFUND_RET);
     }
+    
+    @Override
+	protected void setCmdFlag() {
+    	this.setCmdFlagId(Const.SER_REFUND_RET);
+	}
 
     @Override
     protected int getCmdBodySize() {

@@ -12,6 +12,13 @@ import com.jadic.cmd.req.AbstractCmdReq;
 public abstract class AbstractCmdRsp extends AbstractCmd {
     
     private static short cmdSNo = 0;
+    
+    public AbstractCmdRsp() {
+    	setClientType((byte)0);
+    	setCmdFlag();
+    }
+    
+    protected abstract void setCmdFlag() ;
 
     @Override
     protected short getNextCmdSNo() {
@@ -30,6 +37,4 @@ public abstract class AbstractCmdRsp extends AbstractCmd {
         this.setClientType(cmdReq.getClientType());
         this.setTerminalId(cmdReq.getTerminalId());
     }
-
-    
 }

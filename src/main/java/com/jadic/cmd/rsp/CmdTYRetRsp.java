@@ -15,11 +15,15 @@ public class CmdTYRetRsp extends AbstractCmdRsp {
     private byte ret;
 
     public CmdTYRetRsp() {
-        this.setCmdFlagId(Const.SER_TY_RET);
         this.setRet(Const.TY_RET_OK);
     }
     
     @Override
+	protected void setCmdFlag() {
+    	this.setCmdFlagId(Const.SER_TY_RET);
+	}
+
+	@Override
     protected int getCmdBodySize() {
         return 5;
     }

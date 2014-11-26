@@ -14,11 +14,15 @@ public class CmdLoginRsp extends AbstractCmdRsp {
     private byte ret;
     
     public CmdLoginRsp() {
-        this.setCmdFlagId(Const.SER_LOGIN_RET);
         this.ret = Const.LOGIN_RET_OK;
     }
 
     @Override
+	protected void setCmdFlag() {
+    	this.setCmdFlagId(Const.SER_LOGIN_RET);
+	}
+
+	@Override
     protected int getCmdBodySize() {
         return 3;
     }

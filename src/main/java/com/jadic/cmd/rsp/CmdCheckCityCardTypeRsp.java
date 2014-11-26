@@ -16,9 +16,13 @@ public class CmdCheckCityCardTypeRsp extends AbstractCmdRsp {
     
     public CmdCheckCityCardTypeRsp() {
         cityCardNo = new byte[8];
-        setCmdFlagId(Const.SER_CHECK_CITY_CARD_TYPE);
     }
 
+    @Override
+	protected void setCmdFlag() {
+    	setCmdFlagId(Const.SER_CHECK_CITY_CARD_TYPE);
+	}
+    
     @Override
     protected int getCmdBodySize() {
         return cityCardNo.length + 1;

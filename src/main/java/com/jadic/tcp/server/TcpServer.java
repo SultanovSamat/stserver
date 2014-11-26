@@ -177,6 +177,20 @@ public class TcpServer implements ITcpChannelDisposer {
         return this.tcpChannels.size();
     }
     
+    public TcpChannel getTcpChannelByTerminalId(int terminalId) {
+    	if (tcpChannels.size() > 0) {
+            Iterator<Entry<Integer, TcpChannel>> iterator = tcpChannels.entrySet().iterator();
+            TcpChannel tcpChannel = null; 
+            while (iterator.hasNext()) {
+                tcpChannel = iterator.next().getValue();
+                if (tcpChannel.getTerminalId() == terminalId) {
+                	return tcpChannel;
+                }
+            }
+        }
+    	return null;
+    }
+    
     @Override
     public void executeDisposeTask(TcpChannel tcpChannel) {
         this.threadPoolDisposeTcpData.execute(new ThreadDisposeTcpChannelData(tcpChannel, this.cmdBizDisposer));

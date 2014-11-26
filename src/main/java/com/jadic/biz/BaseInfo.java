@@ -36,8 +36,6 @@ public final class BaseInfo {
             if (oldTerminal != null) {
                 if (oldTerminal.getEnabled() != terminal.getEnabled()) {
                     oldTerminal.setEnabled(terminal.getEnabled());
-                    noticeTerminalEnabled(terminal);//if enabled status changed, notice terminal
-                    log.info("terminal[{}] enabled status changed, new status[{}]", terminal.getId(), terminal.getEnabled());
                 }
             } else {
                 terminals.put(terminal.getId(), terminal);
@@ -47,13 +45,27 @@ public final class BaseInfo {
     }
     
     /**
-     * notice terminal enabled status
+     * 程序运行过程中检测终端数据，如果终端启用状态变化则返回true
      * @param terminal
+     * @return
      */
-    private void noticeTerminalEnabled(TerminalBean terminal) {
-        //TODO
+    public boolean updateBaseInfo(TerminalBean terminal) {
+    	boolean isStatusChanged = false;
+    	if (terminal != null) {
+	    	TerminalBean oldTerminal = terminals.get(terminal.getId());
+	        if (oldTerminal != null) {
+	            if (oldTerminal.getEnabled() != terminal.getEnabled()) {
+	                oldTerminal.setEnabled(terminal.getEnabled());
+	                isStatusChanged = true;
+	            }
+	        } else {
+	            terminals.put(terminal.getId(), terminal);
+	            log.info("a terminal[{}] is added", terminal);
+	        }
+    	}
+        return isStatusChanged;
     }
-
+    
     public TerminalBean getTerminal(long terminalId) {
         return terminals.get(terminalId);
     }

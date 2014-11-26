@@ -33,6 +33,7 @@ public final class Const {
     public final static short SER_QUERY_ZHB_BALANCE     = 0x7009;//账户宝余额查询应答
     public final static short SER_MODIFY_ZHB_PASS       = 0x700A;//修改账户宝密码应答
     public final static short SER_CHECK_CITY_CARD_TYPE  = 0x700B;//检测市民卡类型应答 是否记名卡
+    public final static short SER_TERM_STATUS_CHANGED   = 0x700C;//终端状态变化
     //-----------------------------通讯命令字定义-------------------------
     
     public final static byte TY_RET_OK                  = 0x00;//0：成功/确认  

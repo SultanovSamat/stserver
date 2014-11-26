@@ -17,13 +17,17 @@ public class CmdGetMac2Rsp extends AbstractCmdRsp {
     private byte[] errTip;
     
     public CmdGetMac2Rsp() {
-        this.setCmdFlagId(Const.SER_GET_MAC2_RET);
         ret = 0;
         mac2 = new byte[4];
         tranSNo = new byte[6];
         errTipLen = 0;
         errTip = ZERO_BYTES;
     }
+    
+    @Override
+	protected void setCmdFlag() {
+    	this.setCmdFlagId(Const.SER_GET_MAC2_RET);
+	}
 
     @Override
     protected int getCmdBodySize() {

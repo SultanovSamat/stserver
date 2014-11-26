@@ -15,10 +15,14 @@ public class CmdChargeDetailRsp extends AbstractCmdRsp {
     private long recordId;//充值明细唯一编号
 
     public CmdChargeDetailRsp() {
-        this.setCmdFlagId(Const.SER_CHARGE_DETAIL_RET);
     }
     
     @Override
+	protected void setCmdFlag() {
+    	this.setCmdFlagId(Const.SER_CHARGE_DETAIL_RET);
+	}
+
+	@Override
     protected int getCmdBodySize() {
         return 9;
     }
