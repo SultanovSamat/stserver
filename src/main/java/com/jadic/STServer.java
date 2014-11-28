@@ -40,7 +40,7 @@ public class STServer implements ICmdBizDisposer, IMainServer{
         tcpServer.start();
         threadModuleStatus.start();
         threadTransaction.start();
-        loadBaseInfoTimer = new KKSimpleTimer(new ThreadLoadBaseinfo(this), 3, 3);
+        loadBaseInfoTimer = new KKSimpleTimer(new ThreadLoadBaseinfo(this), 60, 60);
         loadBaseInfoTimer.start();
         threadUploadPosDealData = new ThreadUploadPosDealData();
         threadUploadPosDealData.start();
@@ -50,28 +50,28 @@ public class STServer implements ICmdBizDisposer, IMainServer{
         BaseInfo.getBaseInfo().updateBaseInfo(DBOper.getDBOper().queryTerminals());
     }
     
+    @Override
+    public TcpChannel getTcpChannelByTerminalId(int terminalId) {
+        return tcpServer.getTcpChannelByTerminalId(terminalId);
+    }
+    
+    @Override
+    public TcpChannel getTcpChannelByTChannelId(int channelId) {
+        return tcpServer.getTcpChannel(channelId);
+    }
+    
+    @Override
+    public void disposeCmdModuleStatus(CmdModuleStatusReq moduleStatus) {
+        this.threadModuleStatus.addSingleToQueue(moduleStatus);
+    }
+    
+    @Override
+    public void disposeCmdChargeDetail(CmdChargeDetailReq transaction) {
+        this.threadTransaction.addSingleToQueue(transaction);
+    }
+    
     public static void main(String[] args) {
         STServer stServer = new STServer();
         stServer.start();
     }
-    
-    @Override
-    public TcpChannel getTcpChannelByTerminalId(int terminalId) {
-    	return tcpServer.getTcpChannelByTerminalId(terminalId);
-    }
-
-	@Override
-	public TcpChannel getTcpChannelByTChannelId(int channelId) {
-		return tcpServer.getTcpChannel(channelId);
-	}
-
-	@Override
-	public void disposeCmdModuleStatus(CmdModuleStatusReq moduleStatus) {
-		this.threadModuleStatus.addSingleToQueue(moduleStatus);
-	}
-
-	@Override
-	public void disposeCmdChargeDetail(CmdChargeDetailReq transaction) {
-		this.threadTransaction.addSingleToQueue(transaction);
-	}
 }
