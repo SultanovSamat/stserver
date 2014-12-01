@@ -34,4 +34,13 @@ public final class SQL {
     		                                                "(CardNo, Amount, RefundTime, Status, InsertTime, TerminalID, ChargeType) " +
     		                                                "                values (?, ?, ?, 0, sysdate(), ?, ?) ";
     
+    //有现金充值时累计现金金额
+    public final static String ADD_CASH_AMOUNT			= "update tab_terminal_status " +
+    													  "set CashBoxAmount = CashBoxAmount + ? " +
+    													  "where TerminalId = ? ";
+    
+    //现金金额清零
+    public final static String SET_CASH_AMOUNT_ZERO		= "update tab_terminal_status " +
+														  "set CashBoxAmount = 0 " +
+														  "where TerminalId = ? ";
 }

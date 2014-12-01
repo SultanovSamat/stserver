@@ -8,6 +8,7 @@ import com.jadic.biz.bean.TerminalBean;
 import com.jadic.cmd.req.AbstractCmdReq;
 import com.jadic.cmd.req.CmdChargeDetailReq;
 import com.jadic.cmd.req.CmdCheckCityCardTypeReq;
+import com.jadic.cmd.req.CmdClearCashBox;
 import com.jadic.cmd.req.CmdDefaultReq;
 import com.jadic.cmd.req.CmdGetMac2Req;
 import com.jadic.cmd.req.CmdHeartbeatReq;
@@ -90,10 +91,10 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         short cmdFlag = buffer.getShort(buffer.readerIndex() + 1);
 
         // can't deal other cmd, unless terminal is logined
-        if (!tcpChannel.isLogined() && cmdFlag != Const.TER_LOGIN) {
-            dealInvalidCmd(buffer, Const.TY_RET_NO_LOGIN);
-            return;
-        }
+//        if (!tcpChannel.isLogined() && cmdFlag != Const.TER_LOGIN) {
+//            dealInvalidCmd(buffer, Const.TY_RET_NO_LOGIN);
+//            return;
+//        }
 
         switch (cmdFlag) {
         case Const.TER_TY_RET:
@@ -129,6 +130,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         case Const.TER_CHECK_CITY_CARD_TYPE:
             dealCmdCheckCityCardType(buffer);
             break;
+        case Const.TER_CLEAR_CASH_BOX:
+        	dealCmdClearCashBox(buffer);
+        	break;
         default:
             dealInvalidCmd(buffer, Const.TY_RET_NOT_SUPPORTED);
             log.warn("Unsupported command flag:{}", KKTool.byteArrayToHexStr(KKTool.short2BytesBigEndian(cmdFlag)));
@@ -221,10 +225,20 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     		long recordId = 0;
     		byte chargeStatus = cmdReq.getStatus();
     		byte chargeType = cmdReq.getChargeType();
+    		int terminalId = cmdReq.getTerminalId();
     		if (chargeStatus == Const.CHARGE_DETAIL_STATUS_SUCC) {//仅保存成功交易的记录，失败的记录会有退款记录
         		recordId = DBOper.getDBOper().addNewChargeDetail(cmdReq);
         		if (recordId < 0) {
         		    ret = 0;
+        		}
+        		
+        		if (chargeType == Const.CHARGE_TYPE_CASH) {
+        			int amountAdded = cmdReq.getTransAmount() / 100;//转成元
+        			if (DBOper.getDBOper().addCashBoxAmount(terminalId, amountAdded)) {
+        				log.info("CmdChargeDetail:succeed to add cash box amount, terminalId:{}, amountAdded:{}", terminalId, amountAdded);
+        			} else {
+        				log.info("CmdChargeDetail:fail to add cash box amount, terminalId:{}, amountAdded:{}", terminalId, amountAdded);
+        			}
         		}
     		}
     		CmdChargeDetailRsp cmdRsp = new CmdChargeDetailRsp();
@@ -232,7 +246,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     		cmdRsp.setRet(ret);
     		cmdRsp.setRecordId(recordId);
     		sendData(cmdRsp.getSendBuffer());
-    		log.info("recv charege detail[{}]", tcpChannel);
+    		log.info("recv charge detail[{}]", tcpChannel);
     		if (this.cmdBizDisposer != null) {
     		    //只上传成功的现金和银行卡充值记录
     		    if (chargeStatus == Const.CHARGE_DETAIL_STATUS_SUCC && chargeType <= Const.CHARGE_TYPE_BANK_CARD) {
@@ -253,6 +267,16 @@ public class ThreadDisposeTcpChannelData implements Runnable {
                 ret = 0;
                 log.info("save refund data fail[{}]", tcpChannel);
             }
+            
+            if (cmdReq.getChargeType() == Const.CHARGE_TYPE_CASH) {
+            	int terminalId = cmdReq.getTerminalId();
+    			int amountAdded = cmdReq.getAmount() / 100;//转成元
+    			if (DBOper.getDBOper().addCashBoxAmount(terminalId, amountAdded)) {
+    				log.info("CmdRefund:succeed to add cash box amount, terminalId:{}, amountAdded:{}", terminalId, amountAdded);
+    			} else {
+    				log.info("CmdRefund:fail to add cash box amount, terminalId:{}, amountAdded:{}", terminalId, amountAdded);
+    			}
+    		}
             CmdRefundRsp cmdRsp = new CmdRefundRsp();
             cmdRsp.setCmdCommonField(cmdReq);
             cmdRsp.setRet(ret);
@@ -317,6 +341,20 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         } else {
             log.warn("recv cmd check city card type, but fail to dispose[{}]", tcpChannel);
         }
+    }
+    
+    private void dealCmdClearCashBox(ChannelBuffer buffer) {
+    	CmdClearCashBox cmdReq = new CmdClearCashBox();
+    	if (cmdReq.disposeData(buffer)) {
+    		if (DBOper.getDBOper().setCashBoxAmountZero(cmdReq.getTerminalId())) {
+    			log.info("succeed to set cash box amount zero, terminalId:{}", cmdReq.getTerminalId());
+    		} else {
+    			log.info("fail to set cash box amount zero, terminalId:{}", cmdReq.getTerminalId());
+    		}
+    		sendCmdTYRetOK(cmdReq);
+    	} else {
+    		log.warn("recv cmd clear cash box, but fail to dispose[{}]", tcpChannel);
+    	}
     }
     
     /**

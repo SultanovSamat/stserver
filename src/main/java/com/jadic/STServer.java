@@ -40,7 +40,7 @@ public class STServer implements ICmdBizDisposer, IMainServer{
         tcpServer.start();
         threadModuleStatus.start();
         threadTransaction.start();
-        loadBaseInfoTimer = new KKSimpleTimer(new ThreadLoadBaseinfo(this), 60, 60);
+        loadBaseInfoTimer = new KKSimpleTimer(new ThreadLoadBaseinfo(this), 300, 300);
         loadBaseInfoTimer.start();
         threadUploadPosDealData = new ThreadUploadPosDealData();
         threadUploadPosDealData.start();

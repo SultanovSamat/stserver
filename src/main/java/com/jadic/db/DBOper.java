@@ -42,16 +42,32 @@ public final class DBOper extends DefaultDBImpl {
         return queryForList(SQL.QUERY_TERMINALIDS_ONLINE, null, IDBean.class);
     }
     
+    /**
+     * 更新终端状态（在线状态及各模块状态）
+     * @param sql
+     * @param params
+     * @return
+     */
     public boolean updateTerminalStatus(String sql, List<Object> params) {
         return executeUpdateSingle(sql, params) != -1;
     }
     
+    /**
+     * 更新终端离线
+     * @param terminalId 终端编号
+     * @return
+     */
     public boolean updateTerminalOffline(long terminalId) {
         List<Object> params = new ArrayList<Object>();
         params.add(terminalId);
         return executeUpdateSingle(SQL.UPDATE_TERMINAL_OFFLINE, params) != -1;
     }
     
+    /**
+     * 增加充值明细
+     * @param chargeDetail 充值明细命令
+     * @return
+     */
     public long addNewChargeDetail(CmdChargeDetailReq chargeDetail) {
         List<Object> params = new ArrayList<Object>();
         params.add(chargeDetail.getStatus());
@@ -82,6 +98,11 @@ public final class DBOper extends DefaultDBImpl {
         return -1;
     }
 
+    /**
+     * 增加退款记录
+     * @param refund 退款命令
+     * @return
+     */
     public int addNewRefund(CmdRefundReq refund) {
         List<Object> params = new ArrayList<Object>();
         params.add(KKTool.byteArrayToHexStr(refund.getCityCardNo()));
@@ -96,6 +117,30 @@ public final class DBOper extends DefaultDBImpl {
             logger.error("addNewRefund fail", e);
         }
         return -1;
+    }
+    
+    /**
+     * 累加钱箱现金金额
+     * @param terminalId	终端编号
+     * @param amountAdded	本次累加的金额 (单位:元)
+     * @return
+     */
+    public boolean addCashBoxAmount(int terminalId, int amountAdded) {
+    	List<Object> params = new ArrayList<Object>();
+    	params.add(amountAdded);
+    	params.add(terminalId);
+    	return executeUpdateSingle(SQL.ADD_CASH_AMOUNT, params) != -1;
+    }
+    
+    /**
+     * 更新钱箱现金金额为0
+     * @param terminalId	终端编号
+     * @return
+     */
+    public boolean setCashBoxAmountZero(int terminalId) {
+    	List<Object> params = new ArrayList<Object>();
+    	params.add(terminalId);
+    	return executeUpdateSingle(SQL.SET_CASH_AMOUNT_ZERO, params) != -1;
     }
     
     public void test() {

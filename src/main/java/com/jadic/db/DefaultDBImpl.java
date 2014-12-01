@@ -563,7 +563,7 @@ public class DefaultDBImpl {
                 if (rs != null && rs.next()) {
                     id = rs.getLong(1);
                 }
-                logger.info(sql);
+                logger.debug(sql);
             }
         } finally {
             KKTool.closeRS_Statement_ConnInSilence(rs, statement, conn);

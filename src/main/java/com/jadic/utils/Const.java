@@ -23,6 +23,7 @@ public final class Const {
     public final static short TER_QUERY_ZHB_BALANCE     = 0x0009;//账户宝余额查询
     public final static short TER_MODIFY_ZHB_PASS       = 0x000A;//修改账户宝密码
     public final static short TER_CHECK_CITY_CARD_TYPE  = 0x000B;//检测市民卡类型 是否记名卡
+    public final static short TER_CLEAR_CASH_BOX		= 0x000D;//终端操作清空钱箱
 
     public final static short SER_TY_RET                = 0x7001;//平台通用应答
     public final static short SER_LOGIN_RET             = 0x7003;//终端注册应答
