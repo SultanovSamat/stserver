@@ -10,20 +10,30 @@ import org.jboss.netty.buffer.ChannelBuffer;
 public class CmdClearCashBox extends AbstractCmdReq {
 	
 	private int cashAmount;
+	private byte[] operTime;
+	
+	public CmdClearCashBox() {
+		operTime = new byte[6];
+	}
 
 	@Override
 	protected int getCmdBodySize() {
-		return 4;
+		return 4 + operTime.length;
 	}
 
 	@Override
 	protected boolean disposeCmdBody(ChannelBuffer channelBuffer) {
 		cashAmount = channelBuffer.readInt();
+		channelBuffer.readBytes(operTime);
 		return true;
 	}
 
 	public int getCashAmount() {
 		return cashAmount;
+	}
+
+	public byte[] getOperTime() {
+		return operTime;
 	}
 
 }
