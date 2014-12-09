@@ -35,12 +35,17 @@ public final class SQL {
     		                                                "                values (?, ?, ?, 0, sysdate(), ?, ?) ";
     
     //有现金充值时累计现金金额
-    public final static String ADD_CASH_AMOUNT			= "update tab_terminal_status " +
-    													  "set CashBoxAmount = CashBoxAmount + ? " +
-    													  "where TerminalId = ? ";
+    public final static String ADD_CASH_AMOUNT		  = "update tab_terminal_status " +
+        													"set CashBoxAmount = CashBoxAmount + ? " +
+        													"where TerminalId = ? ";
     
     //现金金额清零
-    public final static String SET_CASH_AMOUNT_ZERO		= "update tab_terminal_status " +
-														  "set CashBoxAmount = 0 " +
-														  "where TerminalId = ? ";
+    public final static String SET_CASH_AMOUNT_ZERO	  = "update tab_terminal_status " +
+														    "set CashBoxAmount = 0 " +
+														    "where TerminalId = ? ";
+    
+    //增加提款记录明细
+    public final static String ADD_WITHDRAW_DETAIL      = "insert into tab_withdraw_detail " +
+    		                                                "(TerminalId, WithdrawAmount, OperTime, OperUserId) " +
+    		                                                "values (?, ?, ?, ?) ";
 }

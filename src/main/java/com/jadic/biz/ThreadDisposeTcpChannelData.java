@@ -351,6 +351,12 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     		} else {
     			log.info("fail to set cash box amount zero, terminalId:{}", cmdReq.getTerminalId());
     		}
+    		
+    		if (DBOper.getDBOper().addWithdrawDetail(cmdReq)) {
+    		    log.info("succeed to add Withdraw Detail, terminalId:{}", cmdReq.getTerminalId());
+    		} else {
+    		    log.info("fail to add Withdraw Detail, terminalId:{}", cmdReq.getTerminalId());
+    		}
     		sendCmdTYRetOK(cmdReq);
     	} else {
     		log.warn("recv cmd clear cash box, but fail to dispose[{}]", tcpChannel);

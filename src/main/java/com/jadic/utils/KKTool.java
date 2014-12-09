@@ -330,6 +330,30 @@ public class KKTool {
         Calendar c = new GregorianCalendar(year, month - 1, day, hour, minute, second);
         return c.getTime();
     }
+    
+    /**
+     * 根据年、月、日、时、分、秒来获取日期格式
+     * 注此处每个参数皆为bcd格式
+     * 如0x14 0x12 0x09 0x15 0x43 0x35 表示2014-12-09 15:43:35
+     * @param bcdYear
+     * @param bcdMonth
+     * @param bcdDay
+     * @param bcdHour
+     * @param bcdMinute
+     * @param bcdSecond
+     * @return
+     */
+    public static Date getBCDDateTime(byte bcdYear, byte bcdMonth, byte bcdDay, 
+            byte bcdHour, byte bcdMinute, byte bcdSecond) {
+        int year = 2000 + bcd2Byte(bcdYear);
+        int month = bcd2Byte(bcdMonth);
+        int day = bcd2Byte(bcdDay);
+        int hour = bcd2Byte(bcdHour);
+        int minute = bcd2Byte(bcdMinute);
+        int second = bcd2Byte(bcdSecond);
+        Calendar c = new GregorianCalendar(year, month - 1, day, hour, minute, second);
+        return c.getTime();
+    }
 
     /**
      * 返回格式: yyyy-MM-dd HH:mm:ss

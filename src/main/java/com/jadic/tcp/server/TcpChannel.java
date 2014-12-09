@@ -105,7 +105,7 @@ public class TcpChannel {
 	 */
 	public boolean sendData(ChannelBuffer buffer) {
 		if (channel != null && channel.isConnected()) {
-			sendDataLog.info(KKTool.channelBufferReadableBytesToHexStr(buffer));
+			sendDataLog.info("[{}] {}", buffer.readableBytes(), KKTool.channelBufferReadableBytesToHexStr(buffer));
 			channel.write(buffer);
 			return true;
 		}

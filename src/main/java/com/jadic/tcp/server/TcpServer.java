@@ -90,7 +90,7 @@ public class TcpServer implements ITcpChannelDisposer {
      */
     private void startCheckTimeoutTimer() {
         this.checkTimeoutTimer = new KKSimpleTimer("tcp server timeout checker", new Runnable() {
-            final static long TIME_OUT = 1000 * 60 * 1;
+            final static long TIME_OUT = 1000 * 60 * 2;
             
             @Override
             public void run() {

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.jadic.biz.bean.IDBean;
 import com.jadic.biz.bean.TerminalBean;
 import com.jadic.cmd.req.CmdChargeDetailReq;
+import com.jadic.cmd.req.CmdClearCashBox;
 import com.jadic.cmd.req.CmdRefundReq;
 import com.jadic.utils.KKTool;
 
@@ -141,6 +142,23 @@ public final class DBOper extends DefaultDBImpl {
     	List<Object> params = new ArrayList<Object>();
     	params.add(terminalId);
     	return executeUpdateSingle(SQL.SET_CASH_AMOUNT_ZERO, params) != -1;
+    }
+    
+    /**
+     * 增加提款操作明细
+     * @param cmd
+     * @return
+     */
+    public boolean addWithdrawDetail(CmdClearCashBox cmd) {
+        List<Object> params = new ArrayList<Object>();
+        params.add(cmd.getTerminalId());
+        params.add(cmd.getCashAmount());
+        byte[] time = cmd.getOperTime();
+        int i = 0;
+        Date operTime = KKTool.getBCDDateTime(time[i ++], time[i ++], time[i ++], time[i ++], time[i ++], time[i ++]);
+        params.add(new Timestamp(operTime.getTime()));
+        params.add(0);
+        return executeUpdateSingle(SQL.ADD_WITHDRAW_DETAIL, params) != -1;
     }
     
     public void test() {
