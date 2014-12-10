@@ -5,7 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jadic.biz.bean.TerminalBean;
+import com.jadic.cmd.AbstractCmd;
 import com.jadic.cmd.req.AbstractCmdReq;
+import com.jadic.cmd.req.CmdAddCashBoxAmountReq;
 import com.jadic.cmd.req.CmdChargeDetailReq;
 import com.jadic.cmd.req.CmdCheckCityCardTypeReq;
 import com.jadic.cmd.req.CmdClearCashBox;
@@ -19,6 +21,7 @@ import com.jadic.cmd.req.CmdPrepaidCardCheckReq;
 import com.jadic.cmd.req.CmdQueryZHBBalanceReq;
 import com.jadic.cmd.req.CmdRefundReq;
 import com.jadic.cmd.req.CmdTYRetReq;
+import com.jadic.cmd.rsp.CmdAddCashBoxAmountRsp;
 import com.jadic.cmd.rsp.CmdChargeDetailRsp;
 import com.jadic.cmd.rsp.CmdCheckCityCardTypeRsp;
 import com.jadic.cmd.rsp.CmdGetMac2Rsp;
@@ -133,6 +136,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         case Const.TER_CLEAR_CASH_BOX:
         	dealCmdClearCashBox(buffer);
         	break;
+        case Const.TER_ADD_CASH_BOX_AMOUNT: 
+        	dealCmdAddCashBoxAmount(buffer);
+        	break;
         default:
             dealInvalidCmd(buffer, Const.TY_RET_NOT_SUPPORTED);
             log.warn("Unsupported command flag:{}", KKTool.byteArrayToHexStr(KKTool.short2BytesBigEndian(cmdFlag)));
@@ -184,9 +190,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             }
             cmdRsp.setRet(ret);
             sendData(cmdRsp.getSendBuffer());
-            String posId = KKTool.byteArrayToHexStr(cmdReq.getPosId());
-            String samId = KKTool.byteArrayToHexStr(cmdReq.getSamId());
-            log.info("a client login, login ret[{}], [{}], posId:{}, samID:{}", ret, tcpChannel, posId, samId);
+            log.info("a client login, login ret[{}], [{}], ver:{}", ret, tcpChannel, KKTool.short2HexStr(cmdReq.getVer()));
         } else {
             log.warn("recv cmd login, but fail to dispose[{}]", tcpChannel);
         }
@@ -346,6 +350,10 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     private void dealCmdClearCashBox(ChannelBuffer buffer) {
     	CmdClearCashBox cmdReq = new CmdClearCashBox();
     	if (cmdReq.disposeData(buffer)) {
+    		TerminalBean terminal = getTerminal(cmdReq);
+    		if (terminal != null) {
+    			terminal.setTotalCashAmount(0);
+    		}
     		if (DBOper.getDBOper().setCashBoxAmountZero(cmdReq.getTerminalId())) {
     			log.info("succeed to set cash box amount zero, terminalId:{}", cmdReq.getTerminalId());
     		} else {
@@ -360,6 +368,24 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     		sendCmdTYRetOK(cmdReq);
     	} else {
     		log.warn("recv cmd clear cash box, but fail to dispose[{}]", tcpChannel);
+    	}
+    }
+    
+    private void dealCmdAddCashBoxAmount(ChannelBuffer buffer) {
+    	CmdAddCashBoxAmountReq cmdReq = new CmdAddCashBoxAmountReq();
+    	if (cmdReq.disposeData(buffer)) {
+    		TerminalBean terminal = getTerminal(cmdReq);
+    		int totalCashAmount = 0;
+    		if (terminal != null) {
+    			terminal.addCashAmount(cmdReq.getAmountAdded());
+    			totalCashAmount = terminal.getTotalCashAmount();
+    		} else {
+    			
+    		}
+    		CmdAddCashBoxAmountRsp cmdRsp = new CmdAddCashBoxAmountRsp();
+    		cmdRsp.setCmdCommonField(cmdReq);
+    		cmdRsp.setCashBoxTotalAmount(totalCashAmount);
+    		sendCmd(cmdRsp);
     	}
     }
     
@@ -401,6 +427,12 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             this.tcpChannel.sendData(KKTool.getEscapedBuffer(buffer));
         }
     }
+    
+    private void sendCmd(AbstractCmd cmd) {
+    	if (cmd != null) {
+    		sendData(cmd.getSendBuffer());
+    	}
+    }
 
     /**
      * 设置tcpchannel、terminal之间相互关联的值即tcpchannel.terminalId与terminal.channelId
@@ -427,6 +459,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     }
 
     private TerminalBean getTerminal(AbstractCmdReq cmdReq) {
-        return BaseInfo.getBaseInfo().getTerminal(cmdReq.getTerminalId());
+        return cmdReq == null ? null : BaseInfo.getBaseInfo().getTerminal(cmdReq.getTerminalId());
     }
+    
 }

@@ -9,6 +9,7 @@ public class TerminalBean {
     private long id;
     private byte enabled;//启用状态 0：启用 1：停用
     private int channelId;//终端关联的TCP Channel Id
+    private int totalCashAmount;//现金总额
 
     @Override
     public String toString() {
@@ -38,5 +39,17 @@ public class TerminalBean {
     public void setId(long id) {
         this.id = id;
     }
+
+	public int getTotalCashAmount() {
+		return totalCashAmount;
+	}
+	
+	public void setTotalCashAmount(int totalAmount) {
+		this.totalCashAmount = totalAmount;
+	}
+
+	public void addCashAmount(int amountAdded) {
+		this.totalCashAmount += amountAdded;
+	}
 
 }

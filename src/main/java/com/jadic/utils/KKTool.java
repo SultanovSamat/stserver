@@ -459,6 +459,10 @@ public class KKTool {
     public static byte[] short2BytesBigEndian(short sValue) {
         return short2Bytes(sValue, BIT_BIGENDIAN);
     }
+    
+    public static String short2HexStr(short sValue) {
+    	return byteArrayToHexStr(short2BytesBigEndian(sValue));
+    }
 
     /**
      * 将short值填入到字节数组中
