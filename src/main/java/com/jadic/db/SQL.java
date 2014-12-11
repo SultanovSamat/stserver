@@ -12,7 +12,7 @@ public final class SQL {
     //查询终端信息
     public final static String QUERY_TERMINAL_INFO      = "select a.id, a.enabled, -1 as channelId, CashBoxAmount as totalCashAmount " +
 		                                                  "from tab_terminal a " +
-		                                                  "left join tab_terminal_status b on b.terminalId = a.id" +
+		                                                  "left join tab_terminal_status b on b.terminalId = a.id " +
 		                                                  "where a.typeid=1";
     
     //上过线的终端设备ID
@@ -42,8 +42,8 @@ public final class SQL {
     
     //强制设置现金累计总金额
     public final static String SET_CASH_AMOUNT		  = "update tab_terminal_status " +
-														"set CashBoxAmount = ? " +
-														"where TerminalId = ? ";
+    														"set CashBoxAmount = ? " +
+    														"where TerminalId = ? ";
     
     //现金金额清零
     public final static String SET_CASH_AMOUNT_ZERO	  = "update tab_terminal_status " +

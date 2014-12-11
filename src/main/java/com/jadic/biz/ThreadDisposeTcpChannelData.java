@@ -236,7 +236,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         		    ret = 0;
         		}
         		
-        		if (chargeType == Const.CHARGE_TYPE_CASH) {
+        		if (tcpChannel.getTerminalVer() <= 0x0100 && chargeType == Const.CHARGE_TYPE_CASH) {
         			int amountAdded = cmdReq.getTransAmount() / 100;//转成元
         			if (DBOper.getDBOper().addCashBoxAmount(terminalId, amountAdded)) {
         				log.info("CmdChargeDetail:succeed to add cash box amount, terminalId:{}, amountAdded:{}", terminalId, amountAdded);
@@ -272,7 +272,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
                 log.info("save refund data fail[{}]", tcpChannel);
             }
             
-            if (cmdReq.getChargeType() == Const.CHARGE_TYPE_CASH) {
+            if (tcpChannel.getTerminalVer() <= 0x0100 && cmdReq.getChargeType() == Const.CHARGE_TYPE_CASH) {
             	int terminalId = cmdReq.getTerminalId();
     			int amountAdded = cmdReq.getAmount() / 100;//转成元
     			if (DBOper.getDBOper().addCashBoxAmount(terminalId, amountAdded)) {
@@ -374,13 +374,21 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     private void dealCmdAddCashBoxAmount(ChannelBuffer buffer) {
     	CmdAddCashBoxAmountReq cmdReq = new CmdAddCashBoxAmountReq();
     	if (cmdReq.disposeData(buffer)) {
+    	    if (cmdReq.getAmountAdded() <= 0) {
+    	        log.warn("recv cmd add cash box amount,but amount added is not greater than 0,quit");
+    	        return;
+    	    }
     		TerminalBean terminal = getTerminal(cmdReq);
     		int totalCashAmount = 0;
     		if (terminal != null) {
     			terminal.addCashAmount(cmdReq.getAmountAdded());
     			totalCashAmount = terminal.getTotalCashAmount();
-    		} else {
-    			
+    			if (DBOper.getDBOper().setCashBoxAmount(cmdReq.getTerminalId(), totalCashAmount)) {
+    			    log.info("succeed to set cashbox amount,terminalId:{}, amountAdded:{}, totalAmount:{}", 
+    			            cmdReq.getTerminalId(), cmdReq.getAmountAdded(), totalCashAmount);
+    			} else {
+    			    log.info("fail to add cashbox amount, terminalId:{}", cmdReq.getTerminalId());
+    			}
     		}
     		CmdAddCashBoxAmountRsp cmdRsp = new CmdAddCashBoxAmountRsp();
     		cmdRsp.setCmdCommonField(cmdReq);

@@ -143,6 +143,18 @@ public final class DBOper extends DefaultDBImpl {
     	params.add(terminalId);
     	return executeUpdateSingle(SQL.SET_CASH_AMOUNT_ZERO, params) != -1;
     }
+
+    /**
+     * 更新钱箱现金金额
+     * @param terminalId	终端编号
+     * @return
+     */
+    public boolean setCashBoxAmount(int terminalId, int totalAmount) {
+        List<Object> params = new ArrayList<Object>();
+        params.add(totalAmount);
+        params.add(terminalId);
+        return executeUpdateSingle(SQL.SET_CASH_AMOUNT, params) != -1;
+    }
     
     /**
      * 增加提款操作明细
