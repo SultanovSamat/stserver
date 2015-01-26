@@ -18,6 +18,7 @@ public abstract class AbstractCmd implements ICmd {
 	private int terminalId;    //终端ID
 	private short cmdBodyLen;	//消息体长度
     private short cmdSNo;		//消息流水号
+    private short cmdSNoResp;   //应答消息流水号
     
     //....						  消息体
     
@@ -42,6 +43,7 @@ public abstract class AbstractCmd implements ICmd {
             this.terminalId = buffer.readInt();
             this.cmdBodyLen = buffer.readShort();
             this.cmdSNo = buffer.readShort();
+            this.cmdSNoResp = buffer.readShort();
             return disposeCmdBody(buffer);
         }
         return false;
@@ -71,6 +73,7 @@ public abstract class AbstractCmd implements ICmd {
         	channelBuffer.writeInt(this.terminalId);
         	channelBuffer.writeShort(this.cmdBodyLen);
             channelBuffer.writeShort(this.cmdSNo);
+            channelBuffer.writeShort(this.cmdSNoResp);
 
             if (fillCmdBody(channelBuffer)) {
                 //CRC check sum
@@ -83,7 +86,7 @@ public abstract class AbstractCmd implements ICmd {
     }
 
     protected int getCmdHeadEndSize() {
-        return 14;//1 + 2 + 1 + 4 + 2 + 2 + 1 + 1
+        return 16;//1 + 2 + 1 + 4 + 2 + 2 + 2 + 1 + 1
     }
     
     private byte getCRCCheckSum(ChannelBuffer buffer) {
@@ -134,6 +137,14 @@ public abstract class AbstractCmd implements ICmd {
 
     public short getCmdSNo() {
         return cmdSNo;
+    }
+
+    public short getCmdSNoResp() {
+        return cmdSNoResp;
+    }
+    
+    protected void setCmdSNoResp(short cmdSNoResp) {
+        this.cmdSNoResp = cmdSNoResp;
     }
 
     public short getCmdBodyLen() {

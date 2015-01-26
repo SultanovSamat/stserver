@@ -36,5 +36,6 @@ public abstract class AbstractCmdRsp extends AbstractCmd {
     public void setCmdCommonField(AbstractCmdReq cmdReq) {
         this.setClientType(cmdReq.getClientType());
         this.setTerminalId(cmdReq.getTerminalId());
+        this.setCmdSNoResp(cmdReq.getCmdSNo());
     }
 }
