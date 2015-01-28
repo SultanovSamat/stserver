@@ -52,6 +52,6 @@ public final class SQL {
     
     //增加提款记录明细
     public final static String ADD_WITHDRAW_DETAIL      = "insert into tab_withdraw_detail " +
-    		                                                "(TerminalId, WithdrawAmount, OperTime, OperUserId) " +
-    		                                                "values (?, ?, ?, ?) ";
+    		                                                "(TerminalId, WithdrawAmount, OperTime, LastOperTime, OperUserId) " +
+    		                                                "values (?, ?, ?, ?, ?) ";
 }

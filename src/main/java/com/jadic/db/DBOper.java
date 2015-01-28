@@ -167,8 +167,15 @@ public final class DBOper extends DefaultDBImpl {
         params.add(cmd.getCashAmount());
         byte[] time = cmd.getOperTime();
         int i = 0;
+        
         Date operTime = KKTool.getBCDDateTime(time[i ++], time[i ++], time[i ++], time[i ++], time[i ++], time[i ++]);
         params.add(new Timestamp(operTime.getTime()));
+        
+        time = cmd.getLastOperTime();
+        i = 0;
+        operTime = KKTool.getBCDDateTime(time[i ++], time[i ++], time[i ++], time[i ++], time[i ++], time[i ++]);
+        params.add(new Timestamp(operTime.getTime()));
+
         params.add(0);
         return executeUpdateSingle(SQL.ADD_WITHDRAW_DETAIL, params) != -1;
     }

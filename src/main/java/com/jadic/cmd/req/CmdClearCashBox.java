@@ -11,20 +11,23 @@ public class CmdClearCashBox extends AbstractCmdReq {
 	
 	private int cashAmount;
 	private byte[] operTime;
+	private byte[] lastOperTime;
 	
 	public CmdClearCashBox() {
 		operTime = new byte[6];
+		lastOperTime = new byte[6];
 	}
 
 	@Override
 	protected int getCmdBodySize() {
-		return 4 + operTime.length;
+		return 4 + operTime.length + lastOperTime.length;
 	}
 
 	@Override
 	protected boolean disposeCmdBody(ChannelBuffer channelBuffer) {
 		cashAmount = channelBuffer.readInt();
 		channelBuffer.readBytes(operTime);
+		channelBuffer.readBytes(lastOperTime);
 		return true;
 	}
 
@@ -35,5 +38,9 @@ public class CmdClearCashBox extends AbstractCmdReq {
 	public byte[] getOperTime() {
 		return operTime;
 	}
+
+    public byte[] getLastOperTime() {
+        return lastOperTime;
+    }
 
 }
