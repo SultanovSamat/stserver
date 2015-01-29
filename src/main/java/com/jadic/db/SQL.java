@@ -54,4 +54,8 @@ public final class SQL {
     public final static String ADD_WITHDRAW_DETAIL      = "insert into tab_withdraw_detail " +
     		                                                "(TerminalId, WithdrawAmount, OperTime, LastOperTime, OperUserId) " +
     		                                                "values (?, ?, ?, ?, ?) ";
+    
+    //增加操作日志记录
+    public final static String ADD_OPER_LOG = "insert into tab_oper_log (terminalId, time, logtype, logMemo) " +
+    		                                  "                  values (?, sysdate(), ?, ?)";
 }

@@ -1,5 +1,6 @@
 package com.jadic.utils;
 
+
 public final class Const {
 
     public final static String EMPTY_STR = "";
@@ -178,4 +179,15 @@ public final class Const {
                                                             "</CUSTRECTYPEQUERYREQ>" +
                                                              WS_XML_END;
     //--------------------------------------市民卡接口调用XML字符串--------------------------------------
+    
+    //--------------------------------------操作日志类型----------------------------------------
+    public final static int LOG_TYPE_TERMINAL_ONLINE    = 1;//上线
+    public final static int LOG_TYPE_TERMINAL_OFFLINE   = 2;//离线
+    public final static int LOG_TYPE_WITHDRAW           = 3;//提款
+    public final static int LOG_TYPE_OUT_OF_SERVICE     = 4;//人工暂停服务
+    public final static int LOG_TYPE_CHARGE             = 5;//充值
+    public final static int LOG_TYPE_REFUND             = 6;//退款
+    public final static int LOG_TYPE_QUERY_ZHB_BALANCE  = 7;//查询账户宝余额
+    public final static int LOG_TYPE_MODIFY_ZHB_PASS    = 8;//修改账户宝密码
+    //--------------------------------------操作日志类型----------------------------------------
 }

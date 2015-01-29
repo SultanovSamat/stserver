@@ -3,9 +3,11 @@ package com.jadic;
 import com.jadic.biz.BaseInfo;
 import com.jadic.biz.ICmdBizDisposer;
 import com.jadic.biz.ThreadLoadBaseinfo;
+import com.jadic.biz.ThreadSaveData2DBAsyn;
 import com.jadic.biz.ThreadTerminalChargeDetail;
 import com.jadic.biz.ThreadTerminalModuleStatus;
 import com.jadic.biz.ThreadUploadPosDealData;
+import com.jadic.biz.bean.DBSaveBean;
 import com.jadic.cmd.req.CmdChargeDetailReq;
 import com.jadic.cmd.req.CmdModuleStatusReq;
 import com.jadic.db.DBOper;
@@ -26,6 +28,8 @@ public class STServer implements ICmdBizDisposer, IMainServer{
     private ThreadTerminalModuleStatus threadModuleStatus;
     private ThreadTerminalChargeDetail threadTransaction;
     private ThreadUploadPosDealData threadUploadPosDealData;
+    private ThreadSaveData2DBAsyn threadSaveData2DBAsyn;
+    
     private KKSimpleTimer loadBaseInfoTimer;
     
     public STServer() {
@@ -33,6 +37,7 @@ public class STServer implements ICmdBizDisposer, IMainServer{
         tcpServer = new TcpServer(sysParams.getLocalTcpPort(), this);
         threadModuleStatus = new ThreadTerminalModuleStatus();
         threadTransaction = new ThreadTerminalChargeDetail();
+        threadSaveData2DBAsyn = new ThreadSaveData2DBAsyn();
         WSUtil.getWsUtil();
     }
     
@@ -40,6 +45,7 @@ public class STServer implements ICmdBizDisposer, IMainServer{
         tcpServer.start();
         threadModuleStatus.start();
         threadTransaction.start();
+        threadSaveData2DBAsyn.start();
         loadBaseInfoTimer = new KKSimpleTimer(new ThreadLoadBaseinfo(this), 300, 300);
         loadBaseInfoTimer.start();
         threadUploadPosDealData = new ThreadUploadPosDealData();
@@ -70,6 +76,11 @@ public class STServer implements ICmdBizDisposer, IMainServer{
         this.threadTransaction.addSingleToQueue(transaction);
     }
     
+    @Override
+    public void saveDBAsyn(DBSaveBean dataBean) {
+        this.threadSaveData2DBAsyn.addSingleToQueue(dataBean);
+    }
+
     public static void main(String[] args) {
         STServer stServer = new STServer();
         stServer.start();

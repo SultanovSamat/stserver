@@ -12,6 +12,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jadic.biz.bean.DBSaveBean;
 import com.jadic.biz.bean.IDBean;
 import com.jadic.biz.bean.TerminalBean;
 import com.jadic.cmd.req.CmdChargeDetailReq;
@@ -178,6 +179,25 @@ public final class DBOper extends DefaultDBImpl {
 
         params.add(0);
         return executeUpdateSingle(SQL.ADD_WITHDRAW_DETAIL, params) != -1;
+    }
+    
+    /**
+     * 增加操作日志
+     * @param terminalId    终端编号
+     * @param logType   日志类型
+     * @param logMemo   日志备注
+     * @return true if succeed to add
+     */
+    public boolean addOperLog(int terminalId, int logType, String logMemo) {
+        List<Object> params = new ArrayList<Object>();
+        params.add(terminalId);
+        params.add(logType);
+        params.add(logMemo);
+        return executeUpdateSingle(SQL.ADD_OPER_LOG, params) != -1;
+    }
+    
+    public boolean saveDataBean(DBSaveBean dataBean) {
+        return executeUpdateSingle(dataBean.getSql(), dataBean.getParams()) != -1;
     }
     
     public void test() {

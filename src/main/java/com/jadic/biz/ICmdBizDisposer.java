@@ -1,5 +1,6 @@
 package com.jadic.biz;
 
+import com.jadic.biz.bean.DBSaveBean;
 import com.jadic.cmd.req.CmdModuleStatusReq;
 import com.jadic.cmd.req.CmdChargeDetailReq;
 
@@ -12,5 +13,6 @@ public interface ICmdBizDisposer {
 	
 	public void disposeCmdModuleStatus(CmdModuleStatusReq moduleStatus);
 	public void disposeCmdChargeDetail(CmdChargeDetailReq chargeDetail);
+	public void saveDBAsyn(DBSaveBean dataBean);
 
 }

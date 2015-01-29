@@ -191,6 +191,10 @@ public class TcpServer implements ITcpChannelDisposer {
     	return null;
     }
     
+    public ICmdBizDisposer getCmdBizDisposer() {
+        return this.cmdBizDisposer;
+    }
+    
     @Override
     public void executeDisposeTask(TcpChannel tcpChannel) {
         this.threadPoolDisposeTcpData.execute(new ThreadDisposeTcpChannelData(tcpChannel, this.cmdBizDisposer));

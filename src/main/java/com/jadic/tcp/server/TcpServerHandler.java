@@ -9,6 +9,10 @@ import org.jboss.netty.channel.SimpleChannelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jadic.biz.ICmdBizDisposer;
+import com.jadic.biz.bean.DBSaveBean;
+import com.jadic.db.SQL;
+import com.jadic.utils.Const;
 import com.jadic.utils.KKTool;
 
 /**
@@ -51,6 +55,15 @@ public class TcpServerHandler extends SimpleChannelHandler {
 	public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
 		TcpChannel tcpChannel = this.tcpServer.getTcpChannel(ctx.getChannel().getId());
 		this.tcpServer.removeTcpChannel(ctx.getChannel().getId());
+		
+		ICmdBizDisposer cmdBizDisposer = this.tcpServer.getCmdBizDisposer();
+		if (cmdBizDisposer != null && tcpChannel != null && tcpChannel.getTerminalId() > 0) {
+		    DBSaveBean dataBean = new DBSaveBean(SQL.ADD_OPER_LOG);
+		    dataBean.addParam(tcpChannel.getTerminalId());
+		    dataBean.addParam(Const.LOG_TYPE_TERMINAL_OFFLINE);
+		    dataBean.addParam("");
+		    cmdBizDisposer.saveDBAsyn(dataBean);
+		}
 		log.info("a tcp client [{}] disconnected from tcp server, total:{}", tcpChannel != null ? tcpChannel : ctx.getChannel().getRemoteAddress(), tcpServer.getClientsCount());
 	}
 

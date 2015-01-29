@@ -2224,6 +2224,27 @@ public class KKTool {
         }
         return b;
     }
+    
+    public static String getChargeTypeName(byte chargeType) {
+        String typeName = null;
+        switch (chargeType) {
+        case Const.CHARGE_TYPE_CASH:
+            typeName = "现金";
+            break;
+        case Const.CHARGE_TYPE_BANK_CARD:
+            typeName = "银行卡";
+            break;
+        case Const.CHARGE_TYPE_PREPAID_CARD:
+            typeName = "充值卡";
+            break;
+        case Const.CHARGE_TYPE_ZHB:
+            typeName = "账户宝";
+            break;
+        default:
+            break;
+        }
+        return typeName;
+    }
 
     public static void main(String[] args) {
         KKTool.createFileDir(Const.INITIAL_DATA_DIR);

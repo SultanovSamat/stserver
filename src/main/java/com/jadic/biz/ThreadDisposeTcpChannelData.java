@@ -1,9 +1,13 @@
 package com.jadic.biz;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jadic.biz.bean.DBSaveBean;
 import com.jadic.biz.bean.TerminalBean;
 import com.jadic.cmd.AbstractCmd;
 import com.jadic.cmd.req.AbstractCmdReq;
@@ -32,6 +36,7 @@ import com.jadic.cmd.rsp.CmdQueryZHBBalanceRsp;
 import com.jadic.cmd.rsp.CmdRefundRsp;
 import com.jadic.cmd.rsp.CmdTYRetRsp;
 import com.jadic.db.DBOper;
+import com.jadic.db.SQL;
 import com.jadic.tcp.server.TcpChannel;
 import com.jadic.utils.Const;
 import com.jadic.utils.KKTool;
@@ -158,8 +163,8 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     private void dealCmdHeartbeat(ChannelBuffer buffer) {
         CmdHeartbeatReq cmdReq = new CmdHeartbeatReq();
         if (cmdReq.disposeData(buffer)) {
-            log.debug("recv heartbeat[{}] ", tcpChannel);
             sendCmdTYRetOK(cmdReq);
+            log.debug("recv heartbeat[{}] ", tcpChannel);
         } else {
             log.warn("recv cmd heartbeat, but fail to dispose[{}]", tcpChannel);
         }
@@ -190,6 +195,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             }
             cmdRsp.setRet(ret);
             sendData(cmdRsp.getSendBuffer());
+            if (ret == 0) {
+                addOperLog(cmdReq.getTerminalId(), Const.LOG_TYPE_TERMINAL_ONLINE, "ver:" + KKTool.short2HexStr(cmdReq.getVer()));
+            }
             log.info("a client login, login ret[{}], [{}], ver:{}", ret, tcpChannel, KKTool.short2HexStr(cmdReq.getVer()));
         } else {
             log.warn("recv cmd login, but fail to dispose[{}]", tcpChannel);
@@ -238,12 +246,14 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         		
         		if (tcpChannel.getTerminalVer() <= 0x0100 && chargeType == Const.CHARGE_TYPE_CASH) {
         			int amountAdded = cmdReq.getTransAmount() / 100;//转成元
-        			if (DBOper.getDBOper().addCashBoxAmount(terminalId, amountAdded)) {
-        				log.info("CmdChargeDetail:succeed to add cash box amount, terminalId:{}, amountAdded:{}", terminalId, amountAdded);
-        			} else {
-        				log.info("CmdChargeDetail:fail to add cash box amount, terminalId:{}, amountAdded:{}", terminalId, amountAdded);
-        			}
+        			addAsynSaveData(new DBSaveBean(SQL.ADD_CASH_AMOUNT).addParam(terminalId).addParam(amountAdded));
+        			log.info("add cash box amount, terminalId:{}, amountAdded:{}", terminalId, amountAdded);
         		}
+        		
+        		String logMemo = "卡号：" + KKTool.byteArrayToHexStr(cmdReq.getCityCardNo()) + 
+        		                ",类型:" + KKTool.getChargeTypeName(chargeType) + 
+        		                ",金额:" + cmdReq.getTransAmount()/100;
+        		addOperLog(terminalId, Const.LOG_TYPE_CHARGE, logMemo);
     		}
     		CmdChargeDetailRsp cmdRsp = new CmdChargeDetailRsp();
     		cmdRsp.setCmdCommonField(cmdReq);
@@ -272,14 +282,19 @@ public class ThreadDisposeTcpChannelData implements Runnable {
                 log.info("save refund data fail[{}]", tcpChannel);
             }
             
+            String logMemo = "卡号：" + KKTool.byteArrayToHexStr(cmdReq.getCityCardNo()) + 
+                            ",类型:" + KKTool.getChargeTypeName(cmdReq.getChargeType()) + 
+                            ",金额:" + cmdReq.getAmount()/100;
+            addOperLog(cmdReq.getTerminalId(), Const.LOG_TYPE_REFUND, logMemo);
+            
             if (tcpChannel.getTerminalVer() <= 0x0100 && cmdReq.getChargeType() == Const.CHARGE_TYPE_CASH) {
             	int terminalId = cmdReq.getTerminalId();
     			int amountAdded = cmdReq.getAmount() / 100;//转成元
-    			if (DBOper.getDBOper().addCashBoxAmount(terminalId, amountAdded)) {
-    				log.info("CmdRefund:succeed to add cash box amount, terminalId:{}, amountAdded:{}", terminalId, amountAdded);
-    			} else {
-    				log.info("CmdRefund:fail to add cash box amount, terminalId:{}, amountAdded:{}", terminalId, amountAdded);
-    			}
+    			
+    			DBSaveBean dataBean = new DBSaveBean(SQL.ADD_CASH_AMOUNT);
+    			dataBean.addParam(terminalId).addParam(amountAdded);
+    			addAsynSaveData(dataBean);
+    			log.info("CmdRefund:add cash box amount, terminalId:{}, amountAdded:{}", terminalId, amountAdded);
     		}
             CmdRefundRsp cmdRsp = new CmdRefundRsp();
             cmdRsp.setCmdCommonField(cmdReq);
@@ -312,6 +327,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             WSUtil.getWsUtil().queryZHBBalance(cmdReq, cmdRsp);
             cmdRsp.setCmdCommonField(cmdReq);
             sendData(cmdRsp.getSendBuffer());
+            addOperLog(cmdReq.getTerminalId(), Const.LOG_TYPE_QUERY_ZHB_BALANCE, "卡号：" + KKTool.byteArrayToHexStr(cmdReq.getCityCardNo()));
             log.info("recv cmd query zhb balance, ret:{}, amount:{}", cmdRsp.getCheckRet(), cmdRsp.getAmount());
         } else {
             log.warn("recv cmd query zhb balance, but fail to dispose[{}]", tcpChannel);
@@ -325,6 +341,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             cmdRsp.setCmdCommonField(cmdReq);
             WSUtil.getWsUtil().modifyZHBPassword(cmdReq, cmdRsp);
             sendData(cmdRsp.getSendBuffer());
+            addOperLog(cmdReq.getTerminalId(), Const.LOG_TYPE_MODIFY_ZHB_PASS, "卡号：" + KKTool.byteArrayToHexStr(cmdReq.getCardNo()));
             log.info("recv cmd modify zhb pass, ret:{}", cmdRsp.getRet());
         } else {
             log.warn("recv cmd modify zhb pass, but fail to dispose[{}]", tcpChannel);
@@ -350,22 +367,29 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     private void dealCmdClearCashBox(ChannelBuffer buffer) {
     	CmdClearCashBox cmdReq = new CmdClearCashBox();
     	if (cmdReq.disposeData(buffer)) {
+    	    sendCmdTYRetOK(cmdReq);
     		TerminalBean terminal = getTerminal(cmdReq);
     		if (terminal != null) {
     			terminal.setTotalCashAmount(0);
     		}
-    		if (DBOper.getDBOper().setCashBoxAmountZero(cmdReq.getTerminalId())) {
-    			log.info("succeed to set cash box amount zero, terminalId:{}", cmdReq.getTerminalId());
-    		} else {
-    			log.info("fail to set cash box amount zero, terminalId:{}", cmdReq.getTerminalId());
-    		}
+    		log.info("set cash box amount zero and add withdraw detail, terminalId:{}", cmdReq.getTerminalId());
     		
-    		if (DBOper.getDBOper().addWithdrawDetail(cmdReq)) {
-    		    log.info("succeed to add Withdraw Detail, terminalId:{}", cmdReq.getTerminalId());
-    		} else {
-    		    log.info("fail to add Withdraw Detail, terminalId:{}", cmdReq.getTerminalId());
-    		}
-    		sendCmdTYRetOK(cmdReq);
+    		addAsynSaveData(new DBSaveBean(SQL.SET_CASH_AMOUNT_ZERO).addParam(cmdReq.getTerminalId()));
+		    
+		    DBSaveBean dataBean = new DBSaveBean(SQL.ADD_WITHDRAW_DETAIL);
+		    dataBean.addParam(cmdReq.getTerminalId()).addParam(cmdReq.getCashAmount());
+	        byte[] time = cmdReq.getOperTime();
+	        int i = 0;
+	        
+	        Date operTime = KKTool.getBCDDateTime(time[i ++], time[i ++], time[i ++], time[i ++], time[i ++], time[i ++]);
+	        dataBean.addParam(new Timestamp(operTime.getTime()));
+	        
+	        time = cmdReq.getLastOperTime();
+	        i = 0;
+	        operTime = KKTool.getBCDDateTime(time[i ++], time[i ++], time[i ++], time[i ++], time[i ++], time[i ++]);
+	        dataBean.addParam(new Timestamp(operTime.getTime())).addParam(0);
+	        addAsynSaveData(dataBean);
+	        addOperLog(cmdReq.getTerminalId(), Const.LOG_TYPE_WITHDRAW, "金额：" + cmdReq.getCashAmount());
     	} else {
     		log.warn("recv cmd clear cash box, but fail to dispose[{}]", tcpChannel);
     	}
@@ -383,12 +407,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     		if (terminal != null) {
     			terminal.addCashAmount(cmdReq.getAmountAdded());
     			totalCashAmount = terminal.getTotalCashAmount();
-    			if (DBOper.getDBOper().setCashBoxAmount(cmdReq.getTerminalId(), totalCashAmount)) {
-    			    log.info("succeed to set cashbox amount,terminalId:{}, amountAdded:{}, totalAmount:{}", 
-    			            cmdReq.getTerminalId(), cmdReq.getAmountAdded(), totalCashAmount);
-    			} else {
-    			    log.info("fail to add cashbox amount, terminalId:{}", cmdReq.getTerminalId());
-    			}
+    			addAsynSaveData(new DBSaveBean(SQL.SET_CASH_AMOUNT).addParam(cmdReq.getTerminalId()).addParam(totalCashAmount));
+    			log.info("set cashbox amount,terminalId:{}, amountAdded:{}, totalAmount:{}", 
+    			        cmdReq.getTerminalId(), cmdReq.getAmountAdded(), totalCashAmount);
     		}
     		CmdAddCashBoxAmountRsp cmdRsp = new CmdAddCashBoxAmountRsp();
     		cmdRsp.setCmdCommonField(cmdReq);
@@ -440,6 +461,18 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     	if (cmd != null) {
     		sendData(cmd.getSendBuffer());
     	}
+    }
+    
+    private void addOperLog(int terminalId, int logType, String logMemo) {
+        DBSaveBean dataBean = new DBSaveBean(SQL.ADD_OPER_LOG);
+        dataBean.addParam(terminalId).addParam(logType).addParam(logMemo);
+        addAsynSaveData(dataBean);
+    }
+    
+    private void addAsynSaveData(DBSaveBean dataBean) {
+        if (this.cmdBizDisposer != null) {
+            this.cmdBizDisposer.saveDBAsyn(dataBean);
+        }
     }
 
     /**
