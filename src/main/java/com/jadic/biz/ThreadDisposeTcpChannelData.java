@@ -196,7 +196,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             cmdRsp.setRet(ret);
             sendData(cmdRsp.getSendBuffer());
             if (ret == 0) {
-                addOperLog(cmdReq.getTerminalId(), Const.LOG_TYPE_TERMINAL_ONLINE, "ver:" + KKTool.short2HexStr(cmdReq.getVer()));
+                addOperLog(cmdReq.getTerminalId(), Const.LOG_TYPE_TERMINAL_ONLINE, "版本:" + KKTool.short2HexStr(cmdReq.getVer()));
             }
             log.info("a client login, login ret[{}], [{}], ver:{}", ret, tcpChannel, KKTool.short2HexStr(cmdReq.getVer()));
         } else {
@@ -250,7 +250,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         			log.info("add cash box amount, terminalId:{}, amountAdded:{}", terminalId, amountAdded);
         		}
         		
-        		String logMemo = "卡号：" + KKTool.byteArrayToHexStr(cmdReq.getCityCardNo()) + 
+        		String logMemo = "卡号:" + KKTool.byteArrayToHexStr(cmdReq.getCityCardNo()) + 
         		                ",类型:" + KKTool.getChargeTypeName(chargeType) + 
         		                ",金额:" + cmdReq.getTransAmount()/100;
         		addOperLog(terminalId, Const.LOG_TYPE_CHARGE, logMemo);
@@ -282,7 +282,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
                 log.info("save refund data fail[{}]", tcpChannel);
             }
             
-            String logMemo = "卡号：" + KKTool.byteArrayToHexStr(cmdReq.getCityCardNo()) + 
+            String logMemo = "卡号:" + KKTool.byteArrayToHexStr(cmdReq.getCityCardNo()) + 
                             ",类型:" + KKTool.getChargeTypeName(cmdReq.getChargeType()) + 
                             ",金额:" + cmdReq.getAmount()/100;
             addOperLog(cmdReq.getTerminalId(), Const.LOG_TYPE_REFUND, logMemo);
@@ -327,7 +327,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             WSUtil.getWsUtil().queryZHBBalance(cmdReq, cmdRsp);
             cmdRsp.setCmdCommonField(cmdReq);
             sendData(cmdRsp.getSendBuffer());
-            addOperLog(cmdReq.getTerminalId(), Const.LOG_TYPE_QUERY_ZHB_BALANCE, "卡号：" + KKTool.byteArrayToHexStr(cmdReq.getCityCardNo()));
+            addOperLog(cmdReq.getTerminalId(), Const.LOG_TYPE_QUERY_ZHB_BALANCE, "卡号:" + KKTool.byteArrayToHexStr(cmdReq.getCityCardNo()));
             log.info("recv cmd query zhb balance, ret:{}, amount:{}", cmdRsp.getCheckRet(), cmdRsp.getAmount());
         } else {
             log.warn("recv cmd query zhb balance, but fail to dispose[{}]", tcpChannel);
@@ -341,7 +341,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             cmdRsp.setCmdCommonField(cmdReq);
             WSUtil.getWsUtil().modifyZHBPassword(cmdReq, cmdRsp);
             sendData(cmdRsp.getSendBuffer());
-            addOperLog(cmdReq.getTerminalId(), Const.LOG_TYPE_MODIFY_ZHB_PASS, "卡号：" + KKTool.byteArrayToHexStr(cmdReq.getCardNo()));
+            addOperLog(cmdReq.getTerminalId(), Const.LOG_TYPE_MODIFY_ZHB_PASS, "卡号:" + KKTool.byteArrayToHexStr(cmdReq.getCardNo()));
             log.info("recv cmd modify zhb pass, ret:{}", cmdRsp.getRet());
         } else {
             log.warn("recv cmd modify zhb pass, but fail to dispose[{}]", tcpChannel);
@@ -389,7 +389,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
 	        operTime = KKTool.getBCDDateTime(time[i ++], time[i ++], time[i ++], time[i ++], time[i ++], time[i ++]);
 	        dataBean.addParam(new Timestamp(operTime.getTime())).addParam(0);
 	        addAsynSaveData(dataBean);
-	        addOperLog(cmdReq.getTerminalId(), Const.LOG_TYPE_WITHDRAW, "金额：" + cmdReq.getCashAmount());
+	        addOperLog(cmdReq.getTerminalId(), Const.LOG_TYPE_WITHDRAW, "金额:" + cmdReq.getCashAmount());
     	} else {
     		log.warn("recv cmd clear cash box, but fail to dispose[{}]", tcpChannel);
     	}

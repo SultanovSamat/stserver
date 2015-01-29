@@ -22,7 +22,7 @@ public class ThreadSaveData2DBAsyn extends AbstractThreadDisposeDataFromQueue<DB
         while (!isInterrupted()) {
             while ((dataBean = getQueuePollData()) != null) {
                 boolean saveResult = saveData(dataBean);
-                log.debug("save data, sql:{}, result:{}", dataBean.getSql(), saveResult);
+                log.debug("save data result:{}, sql:{}", saveResult, dataBean.getSql());
             }
             waitNewData();
         }
