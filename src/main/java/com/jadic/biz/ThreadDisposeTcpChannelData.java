@@ -21,6 +21,7 @@ import com.jadic.cmd.req.CmdHeartbeatReq;
 import com.jadic.cmd.req.CmdLoginReq;
 import com.jadic.cmd.req.CmdModifyZHBPassReq;
 import com.jadic.cmd.req.CmdModuleStatusReq;
+import com.jadic.cmd.req.CmdOperLogReq;
 import com.jadic.cmd.req.CmdPrepaidCardCheckReq;
 import com.jadic.cmd.req.CmdQueryZHBBalanceReq;
 import com.jadic.cmd.req.CmdRefundReq;
@@ -144,6 +145,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         case Const.TER_ADD_CASH_BOX_AMOUNT: 
         	dealCmdAddCashBoxAmount(buffer);
         	break;
+        case Const.TER_OPER_LOG:
+            dealCmdOperLog(buffer);
+            break;
         default:
             dealInvalidCmd(buffer, Const.TY_RET_NOT_SUPPORTED);
             log.warn("Unsupported command flag:{}", KKTool.byteArrayToHexStr(KKTool.short2BytesBigEndian(cmdFlag)));
@@ -415,7 +419,19 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     		cmdRsp.setCmdCommonField(cmdReq);
     		cmdRsp.setCashBoxTotalAmount(totalCashAmount);
     		sendCmd(cmdRsp);
+    	} else {
+            log.warn("recv cmd add cash box amount, but fail to dispose[{}]", tcpChannel);
     	}
+    }
+    
+    private void dealCmdOperLog(ChannelBuffer buffer) {
+        CmdOperLogReq cmdReq = new CmdOperLogReq();
+        if (cmdReq.disposeData(buffer)) {
+            sendCmdTYRetOK(cmdReq);
+            addOperLog(cmdReq.getTerminalId(), cmdReq.getLogType(), "");
+        } else {
+            log.warn("recv cmd oper log, but fail to dispose[{}]", tcpChannel);
+        }
     }
     
     /**

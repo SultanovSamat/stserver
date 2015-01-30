@@ -26,6 +26,7 @@ public final class Const {
     public final static short TER_CHECK_CITY_CARD_TYPE  = 0x000B;//检测市民卡类型 是否记名卡
     public final static short TER_CLEAR_CASH_BOX		= 0x000D;//终端操作清空钱箱
     public final static short TER_ADD_CASH_BOX_AMOUNT	= 0x000E;//增加钱箱现金额
+    public final static short TER_OPER_LOG              = 0x000F;//终端操作日志
 
     public final static short SER_TY_RET                = 0x7001;//平台通用应答
     public final static short SER_LOGIN_RET             = 0x7003;//终端注册应答
@@ -189,5 +190,7 @@ public final class Const {
     public final static int LOG_TYPE_REFUND             = 6;//退款
     public final static int LOG_TYPE_QUERY_ZHB_BALANCE  = 7;//查询账户宝余额
     public final static int LOG_TYPE_MODIFY_ZHB_PASS    = 8;//修改账户宝密码
+    public final static int LOG_TYPE_SERVICE_RECOVERY   = 9;//人工恢复服务
+    
     //--------------------------------------操作日志类型----------------------------------------
 }
