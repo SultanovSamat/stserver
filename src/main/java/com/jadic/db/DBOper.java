@@ -197,7 +197,7 @@ public final class DBOper extends DefaultDBImpl {
     }
     
     public boolean saveDataBean(DBSaveBean dataBean) {
-        return executeUpdateSingle(dataBean.getSql(), dataBean.getParams()) != -1;
+        return executeUpdateSingle(dataBean.getSql(), dataBean.getParams()) > 0;
     }
     
     public void test() {

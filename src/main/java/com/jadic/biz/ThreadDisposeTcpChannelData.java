@@ -250,7 +250,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         		
         		if (tcpChannel.getTerminalVer() <= 0x0100 && chargeType == Const.CHARGE_TYPE_CASH) {
         			int amountAdded = cmdReq.getTransAmount() / 100;//转成元
-        			addAsynSaveData(new DBSaveBean(SQL.ADD_CASH_AMOUNT).addParam(terminalId).addParam(amountAdded));
+        			addAsynSaveData(new DBSaveBean(SQL.ADD_CASH_AMOUNT).addParam(amountAdded).addParam(terminalId));
         			log.info("add cash box amount, terminalId:{}, amountAdded:{}", terminalId, amountAdded);
         		}
         		
@@ -296,7 +296,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     			int amountAdded = cmdReq.getAmount() / 100;//转成元
     			
     			DBSaveBean dataBean = new DBSaveBean(SQL.ADD_CASH_AMOUNT);
-    			dataBean.addParam(terminalId).addParam(amountAdded);
+    			dataBean.addParam(amountAdded).addParam(terminalId);
     			addAsynSaveData(dataBean);
     			log.info("CmdRefund:add cash box amount, terminalId:{}, amountAdded:{}", terminalId, amountAdded);
     		}
@@ -411,7 +411,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     		if (terminal != null) {
     			terminal.addCashAmount(cmdReq.getAmountAdded());
     			totalCashAmount = terminal.getTotalCashAmount();
-    			addAsynSaveData(new DBSaveBean(SQL.SET_CASH_AMOUNT).addParam(cmdReq.getTerminalId()).addParam(totalCashAmount));
+    			addAsynSaveData(new DBSaveBean(SQL.SET_CASH_AMOUNT).addParam(totalCashAmount).addParam(cmdReq.getTerminalId()));
     			log.info("set cashbox amount,terminalId:{}, amountAdded:{}, totalAmount:{}", 
     			        cmdReq.getTerminalId(), cmdReq.getAmountAdded(), totalCashAmount);
     		}
