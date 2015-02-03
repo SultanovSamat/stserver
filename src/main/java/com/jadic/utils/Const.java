@@ -27,6 +27,7 @@ public final class Const {
     public final static short TER_CLEAR_CASH_BOX		= 0x000D;//终端操作清空钱箱
     public final static short TER_ADD_CASH_BOX_AMOUNT	= 0x000E;//增加钱箱现金额
     public final static short TER_OPER_LOG              = 0x000F;//终端操作日志
+    public final static short TER_GET_SERVER_TIME       = 0x0010;//获取服务端时间
 
     public final static short SER_TY_RET                = 0x7001;//平台通用应答
     public final static short SER_LOGIN_RET             = 0x7003;//终端注册应答
@@ -39,6 +40,7 @@ public final class Const {
     public final static short SER_CHECK_CITY_CARD_TYPE  = 0x700B;//检测市民卡类型应答 是否记名卡
     public final static short SER_TERM_STATUS_CHANGED   = 0x700C;//终端状态变化
     public final static short SER_ADD_CASH_BOX_AMOUNT	= 0x700E;//增加钱箱现金额应答
+    public final static short SER_GET_SERVER_TIME       = 0x7010;//应答服务器时间
     //-----------------------------通讯命令字定义-------------------------
     
     public final static byte TY_RET_OK                  = 0x00;//0：成功/确认  

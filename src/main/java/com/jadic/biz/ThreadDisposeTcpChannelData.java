@@ -17,6 +17,7 @@ import com.jadic.cmd.req.CmdCheckCityCardTypeReq;
 import com.jadic.cmd.req.CmdClearCashBox;
 import com.jadic.cmd.req.CmdDefaultReq;
 import com.jadic.cmd.req.CmdGetMac2Req;
+import com.jadic.cmd.req.CmdGetServerTimeReq;
 import com.jadic.cmd.req.CmdHeartbeatReq;
 import com.jadic.cmd.req.CmdLoginReq;
 import com.jadic.cmd.req.CmdModifyZHBPassReq;
@@ -30,6 +31,7 @@ import com.jadic.cmd.rsp.CmdAddCashBoxAmountRsp;
 import com.jadic.cmd.rsp.CmdChargeDetailRsp;
 import com.jadic.cmd.rsp.CmdCheckCityCardTypeRsp;
 import com.jadic.cmd.rsp.CmdGetMac2Rsp;
+import com.jadic.cmd.rsp.CmdGetServerTimeRsp;
 import com.jadic.cmd.rsp.CmdLoginRsp;
 import com.jadic.cmd.rsp.CmdModifyZHBPassRsp;
 import com.jadic.cmd.rsp.CmdPrepaidCardCheckRsp;
@@ -147,6 +149,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         	break;
         case Const.TER_OPER_LOG:
             dealCmdOperLog(buffer);
+            break;
+        case Const.TER_GET_SERVER_TIME:
+            dealCmdGetServerTime(buffer);
             break;
         default:
             dealInvalidCmd(buffer, Const.TY_RET_NOT_SUPPORTED);
@@ -431,6 +436,18 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             addOperLog(cmdReq.getTerminalId(), cmdReq.getLogType(), "");
         } else {
             log.warn("recv cmd oper log, but fail to dispose[{}]", tcpChannel);
+        }
+    }
+    
+    private void dealCmdGetServerTime(ChannelBuffer buffer) {
+        CmdGetServerTimeReq cmdReq = new CmdGetServerTimeReq();
+        if (cmdReq.disposeData(buffer)) {
+            CmdGetServerTimeRsp cmdRsp = new CmdGetServerTimeRsp();
+            cmdRsp.setCmdCommonField(cmdReq);
+            sendCmd(cmdRsp);
+            log.info("send server time[{}] to terminal[{}]", KKTool.byteArrayToHexStr(cmdRsp.getServerTime()), cmdRsp.getTerminalId());
+        } else {
+            log.warn("recv cmd get server time, but fail to dispose}", tcpChannel);
         }
     }
     
