@@ -1,5 +1,6 @@
 package com.jadic.biz;
 
+import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -26,6 +27,7 @@ import com.jadic.cmd.req.CmdOperLogReq;
 import com.jadic.cmd.req.CmdPrepaidCardCheckReq;
 import com.jadic.cmd.req.CmdQueryZHBBalanceReq;
 import com.jadic.cmd.req.CmdRefundReq;
+import com.jadic.cmd.req.CmdRefundWithReasonReq;
 import com.jadic.cmd.req.CmdTYRetReq;
 import com.jadic.cmd.rsp.CmdAddCashBoxAmountRsp;
 import com.jadic.cmd.rsp.CmdChargeDetailRsp;
@@ -152,6 +154,9 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             break;
         case Const.TER_GET_SERVER_TIME:
             dealCmdGetServerTime(buffer);
+            break;
+        case Const.TER_REFUND_WITH_REASON:
+            dealCmdRefundWithReason(buffer);
             break;
         default:
             dealInvalidCmd(buffer, Const.TY_RET_NOT_SUPPORTED);
@@ -448,6 +453,32 @@ public class ThreadDisposeTcpChannelData implements Runnable {
             log.info("send server time[{}] to terminal[{}]", KKTool.byteArrayToHexStr(cmdRsp.getServerTime()), cmdRsp.getTerminalId());
         } else {
             log.warn("recv cmd get server time, but fail to dispose}", tcpChannel);
+        }
+    }
+    
+    private void dealCmdRefundWithReason(ChannelBuffer buffer) {
+        CmdRefundWithReasonReq cmdReq = new CmdRefundWithReasonReq();
+        if (cmdReq.disposeData(buffer)) {
+            sendCmdTYRetOK(cmdReq);
+            
+            DBSaveBean dataBean = new DBSaveBean(SQL.ADD_REFUND_WITH_REASON);
+            dataBean.addParam(KKTool.byteArrayToHexStr(cmdReq.getCityCardNo()));
+            dataBean.addParam(cmdReq.getAmount());
+            Date refundTime = KKTool.getBCDDateTime(cmdReq.getTime(), 0);
+            dataBean.addParam(new Timestamp(refundTime.getTime()));
+            dataBean.addParam(cmdReq.getTerminalId());
+            dataBean.addParam(cmdReq.getChargeType());
+            dataBean.addParam(new String(cmdReq.getReason(), Charset.forName("GBK")));
+            addAsynSaveData(dataBean);
+            
+            String logMemo = "卡号:" + KKTool.byteArrayToHexStr(cmdReq.getCityCardNo()) + 
+                            ",类型:" + KKTool.getChargeTypeName(cmdReq.getChargeType()) + 
+                            ",金额:" + cmdReq.getAmount()/100;
+            addOperLog(cmdReq.getTerminalId(), Const.LOG_TYPE_REFUND, logMemo);
+            
+            log.info("recv cmd refund[{}]", logMemo);
+        } else {
+            log.warn("recv cmd refund, but fail to dispose[{}]", tcpChannel);
         }
     }
     

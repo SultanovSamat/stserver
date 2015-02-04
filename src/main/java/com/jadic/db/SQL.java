@@ -34,7 +34,12 @@ public final class SQL {
     public final static String ADD_REFUND               = "insert into tab_refund " +
     		                                                "(CardNo, Amount, RefundTime, Status, InsertTime, TerminalID, ChargeType) " +
     		                                                "                values (?, ?, ?, 0, sysdate(), ?, ?) ";
-    
+
+    //增加退款明细含退款原因
+    public final static String ADD_REFUND_WITH_REASON   = " insert into tab_refund " +
+                                                          " (CardNo, Amount, RefundTime, Status, InsertTime, TerminalID, ChargeType, RefundReason) " +
+                                                          " values (?, ?, ?, 0, sysdate(), ?, ?, ?) ";
+                                                
     //有现金充值时累计现金金额
     public final static String ADD_CASH_AMOUNT		  = "update tab_terminal_status " +
     													"set CashBoxAmount = CashBoxAmount + ? " +

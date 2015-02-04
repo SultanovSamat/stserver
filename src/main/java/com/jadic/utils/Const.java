@@ -28,6 +28,7 @@ public final class Const {
     public final static short TER_ADD_CASH_BOX_AMOUNT	= 0x000E;//增加钱箱现金额
     public final static short TER_OPER_LOG              = 0x000F;//终端操作日志
     public final static short TER_GET_SERVER_TIME       = 0x0010;//获取服务端时间
+    public final static short TER_REFUND_WITH_REASON    = 0x0011;//退款记录登记含退款原因
 
     public final static short SER_TY_RET                = 0x7001;//平台通用应答
     public final static short SER_LOGIN_RET             = 0x7003;//终端注册应答
