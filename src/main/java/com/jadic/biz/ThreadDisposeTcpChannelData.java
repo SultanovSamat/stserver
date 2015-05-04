@@ -202,7 +202,7 @@ public class ThreadDisposeTcpChannelData implements Runnable {
                 } else if (terminal.getChannelId() == -1 || terminal.getChannelId() == tcpChannel.getId()) {
                     ret = 0;
                 } else {// 被占用
-                    ret = 1;
+                    //ret = 1;  暂时去掉
                 }
             } else {//该终端号不存在
                 ret = 2;
