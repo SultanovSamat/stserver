@@ -60,7 +60,7 @@ public class DefaultDBImpl {
         }        
     }
 
-    protected <T> List<T> queryForList(String sql, Object[] paramsObj, Class<T> objClass) {
+    protected <T> List<T> queryForList(String sql, List<Object> paramsObj, Class<T> objClass) {
         List<T> list = new ArrayList<T>();
         Connection connection = null;
         PreparedStatement pstmt = null;
@@ -73,8 +73,8 @@ public class DefaultDBImpl {
             }
             pstmt = connection.prepareStatement(sql);
             if (paramsObj != null) {
-                for (int i = 0; i < paramsObj.length; i++) {
-                    pstmt.setObject(i + 1, paramsObj[i]);
+                for (int i = 0; i < paramsObj.size(); i++) {
+                    pstmt.setObject(i + 1, paramsObj.get(i));
                 }
             }
             Field[] fields = objClass.getDeclaredFields();

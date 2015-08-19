@@ -2,7 +2,15 @@ package com.jadic.biz;
 
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.slf4j.Logger;
@@ -58,6 +66,8 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     private ICmdBizDisposer cmdBizDisposer;
 
     final static int MAX_DISPOSE_COUNT = 20;// 线程处理每个通道一次最多连续处理次数
+    
+    private final static Map<Integer, List<Short>> terminalCmdSNos = new ConcurrentHashMap<Integer, List<Short>>(); 
 
     public ThreadDisposeTcpChannelData(TcpChannel tcpChannel, ICmdBizDisposer cmdBizDisposer) {
         this.tcpChannel = tcpChannel;
@@ -290,10 +300,15 @@ public class ThreadDisposeTcpChannelData implements Runnable {
         CmdRefundReq cmdReq = new CmdRefundReq();
         if (cmdReq.disposeData(buffer)) {
             byte ret = 1;
-            int recordId = DBOper.getDBOper().addNewRefund(cmdReq);
-            if (recordId < 0) {
-                ret = 0;
-                log.info("save refund data fail[{}]", tcpChannel);
+            int recordId = DBOper.getDBOper().queryRepeatedRefund(cmdReq);
+            if (recordId <= 0) {//无重复记录
+                recordId = DBOper.getDBOper().addNewRefund(cmdReq);
+                if (recordId < 0) {
+                    ret = 0;
+                    log.info("save refund data fail[{}]", tcpChannel);
+                }
+            } else {
+                log.info("repeated refund record");
             }
             
             String logMemo = "卡号:" + KKTool.byteArrayToHexStr(cmdReq.getCityCardNo()) + 
@@ -419,11 +434,17 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     		TerminalBean terminal = getTerminal(cmdReq);
     		int totalCashAmount = 0;
     		if (terminal != null) {
-    			terminal.addCashAmount(cmdReq.getAmountAdded());
-    			totalCashAmount = terminal.getTotalCashAmount();
-    			addAsynSaveData(new DBSaveBean(SQL.SET_CASH_AMOUNT).addParam(totalCashAmount).addParam(cmdReq.getTerminalId()));
-    			log.info("set cashbox amount,terminalId:{}, amountAdded:{}, totalAmount:{}", 
-    			        cmdReq.getTerminalId(), cmdReq.getAmountAdded(), totalCashAmount);
+    		    if (isCmdRepeated(cmdReq)) {
+    		        totalCashAmount = terminal.getTotalCashAmount();
+    		        log.info("repeated add cashbox amount, terminalId:{}, amountAdded:{}, totalAmount:{}", 
+                            cmdReq.getTerminalId(), cmdReq.getAmountAdded(), totalCashAmount);
+    		    } else {
+        			terminal.addCashAmount(cmdReq.getAmountAdded());
+        			totalCashAmount = terminal.getTotalCashAmount();
+        			addAsynSaveData(new DBSaveBean(SQL.SET_CASH_AMOUNT).addParam(totalCashAmount).addParam(cmdReq.getTerminalId()));
+        			log.info("set cashbox amount,terminalId:{}, amountAdded:{}, totalAmount:{}", 
+        			        cmdReq.getTerminalId(), cmdReq.getAmountAdded(), totalCashAmount);
+    		    }
     		}
     		CmdAddCashBoxAmountRsp cmdRsp = new CmdAddCashBoxAmountRsp();
     		cmdRsp.setCmdCommonField(cmdReq);
@@ -432,6 +453,35 @@ public class ThreadDisposeTcpChannelData implements Runnable {
     	} else {
             log.warn("recv cmd add cash box amount, but fail to dispose[{}]", tcpChannel);
     	}
+    }
+    
+    /**
+     * 检测命令是否重复<br>
+     * 缓存列表中按终端设备区分，每个终端设备维护一个最近命令流水号的列表，检测到流水号已存在，则认为是重复流水号，列表中只缓存最近100个流水号
+     * @param cmd
+     * @return true:该终端流水号已重复发送
+     */
+    private boolean isCmdRepeated(AbstractCmd cmd) {
+        if (cmd != null) {
+            Integer terminalId = cmd.getTerminalId();
+            Short cmdSNo = cmd.getCmdSNo();
+            List<Short> cmdSNos = terminalCmdSNos.get(terminalId);
+            if (cmdSNos != null) {
+                if (cmdSNos.contains(cmdSNo)) {//重复
+                    return true;
+                } else {//未重复，则添加
+                    cmdSNos.add(cmdSNo);
+                    if (cmdSNos.size() > 100) {
+                        cmdSNos.remove(0);
+                    }
+                }
+            } else {//该设备未添加过命令流水号
+                cmdSNos = Collections.synchronizedList(new LinkedList<Short>());
+                cmdSNos.add(cmdSNo);
+                terminalCmdSNos.put(terminalId, cmdSNos);
+            }
+        }
+        return false;
     }
     
     private void dealCmdOperLog(ChannelBuffer buffer) {

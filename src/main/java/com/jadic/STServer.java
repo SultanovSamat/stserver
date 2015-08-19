@@ -1,5 +1,8 @@
 package com.jadic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.jadic.biz.BaseInfo;
 import com.jadic.biz.ICmdBizDisposer;
 import com.jadic.biz.ThreadLoadBaseinfo;
@@ -22,6 +25,8 @@ import com.jadic.ws.WSUtil;
  * @created 2014-6-30
  */
 public class STServer implements ICmdBizDisposer, IMainServer{
+    
+    private final static Logger log = LoggerFactory.getLogger(STServer.class);
 
     private TcpServer tcpServer;
     private SysParams sysParams = SysParams.getInstance();
@@ -33,6 +38,7 @@ public class STServer implements ICmdBizDisposer, IMainServer{
     private KKSimpleTimer loadBaseInfoTimer;
     
     public STServer() {
+        log.info(sysParams.getSysParamStrs());
         loadBaseInfo();
         tcpServer = new TcpServer(sysParams.getLocalTcpPort(), this);
         threadModuleStatus = new ThreadTerminalModuleStatus();

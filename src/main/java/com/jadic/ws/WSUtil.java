@@ -28,6 +28,9 @@ import java.util.concurrent.Executors;
  * wsdl2java -frontend jaxws21 -d e:\test\czsmk -p com.jadic.ws.czsmk -encoding utf-8 "e:\CenterProcess.wsdl"
  * @author 	Jadic
  * @created 2014-7-17
+ * 
+ * 2015-07-28
+ * 1.为实现分多个服务同时正常工作，增加每个服务代号（0-9），占用流水号中的1位，防止流水号冲突
  */
 public final class WSUtil {
     
@@ -38,7 +41,7 @@ public final class WSUtil {
     
     private final static String SNO_PREFIX = "ZZZD";//流水号、交易号的前缀 (自助终端的缩写)
     
-    private final static long MAX_SNO = 999999L;
+    private final static long MAX_SNO = 99999L;
     private ExecutorService threadPool;
     private final static String SNO_FILE_NAME = "sNo4CityCardWS.txt";
     private long sNo = 0;
@@ -53,6 +56,8 @@ public final class WSUtil {
     private final static String deptNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getAgencyNo(), 10, false);
     private final static String operNo = KKTool.getStrWithMaxLen(SysParams.getInstance().getOperNo(), 10, false);    
     private final static String SAMID = KKTool.getFixedLenString(SysParams.getInstance().getSamId(), 12, '0', true, false);
+    private final static int SERVER_NO = SysParams.getInstance().getServerNo();//本服务分多个部署时，区分不同的服务，并在流水号中体现
+    private final static int ACC_DIGIT = 5;//实际用来累加流水号的数字位数
     
     private URL url;
     private CenterProcessPortType centerProcess;
@@ -141,7 +146,7 @@ public final class WSUtil {
                     String date = dateSNo.substring(0, 6);
                     //文件中记录的日期没有超过当前日期，则获取流水号，否则流水号从1开始重新记
                     if (this.currDate.compareTo(date) == 0) {
-                        this.sNo = Long.parseLong(dateSNo.substring(6));
+                        this.sNo = Long.parseLong(dateSNo.substring(12 - ACC_DIGIT));
                         if (this.sNo > MAX_SNO) {
                             this.sNo = 1;
                         }            
@@ -160,7 +165,7 @@ public final class WSUtil {
             BufferedWriter writer = null;
             try {
                 writer = new BufferedWriter(new FileWriter(file));
-                writer.write(this.currDate + KKTool.getFixedLenString(String.valueOf(sNo), 6, '0', true));
+                writer.write(this.currDate + SERVER_NO + KKTool.getFixedLenString(String.valueOf(sNo), ACC_DIGIT, '0', true));
                 writer.flush();
             } catch (IOException e) {
                 log.error("initSNoFromFile", e);
@@ -184,7 +189,7 @@ public final class WSUtil {
 		        BufferedWriter writer = null;
 		        try {
 		            writer = new BufferedWriter(new FileWriter(file));
-		            writer.write(date + KKTool.getFixedLenString(String.valueOf(sNo), 6, '0', true));
+		            writer.write(date + SERVER_NO + KKTool.getFixedLenString(String.valueOf(sNo), ACC_DIGIT, '0', true));
 		            writer.flush();
 		        } catch (IOException e) {
 		            log.error("updateFileNextSNo", e);
@@ -200,7 +205,7 @@ public final class WSUtil {
         if (date.compareTo(this.currDate) > 0) {
             this.currDate = date;
         }
-    	return SNO_PREFIX + date + KKTool.getFixedLenString(String.valueOf(getNextSNo()), 6, '0', true);
+    	return SNO_PREFIX + date + SERVER_NO + KKTool.getFixedLenString(String.valueOf(getNextSNo()), ACC_DIGIT, '0', true);
     }
     
     /**

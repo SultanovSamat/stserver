@@ -30,6 +30,11 @@ public final class SQL {
     		                                                " TerminalId, PosId, SAMID, AgencyNo, SysTime) " +
     		                                                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, sysdate()) ";
     
+    //查询退款记录
+    public final static String QUERY_REFUND             = "select id " +
+                                                          "from tab_refund " + 
+                                                          "where terminalId = ? and cardNo = ? and refundTime = ? ";
+
     //增加退款明细
     public final static String ADD_REFUND               = "insert into tab_refund " +
     		                                                "(CardNo, Amount, RefundTime, Status, InsertTime, TerminalID, ChargeType) " +

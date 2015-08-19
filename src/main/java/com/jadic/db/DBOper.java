@@ -19,6 +19,7 @@ import com.jadic.cmd.req.CmdChargeDetailReq;
 import com.jadic.cmd.req.CmdClearCashBox;
 import com.jadic.cmd.req.CmdRefundReq;
 import com.jadic.utils.KKTool;
+import com.mysql.fabric.xmlrpc.base.Param;
 
 /**
  * 数据库操作
@@ -98,6 +99,24 @@ public final class DBOper extends DefaultDBImpl {
             logger.error("addNewChargeDetail fail", e);
         }
         return -1;
+    }
+    
+    /**
+     * 查询该退款请求是否已存储过
+     * @param refundReq
+     * @return 退款记录编号  0表示无该退款记录
+     */
+    public int queryRepeatedRefund(CmdRefundReq refundReq) {
+        List<Object> params = new ArrayList<Object>();
+        params.add(refundReq.getTerminalId());
+        params.add(KKTool.byteArrayToHexStr(refundReq.getCityCardNo()));
+        Date refundTime = KKTool.getBCDDateTime(refundReq.getTime(), 0);
+        params.add(new Timestamp(refundTime.getTime()));
+        List<IDBean> idList = queryForList(SQL.QUERY_REFUND, params, IDBean.class);
+        if (idList != null && idList.size() > 0) {
+            return idList.get(0).getId();
+        }
+        return 0;
     }
 
     /**

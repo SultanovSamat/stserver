@@ -43,6 +43,8 @@ public class SysParams {
     private String ftpUserName;
     private String ftpUserPass;
     private String ftpUploadDir;// 本地文件上传至FTP服务器上的目录
+    
+    private int serverNo;
 
     private List<JDBCConfig> jdbcList;
 
@@ -85,6 +87,10 @@ public class SysParams {
         this.ftpUserName = kkConfig.getStrValue("ftpUserName");
         this.ftpUserPass = kkConfig.getStrValue("ftpUserPass");
         this.ftpUploadDir = kkConfig.getStrValue("ftpUploadDir");
+        this.serverNo = kkConfig.getIntValue("serverNo");
+        if (this.serverNo > 9 || this.serverNo < 0) {
+            this.serverNo = 0;
+        }
     }
 
     /**
@@ -96,22 +102,24 @@ public class SysParams {
         String split = "\n                  * ";
         StringBuilder sBuilder = new StringBuilder();
         sBuilder.append(split);
-        sBuilder.append("jdbc.count=").append(this.jdbcList.size());
+        sBuilder.append("jdbc.count:").append(this.jdbcList.size());
         JDBCConfig jdbcConfig = null;
         for (int i = 0; i < this.jdbcList.size(); i++) {
             jdbcConfig = this.jdbcList.get(i);
             sBuilder.append(split);
-            sBuilder.append("jdbcUrl" + (i + 1)).append(jdbcConfig.getJdbcUrl());
+            sBuilder.append("jdbcUrl" + (i + 1)).append(":").append(jdbcConfig.getJdbcUrl());
             sBuilder.append(split);
-            sBuilder.append("jdbcDriver" + (i + 1)).append(jdbcConfig.getJdbcDriver());
+            sBuilder.append("jdbcDriver" + (i + 1)).append(":").append(jdbcConfig.getJdbcDriver());
             sBuilder.append(split);
-            sBuilder.append("dbUserName" + (i + 1)).append(jdbcConfig.getDbUserName());
+            sBuilder.append("dbUserName" + (i + 1)).append(":").append(jdbcConfig.getDbUserName());
             sBuilder.append(split);
-            sBuilder.append("dbUserPass" + (i + 1)).append(jdbcConfig.getDbUserPass());
+            sBuilder.append("dbUserPass" + (i + 1)).append(":").append(jdbcConfig.getDbUserPass());
         }
 
         sBuilder.append(split);
         sBuilder.append("localTcpPort:").append(this.localTcpPort);
+        sBuilder.append(split);
+        sBuilder.append("serverNo:").append(this.serverNo);
 
         return sBuilder.toString();
     }
@@ -201,6 +209,10 @@ public class SysParams {
 
     public String getSamId() {
         return samId;
+    }
+
+    public int getServerNo() {
+        return serverNo;
     }
 
 }
